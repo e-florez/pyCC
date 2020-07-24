@@ -45,13 +45,44 @@ for input_xyz in glob.glob('*.xyz'):
 
 list_xyz = ["w6s1.xyz"]
 
-# - reading coordinates fro XYZ file
+# - reading coordinates fro XYZ file (importing data with pandas)
+# ------------------------------------------------------------------
+# in a nutshell:
+# with Pandas we have 'num_atoms' lines, each of them has four columns
+# 'data_xyz.iloc[i,j]', where i=0,1,...,(num_atoms-1) and x=0,1,2,3
+# As a result, we have:
+#       data_xyz.iloc[i, 0] is the element (string type)
+#       data_xyz.iloc[i, 1] is a coordinate on the x-axis (float type)
+#       data_xyz.iloc[i, 2] is a coordinate on the y-axis (float type)
+#       data_xyz.iloc[i, 3] is a coordinate on the z-axis (float type)
+# ------------------------------------------------------------------
 for file_xyz in list_xyz:
-    atoms = pd.read_csv(file_xyz, nrows=1, header=None)
-    # importing data with pandas (skipping comments line; rsecond row)
+    num_atoms = pd.read_csv(file_xyz, nrows=1, header=None)
+    num_atoms = int(num_atoms.iloc[0])
+
     data_xyz = pd.read_csv(file_xyz, delim_whitespace=True,
                            skiprows=2, header=None)
 
-    # print(f'\n file: {file_xyz}\n atoms: {int(atoms.iloc[0])}')
-    # print(f'Pandas data is: \n{data_xyz.iloc[0,:]}\n')
-    # print(f'Pandas data is: \n{data_xyz.iloc[1,:]}\n')
+    # - Distance between two atoms
+    coordinates_a = np.zeros(3, dtype=float)
+    coordinates_b = np.zeros(3, dtype=float)
+
+    atom_a = 0
+    while atom_a < num_atoms:
+        # for atom_a
+        coordinates_a[0] = float(data_xyz.iloc[atom_a, 1])
+        coordinates_a[1] = float(data_xyz.iloc[atom_a, 2])
+        coordinates_a[2] = float(data_xyz.iloc[atom_a, 3])
+
+        atom_b = atom_a + 1
+        while atom_b < num_atoms:
+            # for atom_b
+            coordinates_b[0] = float(data_xyz.iloc[atom_b, 1])
+            coordinates_b[1] = float(data_xyz.iloc[atom_b, 2])
+            coordinates_b[2] = float(data_xyz.iloc[atom_b, 3])
+
+            # computing euclidean distance
+            distance = np.linalg.norm(coordinates_a - coordinates_b)
+
+            atom_b += 1
+        atom_a += 1
