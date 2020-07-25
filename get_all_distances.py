@@ -69,7 +69,21 @@ for file_xyz in list_xyz:
     num_atoms = int(num_atoms.iloc[0])
 
     data_xyz = pd.read_csv(file_xyz, delim_whitespace=True,
-                           skiprows=2, header=None)
+                           skiprows=2, header=None,
+                           names=["element", "x-coordinate", "y-coordinate", "z-coordinate"])
+
+    # - list of elemments
+    elements = data_xyz['element'].tolist()
+    elements_list = []
+    for atom in elements:
+        if atom not in elements_list:
+            elements_list.append(atom)
+
+    mercury = data_xyz[data_xyz['element'] == 'Hg']
+
+    print(mercury)
+
+    exit()
 
     # - Distance between two atoms
     coordinates_a = np.zeros(3, dtype=float)
@@ -92,10 +106,30 @@ for file_xyz in list_xyz:
             # computing euclidean distance
             distance = np.linalg.norm(coordinates_a - coordinates_b)
 
-            # Histogram analysis
-            distance_hit = int(round((distance - ro) / dr))
-            if distance_hit >= 0 and distance_hit < nbins:
-                occurences[distance, distance_hit] += 1
-
             atom_b += 1
         atom_a += 1
+
+    # atom_a = 0
+    # while atom_a < num_atoms:
+    #     # for atom_a
+    #     coordinates_a[0] = float(data_xyz.iloc[atom_a, 1])
+    #     coordinates_a[1] = float(data_xyz.iloc[atom_a, 2])
+    #     coordinates_a[2] = float(data_xyz.iloc[atom_a, 3])
+
+    #     atom_b = atom_a + 1
+    #     while atom_b < num_atoms:
+    #         # for atom_b
+    #         coordinates_b[0] = float(data_xyz.iloc[atom_b, 1])
+    #         coordinates_b[1] = float(data_xyz.iloc[atom_b, 2])
+    #         coordinates_b[2] = float(data_xyz.iloc[atom_b, 3])
+
+    #         # computing euclidean distance
+    #         distance = np.linalg.norm(coordinates_a - coordinates_b)
+
+    #         # Histogram analysis
+    #         distance_hit = int(round((distance - ro) / dr))
+    #         if distance_hit >= 0 and distance_hit < nbins:
+    #             occurences[distance, distance_hit] += 1
+
+    #         atom_b += 1
+    #     atom_a += 1
