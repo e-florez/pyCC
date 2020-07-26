@@ -43,15 +43,26 @@ for input_xyz in glob.glob('*.xyz'):
         if unique_input_xyz not in list_xyz:
             list_xyz.append(unique_input_xyz)
 
-list_xyz = ["w6s1.xyz"]
+# list_xyz = ["w6s1.xyz"]
+
+# - to plot
+fig = plt.figure()  # inches WxH, figsize=(7, 8)
+fig.suptitle('Histogram Analisys', fontsize=20, fontweight='bold')
+ax1 = plt.subplot()
+ax1.grid()
+
+# - legends for the main plot
+plt.ylabel('Ocurrence', fontsize=12, fontweight='bold')
+plt.xlabel('Bond Distance [Angstrom]',
+           fontsize=12, fontweight='bold')
 
 # - defining grid for the Histogram Analysis (number of occurences)
 ro = 0.0    # smallest interactomic distance
 rf = 15.0   # largest interactomic distance
-dr = 1.0   # grid points
+dr = 0.1   # grid points
 nbins = int((rf - ro) / dr)  # number of bins for the accurences
 # - array to storage occurences
-occurences = np.zeros([nbins, 2], dtype=float)
+occurences = np.zeros(nbins, dtype=int)
 
 # - reading coordinates fro XYZ file (importing data with pandas)
 for file_xyz in list_xyz:
@@ -70,6 +81,7 @@ for file_xyz in list_xyz:
 
     data_xyz = pd.read_csv(file_xyz, delim_whitespace=True,
                            skiprows=2, header=None,
+
                            names=["element", "x-coordinate", "y-coordinate", "z-coordinate"])
 
     # # - list of elements  ### mercury = data_xyz[data_xyz['element'] == 'Hg']
@@ -100,33 +112,23 @@ for file_xyz in list_xyz:
             # computing euclidean distance
             distance = np.linalg.norm(coordinates_a - coordinates_b)
 
-            atoms_pair = str(data_xyz.iloc[atom_a, 0]) + '-' + \
-                str(data_xyz.iloc[atom_b, 0])
+            # atoms_pair = str(data_xyz.iloc[atom_a, 0]) + '-' + \
+            #     str(data_xyz.iloc[atom_b, 0])
+
+            # Histogram analysis
+            distance_hit = int(round((distance - ro) / dr))
+            if distance_hit > 0 and distance_hit < nbins:
+                occurences[distance_hit] += 1
 
             atom_b += 1
         atom_a += 1
 
-    # atom_a = 0
-    # while atom_a < num_atoms:
-    #     # for atom_a
-    #     coordinates_a[0] = float(data_xyz.iloc[atom_a, 1])
-    #     coordinates_a[1] = float(data_xyz.iloc[atom_a, 2])
-    #     coordinates_a[2] = float(data_xyz.iloc[atom_a, 3])
+# - plotting
+bond_distance = np.linspace(ro, rf, nbins)
+ax1.plot(bond_distance, occurences)
 
-    #     atom_b = atom_a + 1
-    #     while atom_b < num_atoms:
-    #         # for atom_b
-    #         coordinates_b[0] = float(data_xyz.iloc[atom_b, 1])
-    #         coordinates_b[1] = float(data_xyz.iloc[atom_b, 2])
-    #         coordinates_b[2] = float(data_xyz.iloc[atom_b, 3])
+# - ENDING the plot
+plt.show()
 
-    #         # computing euclidean distance
-    #         distance = np.linalg.norm(coordinates_a - coordinates_b)
-
-    #         # Histogram analysis
-    #         distance_hit = int(round((distance - ro) / dr))
-    #         if distance_hit >= 0 and distance_hit < nbins:
-    #             occurences[distance, distance_hit] += 1
-
-    #         atom_b += 1
-    #     atom_a += 1
+# ---------------------------- END
+exit()
