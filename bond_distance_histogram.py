@@ -52,7 +52,7 @@ ax1 = plt.subplot()
 ax1.grid()
 
 # - legends for the main plot
-plt.ylabel('Ocurrence', fontsize=12, fontweight='bold')
+plt.ylabel('Number of Ocurrence', fontsize=12, fontweight='bold')
 plt.xlabel('Bond Distance [Angstrom]',
            fontsize=12, fontweight='bold')
 
@@ -81,7 +81,6 @@ for file_xyz in list_xyz:
 
     data_xyz = pd.read_csv(file_xyz, delim_whitespace=True,
                            skiprows=2, header=None,
-
                            names=["element", "x-coordinate", "y-coordinate", "z-coordinate"])
 
     # # - list of elements
