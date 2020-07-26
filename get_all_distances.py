@@ -72,18 +72,12 @@ for file_xyz in list_xyz:
                            skiprows=2, header=None,
                            names=["element", "x-coordinate", "y-coordinate", "z-coordinate"])
 
-    # - list of elemments
-    elements = data_xyz['element'].tolist()
-    elements_list = []
-    for atom in elements:
-        if atom not in elements_list:
-            elements_list.append(atom)
-
-    mercury = data_xyz[data_xyz['element'] == 'Hg']
-
-    print(mercury)
-
-    exit()
+    # # - list of elements  ### mercury = data_xyz[data_xyz['element'] == 'Hg']
+    # elements = data_xyz['element'].tolist()
+    # elements_list = []
+    # for atom in elements:
+    #     if atom not in elements_list:
+    #         elements_list.append(atom)
 
     # - Distance between two atoms
     coordinates_a = np.zeros(3, dtype=float)
@@ -105,6 +99,9 @@ for file_xyz in list_xyz:
 
             # computing euclidean distance
             distance = np.linalg.norm(coordinates_a - coordinates_b)
+
+            atoms_pair = str(data_xyz.iloc[atom_a, 0]) + '-' + \
+                str(data_xyz.iloc[atom_b, 0])
 
             atom_b += 1
         atom_a += 1
