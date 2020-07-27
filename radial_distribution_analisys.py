@@ -118,9 +118,6 @@ for file_xyz in list_xyz:
                            skiprows=2, header=None,
                            names=["element", "x-coordinate", "y-coordinate", "z-coordinate"])
 
-    # elements = data_xyz['element'].tolist()
-    # mercury = data_xyz[data_xyz['element'] == 'Hg']
-
     # - Distance between two atoms
     coordinates_a = np.zeros(3, dtype=float)
     coordinates_b = np.zeros(3, dtype=float)
@@ -160,10 +157,6 @@ for file_xyz in list_xyz:
 # - bond distance based on  the previous grid for the RDA
 bond_distance = np.linspace(ro, rf, nbins)
 
-# print(f'{sum(occurrences[0, 1, :])}')
-
-# exit()
-
 atom_a = 0
 while atom_a < len(elements_list):
     # - for the same type of atoms (if any)
@@ -190,13 +183,13 @@ while atom_a < len(elements_list):
     atom_a += 1
 
 # - Put a legend below current axis
-# plt.ylim(bottom=0.1)
 plt.legend(loc=0)
+
+# - x ticks
+ax1.xaxis.set_ticks(np.arange(ro, rf + 1, 0.5))
 
 # - ENDING the plot
 plt.show()
-
-# atom_a += 1
 
 print(f'\n *** DONE ***\n')
 # ---------------------------- END
