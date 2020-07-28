@@ -1,10 +1,10 @@
-#!/usr/bin/python3.6
+#!/usr/bin/python3
 
 # ------------------------------------------
 # July 2020
 #               edisonffh@gmail.com
 #
-# python3.6 script to compute bond length
+# python3 script to compute bond length
 # frecuency in Hg(H_2O)_n clusters
 #
 # ------------------------------------------
