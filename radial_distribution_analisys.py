@@ -82,7 +82,7 @@ unique_atoms = len(elements_list)
 #
 
 ro = 0.5    # smallest interactomic distance
-rf = 3.0   # largest interactomic distance
+rf = 5.0   # largest interactomic distance
 dr = 0.05   # grid points
 nbins = int((rf - ro) / dr)  # number of bins for the accurences
 # - array to storage occurrences
