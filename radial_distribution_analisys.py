@@ -82,8 +82,8 @@ unique_atoms = len(elements_list)
 #
 
 ro = 0.5    # smallest interactomic distance
-rf = 10.0   # largest interactomic distance
-dr = 0.2   # grid points
+rf = 3.0   # largest interactomic distance
+dr = 0.05   # grid points
 nbins = int((rf - ro) / dr)  # number of bins for the accurences
 # - array to storage occurrences
 occurrences = np.zeros([unique_atoms, unique_atoms, nbins], dtype=int)
@@ -143,10 +143,11 @@ for file_xyz in list_xyz:
             # computing euclidean distance
             distance = np.linalg.norm(coordinates_a - coordinates_b)
 
-            # Radial distribution analysis
-            distance_hit = int(round((distance - ro) / dr))
-            if distance_hit > 0 and distance_hit < nbins:
-                occurrences[element_a, element_b, distance_hit] += 1
+            if distance <= 2.5:
+                # Radial distribution analysis
+                distance_hit = int(round((distance - ro) / dr))
+                if distance_hit > 0 and distance_hit < nbins:
+                    occurrences[element_a, element_b, distance_hit] += 1
 
             atom_b += 1
         atom_a += 1
