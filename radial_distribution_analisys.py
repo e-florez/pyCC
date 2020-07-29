@@ -46,7 +46,7 @@ for input_xyz in glob.glob('*.xyz'):
         if unique_input_xyz not in list_xyz:
             list_xyz.append(unique_input_xyz)
 
-list_xyz = ["w6s41.xyz"]
+# list_xyz = ["w6s41.xyz"]
 
 # - checking if files exist
 
@@ -85,12 +85,14 @@ unique_atoms = len(elements_list)
 #
 #
 
-ro = 0.5    # smallest interactomic distance
-rf = 3.0   # largest interactomic distance
+ro = 0.6    # smallest interactomic distance
+rf = 3.5   # largest interactomic distance
 dr = 0.05   # grid points
 nbins = int((rf - ro) / dr)  # number of bins for the accurences
 # - array to storage occurrences
 occurrences = np.zeros([unique_atoms, unique_atoms, nbins], dtype=int)
+
+print(f'BSpline used for the RDA with a grid between {ro}-{rf} Angstroms\n')
 
 # - reading coordinates for XYZ file (importing data with pandas)
 for file_xyz in list_xyz:
@@ -157,10 +159,10 @@ for file_xyz in list_xyz:
         atom_a += 1
 
 # - Continue ONLY if any distance was found
-if sum(occurrences[0, 0, :]) < 1:
-    exit(f'\n *** ERROR *** \
-        \n No distance was found between those atoms {elements_list} \
-        \n Please, check files: {list_xyz}\n')
+# if sum(occurrences[0, 0, :]) < 1:
+#     exit(f'\n *** ERROR *** \
+#         \n No distance was found between those atoms {elements_list} \
+#         \n Please, check files: {list_xyz}\n')
 
 # ----------------------------------------------
 # - to plot
@@ -178,7 +180,7 @@ plt.xlabel('Bond Length [Angstrom]',
 bond_distance = np.linspace(ro, rf, nbins)
 
 # - to smooth the curve (BSpline)
-
+smooth_bond_distance = np.linspace(ro, rf, nbins * 1000)
 
 # - plotting
 atom_a = 0
@@ -190,8 +192,14 @@ while atom_a < len(elements_list):
     # - avoiding to plot empty results
     if all_elements or len(elements_list) == 1:
         if sum(occurrences[atom_a, atom_a, :]) > 1:
-            ax1.plot(bond_distance, occurrences[atom_a,
-                                                atom_a, :], label=r'%s' % (atoms_pair))
+            # ax1.plot(bond_distance, occurrences[atom_a,
+            #                                     atom_a, :], label=r'%s' % (atoms_pair))
+
+            # smooth curve BSpline, degree k=3, cubic
+            smooth = make_interp_spline(bond_distance, occurrences[atom_a, atom_a, :], k=3)
+            smooth_occurrences = smooth(smooth_bond_distance)
+            ax1.plot(smooth_bond_distance,
+                        smooth_occurrences, label=r'%s' % (atoms_pair))
 
     # - for different pair of atoms
     atom_b = atom_a + 1
@@ -199,8 +207,14 @@ while atom_a < len(elements_list):
         atoms_pair = elements_list[atom_a] + '-' + \
             elements_list[atom_b]
 
-        ax1.plot(bond_distance,
-                 occurrences[atom_a, atom_b, :], label=r'%s' % (atoms_pair))
+        # ax1.plot(bond_distance,
+        #          occurrences[atom_a, atom_b, :], label=r'%s' % (atoms_pair))
+        
+        # smooth curve BSpline, degree k=3, cubic
+        smooth = make_interp_spline(bond_distance, occurrences[atom_a, atom_b, :], k=3)
+        smooth_occurrences = smooth(smooth_bond_distance)        
+        ax1.plot(smooth_bond_distance,
+                 smooth_occurrences, label=r'%s' % (atoms_pair))
 
         atom_b += 1
     atom_a += 1
@@ -212,7 +226,7 @@ plt.legend(loc=0)
 ax1.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
 
 # - x ticks
-ax1.xaxis.set_ticks(np.arange(ro, rf + 1, 0.5))
+ax1.xaxis.set_ticks(np.arange(ro, rf, 0.2))
 
 # - ENDING the plot
 plt.show()
