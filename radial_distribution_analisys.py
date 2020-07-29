@@ -30,6 +30,7 @@ rc('text', usetex=True)   # --- enable TeX mode for matplotlib
 # -----------------------------------
 # ------ body
 # -----------------------------------
+print(f'\nRadial Distribution Analisys (RDA) for XYZ files\n')
 
 # - list for xyz files
 repited_list_xyz = []  # repited files (if any)
@@ -48,18 +49,19 @@ for input_xyz in glob.glob('*.xyz'):
 # list_xyz = ["w6s1.xyz"]
 
 # - Elements list to do radial distribution analisys
-input_elements = input(f'List of atoms (separated by space)\n \
-    to make the Radial Distribution Analisys [Default: all]: ')
-# print(f'\n')
-
-elements = input_elements.split()
+input_elements = input(
+    f'List of atoms, **separated by space** [Default: all]: ')
 
 # - by default reading elements for the first XYZ file
-if len(elements) < 1:
+all_elements = False
+if len(input_elements.split()) < 1 or input_elements == 'all':
+    all_elements = True
     elements = pd.read_csv(list_xyz[0], delim_whitespace=True,
                            skiprows=2, header=None,
                            names=["element", "x-coordinate", "y-coordinate", "z-coordinate"])
     elements = elements['element'].tolist()
+else:
+    elements = input_elements.split()
 
 elements_list = []
 # - list of elements (uniques)
@@ -77,7 +79,7 @@ unique_atoms = len(elements_list)
 
 # - defining grid for the Radial Distribution Analysis (number of occurrences)
 #
-#
+#    ???????????????
 #
 #
 
@@ -87,17 +89,6 @@ dr = 0.05   # grid points
 nbins = int((rf - ro) / dr)  # number of bins for the accurences
 # - array to storage occurrences
 occurrences = np.zeros([unique_atoms, unique_atoms, nbins], dtype=int)
-
-# - to plot
-fig = plt.figure()  # inches WxH, figsize=(7, 8)
-fig.suptitle('Radial Distribution Analisys', fontsize=20, fontweight='bold')
-ax1 = plt.subplot()
-ax1.grid()
-
-# - legends for the main plot
-plt.ylabel('Number of Ocurrences', fontsize=12, fontweight='bold')
-plt.xlabel('Bond Length [Angstrom]',
-           fontsize=12, fontweight='bold')
 
 # - reading coordinates for XYZ file (importing data with pandas)
 for file_xyz in list_xyz:
@@ -114,9 +105,15 @@ for file_xyz in list_xyz:
     num_atoms = pd.read_csv(file_xyz, nrows=1, header=None)
     num_atoms = int(num_atoms.iloc[0])
 
-    data_xyz = pd.read_csv(file_xyz, delim_whitespace=True,
-                           skiprows=2, header=None,
-                           names=["element", "x-coordinate", "y-coordinate", "z-coordinate"])
+    data_xyz_all = pd.read_csv(file_xyz, delim_whitespace=True,
+                               skiprows=2, header=None,
+                               names=["element", "x-coordinate", "y-coordinate", "z-coordinate"])
+
+    # - filtering to do the RDA for the atoms in the list
+    data_xyz = data_xyz_all[data_xyz_all.element.isin(elements_list)]
+
+    if num_atoms != data_xyz.shape[0]:
+        num_atoms = data_xyz.shape[0]
 
     # - Distance between two atoms
     coordinates_a = np.zeros(3, dtype=float)
@@ -155,6 +152,17 @@ for file_xyz in list_xyz:
 # ----------------------------------------------
 # - plotting
 
+# - to plot
+fig = plt.figure()  # inches WxH, figsize=(7, 8)
+fig.suptitle('Radial Distribution Analisys', fontsize=20, fontweight='bold')
+ax1 = plt.subplot()
+ax1.grid()
+
+# - legends for the main plot
+plt.ylabel('Number of Ocurrences', fontsize=12, fontweight='bold')
+plt.xlabel('Bond Length [Angstrom]',
+           fontsize=12, fontweight='bold')
+
 # - bond distance based on  the previous grid for the RDA
 bond_distance = np.linspace(ro, rf, nbins)
 
@@ -165,10 +173,10 @@ while atom_a < len(elements_list):
         elements_list[atom_a]
 
     # - avoiding to plot empty results
-    if sum(occurrences[atom_a, atom_a, :]) > 1:
-        ax1.plot(bond_distance, occurrences[atom_a,
-                                            atom_a, :], label=r'%s' % (atoms_pair))
-        ax1.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
+    if all_elements or len(elements_list) == 1:
+        if sum(occurrences[atom_a, atom_a, :]) > 1:
+            ax1.plot(bond_distance, occurrences[atom_a,
+                                                atom_a, :], label=r'%s' % (atoms_pair))
 
     # - for different pair of atoms
     atom_b = atom_a + 1
@@ -178,13 +186,15 @@ while atom_a < len(elements_list):
 
         ax1.plot(bond_distance,
                  occurrences[atom_a, atom_b, :], label=r'%s' % (atoms_pair))
-        ax1.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
 
         atom_b += 1
     atom_a += 1
 
 # - Put a legend below current axis
 plt.legend(loc=0)
+
+# - y axis scale
+ax1.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
 
 # - x ticks
 ax1.xaxis.set_ticks(np.arange(ro, rf + 1, 0.5))
