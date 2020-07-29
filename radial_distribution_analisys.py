@@ -46,7 +46,9 @@ for input_xyz in glob.glob('*.xyz'):
         if unique_input_xyz not in list_xyz:
             list_xyz.append(unique_input_xyz)
 
-# list_xyz = ["w6s1.xyz"]
+list_xyz = ["w6s41.xyz"]
+
+# - checking if files exist
 
 # - Elements list to do radial distribution analisys
 input_elements = input(
@@ -70,7 +72,7 @@ for atom in elements:
         elements_list.append(atom)
 
 if len(elements_list) > 0:
-    print(f'List of atoms to make the RDA: {elements_list}')
+    print(f'\nList of atoms to make the RDA: {elements_list}')
 else:
     exit(f'\n *** ERROR ***\n No atoms found \n')
 
@@ -108,6 +110,11 @@ for file_xyz in list_xyz:
     data_xyz_all = pd.read_csv(file_xyz, delim_whitespace=True,
                                skiprows=2, header=None,
                                names=["element", "x-coordinate", "y-coordinate", "z-coordinate"])
+
+    # - checking coordinates within file
+    if data_xyz_all.shape[0] <= 1:
+        print(f'\n *** WARNING *** \
+            \n Any data was found in {file_xyz}, please, check this files: \n')
 
     # - filtering to do the RDA for the atoms in the list
     data_xyz = data_xyz_all[data_xyz_all.element.isin(elements_list)]
@@ -149,9 +156,13 @@ for file_xyz in list_xyz:
             atom_b += 1
         atom_a += 1
 
-# ----------------------------------------------
-# - plotting
+# - Continue ONLY if any distance was found
+if sum(occurrences[0, 0, :]) < 1:
+    exit(f'\n *** ERROR *** \
+        \n No distance was found between those atoms {elements_list} \
+        \n Please, check files: {list_xyz}\n')
 
+# ----------------------------------------------
 # - to plot
 fig = plt.figure()  # inches WxH, figsize=(7, 8)
 fig.suptitle('Radial Distribution Analisys', fontsize=20, fontweight='bold')
@@ -166,6 +177,10 @@ plt.xlabel('Bond Length [Angstrom]',
 # - bond distance based on  the previous grid for the RDA
 bond_distance = np.linspace(ro, rf, nbins)
 
+# - to smooth the curve (BSpline)
+
+
+# - plotting
 atom_a = 0
 while atom_a < len(elements_list):
     # - for the same type of atoms (if any)
