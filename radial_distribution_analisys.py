@@ -69,6 +69,7 @@ elements_list = []
 # - list of elements (uniques)
 for atom in elements:
     if atom not in elements_list:
+        atom = atom.upper()
         elements_list.append(atom)
 
 if len(elements_list) > 0:
