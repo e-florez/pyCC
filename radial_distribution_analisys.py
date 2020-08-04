@@ -69,7 +69,7 @@ elements_list = []
 # - list of elements (uniques)
 for atom in elements:
     if atom not in elements_list:
-        atom = atom.upper()
+        atom = atom.capitalize()
         elements_list.append(atom)
 
 if len(elements_list) > 0:
@@ -159,29 +159,14 @@ for file_xyz in list_xyz:
             atom_b += 1
         atom_a += 1
 
-# - Continue ONLY if any distance was found
-# if sum(occurrences[0, 0, :]) < 1:
-#     exit(f'\n *** ERROR *** \
-#         \n No distance was found between those atoms {elements_list} \
-#         \n Please, check files: {list_xyz}\n')
-
 # ----------------------------------------------
-# - to plot
-fig = plt.figure()  # inches WxH, figsize=(7, 8)
-fig.suptitle('Radial Distribution Analisys', fontsize=20, fontweight='bold')
-ax1 = plt.subplot()
-ax1.grid()
-
-# - legends for the main plot
-plt.ylabel('Number of Ocurrences', fontsize=12, fontweight='bold')
-plt.xlabel('Bond Length [Angstrom]',
-           fontsize=12, fontweight='bold')
+# # - to plot
 
 # - bond distance based on  the previous grid for the RDA
 bond_distance = np.linspace(ro, rf, nbins)
 
 # - to smooth the curve (BSpline)
-smooth_bond_distance = np.linspace(ro, rf, nbins * 1000)
+smooth_bond_distance = np.linspace(ro, rf, nbins * 100)
 
 # - plotting
 atom_a = 0
@@ -192,15 +177,36 @@ while atom_a < len(elements_list):
 
     # - avoiding to plot empty results
     if all_elements or len(elements_list) == 1:
-        if sum(occurrences[atom_a, atom_a, :]) > 1:
+        if sum(occurrences[atom_a, atom_a, :]) > 0:
+
+            # - to plot
+            fig = plt.figure()  # inches WxH, figsize=(7, 8)
+            fig.suptitle('Radial Distribution Analisys',
+                         fontsize=20, fontweight='bold')
+            ax1 = plt.subplot()
+            ax1.grid()
+
+            # - legends for the main plot
+            plt.ylabel('Number of Ocurrences', fontsize=12, fontweight='bold')
+            plt.xlabel('Bond Length [Angstrom]',
+                       fontsize=12, fontweight='bold')
+
             # ax1.plot(bond_distance, occurrences[atom_a,
             #                                     atom_a, :], label=r'%s' % (atoms_pair))
 
             # smooth curve BSpline, degree k=3, cubic
-            smooth = make_interp_spline(bond_distance, occurrences[atom_a, atom_a, :], k=3)
+            smooth = make_interp_spline(
+                bond_distance, occurrences[atom_a, atom_a, :], k=3)
             smooth_occurrences = smooth(smooth_bond_distance)
             ax1.plot(smooth_bond_distance,
-                        smooth_occurrences, label=r'%s' % (atoms_pair))
+                     smooth_occurrences, label=r'%s' % (atoms_pair))
+
+            # - Put a legend below current axis
+            plt.legend(loc=0)
+            # - y axis scale
+            ax1.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
+            # - x ticks
+            ax1.xaxis.set_ticks(np.arange(ro, rf, 0.2))
 
     # - for different pair of atoms
     atom_b = atom_a + 1
@@ -208,28 +214,41 @@ while atom_a < len(elements_list):
         atoms_pair = elements_list[atom_a] + '-' + \
             elements_list[atom_b]
 
-        # ax1.plot(bond_distance,
-        #          occurrences[atom_a, atom_b, :], label=r'%s' % (atoms_pair))
-        
-        # smooth curve BSpline, degree k=3, cubic
-        smooth = make_interp_spline(bond_distance, occurrences[atom_a, atom_b, :], k=3)
-        smooth_occurrences = smooth(smooth_bond_distance)        
-        ax1.plot(smooth_bond_distance,
-                 smooth_occurrences, label=r'%s' % (atoms_pair))
+        if sum(occurrences[atom_a, atom_b, :]) > 0:
+
+            # - to plot
+            fig = plt.figure()  # inches WxH, figsize=(7, 8)
+            fig.suptitle('Radial Distribution Analisys',
+                         fontsize=20, fontweight='bold')
+            ax1 = plt.subplot()
+            ax1.grid()
+
+            # - legends for the main plot
+            plt.ylabel('Number of Ocurrences', fontsize=12, fontweight='bold')
+            plt.xlabel('Bond Length [Angstrom]',
+                       fontsize=12, fontweight='bold')
+
+            # ax1.plot(bond_distance,
+            #          occurrences[atom_a, atom_b, :], label=r'%s' % (atoms_pair))
+
+            # smooth curve BSpline, degree k=3, cubic
+            smooth = make_interp_spline(
+                bond_distance, occurrences[atom_a, atom_b, :], k=3)
+            smooth_occurrences = smooth(smooth_bond_distance)
+            ax1.plot(smooth_bond_distance,
+                     smooth_occurrences, label=r'%s' % (atoms_pair))
+
+            # - Put a legend below current axis
+            plt.legend(loc=0)
+            # - y axis scale
+            ax1.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
+            # - x ticks
+            ax1.xaxis.set_ticks(np.arange(ro, rf, 0.2))
 
         atom_b += 1
     atom_a += 1
 
-# - Put a legend below current axis
-plt.legend(loc=0)
-
-# - y axis scale
-ax1.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
-
-# - x ticks
-ax1.xaxis.set_ticks(np.arange(ro, rf, 0.2))
-
-# - ENDING the plot
+# - ENDING the plots
 plt.show()
 
 print(f'\n *** DONE ***\n')
