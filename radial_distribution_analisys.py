@@ -13,6 +13,7 @@
 # ------ moules
 # -----------------------------------
 
+import os.path  # - to check id a file or dir exits -> os.path.exists()
 # -  to smooth out your data
 from scipy.interpolate import make_interp_spline, BSpline
 # - Unix style pathname pattern expansion
@@ -46,9 +47,15 @@ for input_xyz in glob.glob('*.xyz'):
         if unique_input_xyz not in list_xyz:
             list_xyz.append(unique_input_xyz)
 
-# list_xyz = ["w6s41.xyz"]
+list_xyz = ["w1s1.xyz"]
 
 # - checking if files exist
+if len(list_xyz) > 0:
+    for input_xyz in list_xyz:
+        if not os.path.exists(input_xyz):
+            exit(f' *** ERROR ***\n file {input_xyz} does not exits \n')
+else:
+    exit(f' *** ERROR ***\n any file was found in {list_xyz} \n')
 
 # - Elements list to do radial distribution analisys
 input_elements = input(
@@ -189,11 +196,12 @@ while atom_a < len(elements_list):
         if total_bond > 0:
 
             # - saving RDA
-            np.savetxt('rda_' + atoms_pair + '.dat',
+            np.savetxt(atoms_pair + '_rda' + '.dat',
                        np.transpose(
                            [bond_distance, occurrences[atom_a, atom_a, :]]),
-                       delimiter=' ', header='distance [Angstrom]     occurrence',
-                       fmt='%.3f %28i')
+                       delimiter=' ',
+                       header='distance [Angstrom]   occurrence (total=%i)' % total_bond,
+                       fmt='%.6f %28i')
 
             # - to plot
             fig = plt.figure()  # inches WxH, figsize=(7, 8)
@@ -236,11 +244,12 @@ while atom_a < len(elements_list):
         if total_bond > 0:
 
             # - saving RDA
-            np.savetxt('rda_' + atoms_pair + '.dat',
+            np.savetxt(atoms_pair + '_rda' + '.dat',
                        np.transpose(
                            [bond_distance, occurrences[atom_a, atom_b, :]]),
-                       delimiter=' ', header='distance [Angstrom]     occurrence',
-                       fmt='%.3f %28i')
+                       delimiter=' ',
+                       header='distance [Angstrom]   occurrence (total=%i)' % total_bond,
+                       fmt='%.6f %28i')
 
             # - to plot
             fig = plt.figure()  # inches WxH, figsize=(7, 8)
