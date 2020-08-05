@@ -90,10 +90,17 @@ ro = 0.6    # smallest interactomic distance
 rf = 3.5   # largest interactomic distance
 dr = 0.05   # grid points
 nbins = int((rf - ro) / dr)  # number of bins for the accurences
+
+# - points to use BSpline
+bs_points = 100
+
 # - array to storage occurrences
 occurrences = np.zeros([unique_atoms, unique_atoms, nbins], dtype=int)
 
-print(f'BSpline used for the RDA with a grid between {ro}-{rf} Angstroms\n')
+print()
+print(f'RDA with {nbins} bins, grid {dr} between {ro}-{rf} Angstroms')
+print(f'BSpline used for the RDA with {bs_points} points')
+print()
 
 # - reading coordinates for XYZ file (importing data with pandas)
 for file_xyz in list_xyz:
@@ -117,7 +124,7 @@ for file_xyz in list_xyz:
     # - checking coordinates within file
     if data_xyz_all.shape[0] <= 1:
         print(f'\n *** WARNING *** \
-            \n Any data was found in {file_xyz}, please, check this files: \n')
+            \n data was found in {file_xyz}, please, check this files: \n')
 
     # - filtering to do the RDA for the atoms in the list
     data_xyz = data_xyz_all[data_xyz_all.element.isin(elements_list)]
@@ -160,34 +167,44 @@ for file_xyz in list_xyz:
         atom_a += 1
 
 # ----------------------------------------------
-# # - to plot
 
 # - bond distance based on  the previous grid for the RDA
 bond_distance = np.linspace(ro, rf, nbins)
-
 # - to smooth the curve (BSpline)
-smooth_bond_distance = np.linspace(ro, rf, nbins * 100)
+smooth_bond_distance = np.linspace(ro, rf, nbins * bs_points)
 
-# - plotting
+# ----------------------------------------------
+# - plotting & saving
+
 atom_a = 0
 while atom_a < len(elements_list):
     # - for the same type of atoms (if any)
     atoms_pair = elements_list[atom_a] + '-' + \
         elements_list[atom_a]
 
+    total_bond = sum(occurrences[atom_a, atom_a, :])
+
     # - avoiding to plot empty results
     if all_elements or len(elements_list) == 1:
-        if sum(occurrences[atom_a, atom_a, :]) > 0:
+        if total_bond > 0:
+
+            # - saving RDA
+            np.savetxt('rda_' + atoms_pair + '.dat',
+                       np.transpose(
+                           [bond_distance, occurrences[atom_a, atom_a, :]]),
+                       delimiter=' ', header='distance [Angstrom]     occurrence',
+                       fmt='%.3f %28i')
 
             # - to plot
             fig = plt.figure()  # inches WxH, figsize=(7, 8)
-            fig.suptitle('Radial Distribution Analisys',
+            fig.suptitle('Radial Distribution Analisys \n \small{Total distances= %i}' % total_bond,
                          fontsize=20, fontweight='bold')
             ax1 = plt.subplot()
             ax1.grid()
 
             # - legends for the main plot
-            plt.ylabel('Number of Ocurrences', fontsize=12, fontweight='bold')
+            plt.ylabel('Relative Number of Ocurrences',
+                       fontsize=12, fontweight='bold')
             plt.xlabel('Bond Length [Angstrom]',
                        fontsize=12, fontweight='bold')
 
@@ -199,12 +216,12 @@ while atom_a < len(elements_list):
                 bond_distance, occurrences[atom_a, atom_a, :], k=3)
             smooth_occurrences = smooth(smooth_bond_distance)
             ax1.plot(smooth_bond_distance,
-                     smooth_occurrences, label=r'%s' % (atoms_pair))
+                     smooth_occurrences / total_bond, label='%s' % (atoms_pair))
 
             # - Put a legend below current axis
             plt.legend(loc=0)
             # - y axis scale
-            ax1.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
+            # ax1.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
             # - x ticks
             ax1.xaxis.set_ticks(np.arange(ro, rf, 0.2))
 
@@ -214,17 +231,27 @@ while atom_a < len(elements_list):
         atoms_pair = elements_list[atom_a] + '-' + \
             elements_list[atom_b]
 
-        if sum(occurrences[atom_a, atom_b, :]) > 0:
+        total_bond = sum(occurrences[atom_a, atom_b, :])
+
+        if total_bond > 0:
+
+            # - saving RDA
+            np.savetxt('rda_' + atoms_pair + '.dat',
+                       np.transpose(
+                           [bond_distance, occurrences[atom_a, atom_b, :]]),
+                       delimiter=' ', header='distance [Angstrom]     occurrence',
+                       fmt='%.3f %28i')
 
             # - to plot
             fig = plt.figure()  # inches WxH, figsize=(7, 8)
-            fig.suptitle('Radial Distribution Analisys',
+            fig.suptitle('Radial Distribution Analisys \n \small{Total distances= %i}' % total_bond,
                          fontsize=20, fontweight='bold')
             ax1 = plt.subplot()
             ax1.grid()
 
             # - legends for the main plot
-            plt.ylabel('Number of Ocurrences', fontsize=12, fontweight='bold')
+            plt.ylabel('Relative Number of Ocurrences',
+                       fontsize=12, fontweight='bold')
             plt.xlabel('Bond Length [Angstrom]',
                        fontsize=12, fontweight='bold')
 
@@ -236,12 +263,12 @@ while atom_a < len(elements_list):
                 bond_distance, occurrences[atom_a, atom_b, :], k=3)
             smooth_occurrences = smooth(smooth_bond_distance)
             ax1.plot(smooth_bond_distance,
-                     smooth_occurrences, label=r'%s' % (atoms_pair))
+                     smooth_occurrences / total_bond, label='%s' % (atoms_pair))
 
             # - Put a legend below current axis
             plt.legend(loc=0)
             # - y axis scale
-            ax1.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
+            # ax1.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
             # - x ticks
             ax1.xaxis.set_ticks(np.arange(ro, rf, 0.2))
 
