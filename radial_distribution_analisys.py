@@ -95,7 +95,7 @@ unique_atoms = len(elements_list)
 
 ro = 0.6    # smallest interactomic distance
 rf = 3.5   # largest interactomic distance
-dr = 0.05   # grid points
+dr = 0.5   # grid points
 nbins = int((rf - ro) / dr)  # number of bins for the accurences
 
 # - points to use BSpline
@@ -136,6 +136,7 @@ for file_xyz in list_xyz:
     # - filtering to do the RDA for the atoms in the list
     data_xyz = data_xyz_all[data_xyz_all.element.isin(elements_list)]
 
+    # - to show only asked atoms
     if num_atoms != data_xyz.shape[0]:
         num_atoms = data_xyz.shape[0]
 
@@ -170,8 +171,33 @@ for file_xyz in list_xyz:
                 if distance_hit > 0 and distance_hit < nbins:
                     occurrences[element_a, element_b, distance_hit] += 1
 
+                    # print(
+                    #     f'atom pair: {elements_list[element_a]} - {elements_list[element_b]}')
+                    # print(occurrences[element_a, element_b, :])
+
             atom_b += 1
         atom_a += 1
+
+
+atom_a = 0
+while atom_a < len(elements_list):
+    element_a = elements_list.index(str(data_xyz.iloc[atom_a, 0]))
+    atom_b = atom_a + 1
+    while atom_b < len(elements_list):
+        element_b = elements_list.index(str(data_xyz.iloc[atom_b, 0]))
+        print(
+            f'atom pair: {elements_list[element_a]} - {elements_list[element_b]}')
+        print(occurrences[element_a, element_b, :])
+        print()
+        print('sum atoms', atom_a, atom_b, sum(occurrences[atom_a, atom_b, :]))
+        print()
+        print('sum elements', element_a, element_b,
+              sum(occurrences[element_a, element_b, :]))
+
+        atom_b += 1
+    atom_a += 1
+
+exit()
 
 # ----------------------------------------------
 
@@ -182,7 +208,6 @@ smooth_bond_distance = np.linspace(ro, rf, nbins * bs_points)
 
 # ----------------------------------------------
 # - plotting & saving
-
 atom_a = 0
 while atom_a < len(elements_list):
     # - for the same type of atoms (if any)
@@ -205,7 +230,7 @@ while atom_a < len(elements_list):
 
             # - to plot
             fig = plt.figure()  # inches WxH, figsize=(7, 8)
-            fig.suptitle('Radial Distribution Analisys \n \small{Total distances= %i}' % total_bond,
+            fig.suptitle('Radial Distribution Analisys \n' + r'\small{Total distances= %i}' % total_bond,
                          fontsize=20, fontweight='bold')
             ax1 = plt.subplot()
             ax1.grid()
@@ -241,19 +266,27 @@ while atom_a < len(elements_list):
 
         total_bond = sum(occurrences[atom_a, atom_b, :])
 
+        # - saving RDA
+        np.savetxt(atoms_pair + '_rda' + '.dat',
+                   np.transpose(
+                       [bond_distance, occurrences[atom_a, atom_b, :]]),
+                   delimiter=' ',
+                   header='distance [Angstrom]   occurrence (total=%i)' % total_bond,
+                   fmt='%.6f %28i')
+
         if total_bond > 0:
 
-            # - saving RDA
-            np.savetxt(atoms_pair + '_rda' + '.dat',
-                       np.transpose(
-                           [bond_distance, occurrences[atom_a, atom_b, :]]),
-                       delimiter=' ',
-                       header='distance [Angstrom]   occurrence (total=%i)' % total_bond,
-                       fmt='%.6f %28i')
+            # # - saving RDA
+            # np.savetxt(atoms_pair + '_rda' + '.dat',
+            #            np.transpose(
+            #                [bond_distance, occurrences[atom_a, atom_b, :]]),
+            #            delimiter=' ',
+            #            header='distance [Angstrom]   occurrence (total=%i)' % total_bond,
+            #            fmt='%.6f %28i')
 
             # - to plot
             fig = plt.figure()  # inches WxH, figsize=(7, 8)
-            fig.suptitle('Radial Distribution Analisys \n \small{Total distances= %i}' % total_bond,
+            fig.suptitle('Radial Distribution Analisys \n' + r'\small{Total distances= %i}' % total_bond,
                          fontsize=20, fontweight='bold')
             ax1 = plt.subplot()
             ax1.grid()
