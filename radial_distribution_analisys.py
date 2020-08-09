@@ -47,7 +47,7 @@ for input_xyz in glob.glob('*.xyz'):
         if unique_input_xyz not in list_xyz:
             list_xyz.append(unique_input_xyz)
 
-list_xyz = ["w1s1.xyz"]
+# list_xyz = ["w1s1.xyz"]
 
 # - checking if files exist
 if len(list_xyz) > 0:
@@ -76,8 +76,10 @@ elements_list = []
 # - list of elements (uniques)
 for atom in elements:
     if atom not in elements_list:
-        atom = atom.capitalize()
         elements_list.append(atom)
+
+
+elements_list = [ atom.capitalize() for atom in elements_list ]
 
 if len(elements_list) > 0:
     print(f'\nList of atoms to make the RDA: {elements_list}')
@@ -95,14 +97,14 @@ unique_atoms = len(elements_list)
 
 ro = 0.6    # smallest interactomic distance
 rf = 3.5   # largest interactomic distance
-dr = 0.5   # grid points
+dr = 0.05   # grid points
 nbins = int((rf - ro) / dr)  # number of bins for the accurences
 
 # - points to use BSpline
 bs_points = 100
 
 # - array to storage occurrences
-occurrences = np.zeros([unique_atoms, unique_atoms, nbins], dtype=int)
+occurrences = np.zeros((unique_atoms, unique_atoms, nbins), dtype=int)
 
 print()
 print(f'RDA with {nbins} bins, grid {dr} between {ro}-{rf} Angstroms')
@@ -130,11 +132,16 @@ for file_xyz in list_xyz:
 
     # - checking coordinates within file
     if data_xyz_all.shape[0] <= 1:
-        print(f'\n *** WARNING *** \
-            \n data was found in {file_xyz}, please, check this files: \n')
+        print(f'\n *** WARNING *** \n data was found in {file_xyz}, please, check this files: \n')
 
-    # - filtering to do the RDA for the atoms in the list
-    data_xyz = data_xyz_all[data_xyz_all.element.isin(elements_list)]
+    # - filtering to do the RDA for the atoms in the list (case insensitive)
+    data_xyz = data_xyz_all[data_xyz_all.element.str.capitalize().isin(elements_list)]
+
+    # - Warning elements not in the input list
+    no_elements = data_xyz_all[~data_xyz_all.element.str.capitalize().isin(elements_list)]
+    print(f'*** Warning ***')
+    print(f'element {elements_list} not found {file_xyz} \n')
+    print(no_elements.to_string(index=False, float_format='%.10f'))
 
     # - to show only asked atoms
     if num_atoms != data_xyz.shape[0]:
@@ -173,31 +180,34 @@ for file_xyz in list_xyz:
 
                     # print(
                     #     f'atom pair: {elements_list[element_a]} - {elements_list[element_b]}')
-                    # print(occurrences[element_a, element_b, :])
+                    # print(occurrences)
+                    # print()
 
             atom_b += 1
         atom_a += 1
 
+# print('shape', occurrences[:, :, :])
 
-atom_a = 0
-while atom_a < len(elements_list):
-    element_a = elements_list.index(str(data_xyz.iloc[atom_a, 0]))
-    atom_b = atom_a + 1
-    while atom_b < len(elements_list):
-        element_b = elements_list.index(str(data_xyz.iloc[atom_b, 0]))
-        print(
-            f'atom pair: {elements_list[element_a]} - {elements_list[element_b]}')
-        print(occurrences[element_a, element_b, :])
-        print()
-        print('sum atoms', atom_a, atom_b, sum(occurrences[atom_a, atom_b, :]))
-        print()
-        print('sum elements', element_a, element_b,
-              sum(occurrences[element_a, element_b, :]))
+# exit()
 
-        atom_b += 1
-    atom_a += 1
+# atom_a = 0
+# while atom_a < len(elements_list):
+#     element_a = elements_list[atom_a]
+#     atom_b = atom_a + 1
+#     while atom_b < len(elements_list):
+#         element_b = elements_list[atom_b]
+#         print(
+#             f'atom pair: {elements_list[atom_a]} - {elements_list[atom_b]}')
+#         print(occurrences[atom_a, atom_b, :])
+#         print()
+#         print('sum atoms', atom_a, atom_b, sum(occurrences[atom_a, atom_b, :]))
+#         print()
+#         # print('shape', occurrences[:, :, :])
 
-exit()
+#         atom_b += 1
+#     atom_a += 1
+
+# exit()
 
 # ----------------------------------------------
 
