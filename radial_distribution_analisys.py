@@ -1,10 +1,10 @@
-#!/usr/bin/python3
+#!/usr/bin/python3.8
 
 # ------------------------------------------
 # July 2020
 #               edisonffh@gmail.com
 #
-# python3 script to compute bond length
+# python3.8 script to compute bond length
 # frecuency in Hg(H_2O)_n clusters
 #
 # ------------------------------------------
@@ -22,6 +22,8 @@ import glob
 import pandas as pd
 # - arrays and matrix manipulation
 import numpy as np
+# - math functions
+import math
 # - plotting
 import matplotlib.pyplot as plt
 # - runtime configuration (rc) containing the default styles for every plot element you create
@@ -47,7 +49,7 @@ for input_xyz in glob.glob('*.xyz'):
         if unique_input_xyz not in list_xyz:
             list_xyz.append(unique_input_xyz)
 
-# list_xyz = ["w1s1.xyz"]
+list_xyz = ["w1s1.xyz"]
 
 # - checking if files exist
 if len(list_xyz) > 0:
@@ -78,7 +80,6 @@ for atom in elements:
     if atom not in elements_list:
         elements_list.append(atom)
 
-
 elements_list = [ atom.capitalize() for atom in elements_list ]
 
 if len(elements_list) > 0:
@@ -86,15 +87,7 @@ if len(elements_list) > 0:
 else:
     exit(f'\n *** ERROR ***\n No atoms found \n')
 
-# - number of atoms pair
-unique_atoms = len(elements_list)
-
 # - defining grid for the Radial Distribution Analysis (number of occurrences)
-#
-#    ???????????????
-#
-#
-
 ro = 0.6    # smallest interactomic distance
 rf = 3.5   # largest interactomic distance
 dr = 0.05   # grid points
@@ -103,8 +96,34 @@ nbins = int((rf - ro) / dr)  # number of bins for the accurences
 # - points to use BSpline
 bs_points = 100
 
+# - number of atoms pair, (n+1)!/2*(n-1)!
+atom_pairs = math.factorial(len(elements_list))
+
+# - list of pair of atoms from elements list
+pairs_list = []
+
+atom_a = 0
+while atom_a < len(elements_list):
+    atom_b = atom_a + 1
+    pair = str(elements_list[atom_a]) + '-' + str(elements_list[atom_a])
+    pairs_list.append(pair)
+    while atom_b < len(elements_list):
+        pair = str(elements_list[atom_a]) + '-' + str(elements_list[atom_b])
+        pairs_list.append(pair)
+
+        atom_b += 1
+    atom_a += 1
+
+print()
+print(f' pairs: {pairs_list}, pairs: {atom_pairs}')
+print()
+
 # - array to storage occurrences
-occurrences = np.zeros((unique_atoms, unique_atoms, nbins), dtype=int)
+#
+#    ???????????????
+#
+#
+occurrences = np.zeros((atom_pairs, nbins), dtype=int)
 
 print()
 print(f'RDA with {nbins} bins, grid {dr} between {ro}-{rf} Angstroms')
@@ -138,10 +157,10 @@ for file_xyz in list_xyz:
     data_xyz = data_xyz_all[data_xyz_all.element.str.capitalize().isin(elements_list)]
 
     # - Warning elements not in the input list
-    no_elements = data_xyz_all[~data_xyz_all.element.str.capitalize().isin(elements_list)]
-    print(f'*** Warning ***')
-    print(f'element {elements_list} not found {file_xyz} \n')
-    print(no_elements.to_string(index=False, float_format='%.10f'))
+    # no_elements = data_xyz_all[~data_xyz_all.element.str.capitalize().isin(elements_list)]
+    # print(f'*** Warning ***')
+    # print(f'element {elements_list} not found {file_xyz} \n')
+    # print(no_elements.to_string(index=False, float_format='%.10f'))
 
     # - to show only asked atoms
     if num_atoms != data_xyz.shape[0]:
@@ -154,7 +173,7 @@ for file_xyz in list_xyz:
     atom_a = 0
     while atom_a < num_atoms:
         # for atom_a
-        element_a = elements_list.index(str(data_xyz.iloc[atom_a, 0]))
+        # element_a = elements_list.index(str(data_xyz.iloc[atom_a, 0]))
 
         coordinates_a[0] = float(data_xyz.iloc[atom_a, 1])
         coordinates_a[1] = float(data_xyz.iloc[atom_a, 2])
@@ -163,7 +182,7 @@ for file_xyz in list_xyz:
         atom_b = atom_a + 1
         while atom_b < num_atoms:
             # for atom_b
-            element_b = elements_list.index(str(data_xyz.iloc[atom_b, 0]))
+            # element_b = elements_list.index(str(data_xyz.iloc[atom_b, 0]))
 
             coordinates_b[0] = float(data_xyz.iloc[atom_b, 1])
             coordinates_b[1] = float(data_xyz.iloc[atom_b, 2])
@@ -172,23 +191,32 @@ for file_xyz in list_xyz:
             # computing euclidean distance
             distance = np.linalg.norm(coordinates_a - coordinates_b)
 
+            # - finding atomic pair for previous distance
+            pair = str(data_xyz.iloc[atom_a, 0]) + '-' + str(data_xyz.iloc[atom_b, 0])
+            # - pair AB == BA
+            pair_rev = str(data_xyz.iloc[atom_b, 0]) + '-' + str(data_xyz.iloc[atom_a, 0])
+
+            if pair in pairs_list:
+                pair_idx = pairs_list.index(pair)
+            elif pair_rev in pairs_list:
+                pair_idx = pairs_list.index(pair_rev)
+
             if distance <= rf:
                 # Radial distribution analysis
                 distance_hit = int(round((distance - ro) / dr))
                 if distance_hit > 0 and distance_hit < nbins:
-                    occurrences[element_a, element_b, distance_hit] += 1
+                    occurrences[pair_idx, distance_hit] += 1
 
-                    # print(
-                    #     f'atom pair: {elements_list[element_a]} - {elements_list[element_b]}')
+                    # print(f'atom pair: {pair}')
                     # print(occurrences)
                     # print()
 
             atom_b += 1
         atom_a += 1
 
-# print('shape', occurrences[:, :, :])
+print('shape', occurrences)
 
-# exit()
+exit()
 
 # atom_a = 0
 # while atom_a < len(elements_list):
