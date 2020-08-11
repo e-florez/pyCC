@@ -47,7 +47,27 @@ for input_xyz in glob.glob('*.xyz'):
         if unique_input_xyz not in list_xyz:
             list_xyz.append(unique_input_xyz)
 
-# list_xyz = ["w1s1.xyz"]
+list_xyz = ["w1s1.xyz"]
+
+# - savig list as a pandas df
+df = pd.DataFrame(list_xyz, columns=['files'])
+
+# - sorting df and re indexing
+df = df.sort_values(by='files', ascending=True).reset_index(drop=True)
+
+# - trasposing data 
+list_xyz_to_print = df.T.to_string(index=False, header=False).split('.xyz')
+
+print(f'A total of {len(list_xyz)} XYZ files analized')
+print(f'\nFiles (xyz): \n')
+
+# - printing files for the RDA (five columns)
+num_files = 0
+while num_files < len(list_xyz_to_print):
+    print(f'\t\t'.join(list_xyz_to_print[num_files:num_files + 5]).strip())
+
+    num_files += 6
+print()
 
 # - checking if files exist
 if len(list_xyz) > 0:
@@ -88,7 +108,7 @@ else:
 # - defining grid for the Radial Distribution Analysis (number of occurrences)
 ro = 0.6    # smallest interactomic distance
 rf = 3.5   # largest interactomic distance
-dr = 0.05   # grid points
+dr = 0.5   # grid points
 nbins = int((rf - ro) / dr)  # number of bins for the accurences
 
 # - points to use BSpline
@@ -97,16 +117,27 @@ bs_points = 100
 # - list of pair of atoms from elements list
 pairs_list = []
 
-# - number of atoms pair
-unique_atoms = len(elements_list)
+atom_a = 0
+while atom_a < len(elements_list):
+    atom_b = atom_a + 1
+    pair = str(elements_list[atom_a]) + '-' + str(elements_list[atom_a])
+    pairs_list.append(pair)
+    while atom_b < len(elements_list):
+        pair = str(elements_list[atom_a]) + '-' + str(elements_list[atom_b])
+        pairs_list.append(pair)
+
+        atom_b += 1
+    atom_a += 1
+
+# - number of atoms pair, (n+1)!/2*(n-1)!
+atom_pairs = len(pairs_list)
 
 # - array to storage occurrences
 #
 #    ???????????????
 #
 #
-
-occurrences = np.zeros([unique_atoms, unique_atoms, nbins], dtype=int)
+occurrences = np.zeros((atom_pairs, nbins), dtype=int)
 
 print()
 print(f'RDA with {nbins} bins, grid {dr} between {ro}-{rf} Angstroms')
@@ -176,14 +207,29 @@ for file_xyz in list_xyz:
             # computing euclidean distance
             distance = np.linalg.norm(coordinates_a - coordinates_b)
 
+            # - finding atomic pair for previous distance
+            pair = str(data_xyz.iloc[atom_a, 0]) + '-' + str(data_xyz.iloc[atom_b, 0])
+            # - pair AB == BA
+            pair_rev = str(data_xyz.iloc[atom_b, 0]) + '-' + str(data_xyz.iloc[atom_a, 0])
+
+            if pair in pairs_list:
+                pair_idx = pairs_list.index(pair)
+            elif pair_rev in pairs_list:
+                pair_idx = pairs_list.index(pair_rev)
+
             if distance <= rf:
                 # Radial distribution analysis
                 distance_hit = int(round((distance - ro) / dr))
                 if distance_hit > 0 and distance_hit < nbins:
-                    occurrences[element_a, element_b, distance_hit] += 1
+                    occurrences[pair_idx, distance_hit] += 1
 
             atom_b += 1
         atom_a += 1
+
+
+print('shape', occurrences)
+
+exit()
 
 # ----------------------------------------------
 
