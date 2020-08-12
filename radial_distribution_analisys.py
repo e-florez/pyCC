@@ -47,7 +47,7 @@ for input_xyz in glob.glob('*.xyz'):
         if unique_input_xyz not in list_xyz:
             list_xyz.append(unique_input_xyz)
 
-list_xyz = ["w1s1.xyz"]
+# list_xyz = ["w1s1.xyz"]
 
 # - savig list as a pandas df
 df = pd.DataFrame(list_xyz, columns=['files'])
@@ -55,7 +55,7 @@ df = pd.DataFrame(list_xyz, columns=['files'])
 # - sorting df and re indexing
 df = df.sort_values(by='files', ascending=True).reset_index(drop=True)
 
-# - trasposing data 
+# - trasposing data to print out
 list_xyz_to_print = df.T.to_string(index=False, header=False).split('.xyz')
 
 print(f'A total of {len(list_xyz)} XYZ files analized')
@@ -105,10 +105,11 @@ if len(elements_list) > 0:
 else:
     exit(f'\n *** ERROR ***\n No atoms found \n')
 
+# -------------------------------------------------------------------------------
 # - defining grid for the Radial Distribution Analysis (number of occurrences)
 ro = 0.6    # smallest interactomic distance
 rf = 3.5   # largest interactomic distance
-dr = 0.5   # grid points
+dr = 0.05   # grid points
 nbins = int((rf - ro) / dr)  # number of bins for the accurences
 
 # - points to use BSpline
@@ -144,6 +145,7 @@ print(f'RDA with {nbins} bins, grid {dr} between {ro}-{rf} Angstroms')
 print(f'BSpline used for the RDA with {bs_points} points')
 print()
 
+# -------------------------------------------------------------------------
 # - reading coordinates for XYZ file (importing data with pandas)
 for file_xyz in list_xyz:
     # ------------------------------------------------------------------
@@ -189,7 +191,7 @@ for file_xyz in list_xyz:
     atom_a = 0
     while atom_a < num_atoms:
         # for atom_a
-        element_a = elements_list.index(str(data_xyz.iloc[atom_a, 0]))
+        # element_a = elements_list.index(str(data_xyz.iloc[atom_a, 0]))
 
         coordinates_a[0] = float(data_xyz.iloc[atom_a, 1])
         coordinates_a[1] = float(data_xyz.iloc[atom_a, 2])
@@ -198,7 +200,7 @@ for file_xyz in list_xyz:
         atom_b = atom_a + 1
         while atom_b < num_atoms:
             # for atom_b
-            element_b = elements_list.index(str(data_xyz.iloc[atom_b, 0]))
+            # element_b = elements_list.index(str(data_xyz.iloc[atom_b, 0]))
 
             coordinates_b[0] = float(data_xyz.iloc[atom_b, 1])
             coordinates_b[1] = float(data_xyz.iloc[atom_b, 2])
@@ -211,7 +213,8 @@ for file_xyz in list_xyz:
             pair = str(data_xyz.iloc[atom_a, 0]) + '-' + str(data_xyz.iloc[atom_b, 0])
             # - pair AB == BA
             pair_rev = str(data_xyz.iloc[atom_b, 0]) + '-' + str(data_xyz.iloc[atom_a, 0])
-
+            
+            # - index for pair list
             if pair in pairs_list:
                 pair_idx = pairs_list.index(pair)
             elif pair_rev in pairs_list:
@@ -227,9 +230,9 @@ for file_xyz in list_xyz:
         atom_a += 1
 
 
-print('shape', occurrences)
+# print('shape', occurrences)
 
-exit()
+# exit()
 
 # ----------------------------------------------
 
@@ -243,19 +246,22 @@ smooth_bond_distance = np.linspace(ro, rf, nbins * bs_points)
 atom_a = 0
 while atom_a < len(elements_list):
     # - for the same type of atoms (if any)
-    atoms_pair = elements_list[atom_a] + '-' + \
-        elements_list[atom_a]
+    pair = str(data_xyz.iloc[atom_a, 0]) + '-' + str(data_xyz.iloc[atom_a, 0])
+    
+    # - index for pair list
+    if pair in pairs_list:
+        pair_idx = pairs_list.index(pair)
 
-    total_bond = sum(occurrences[atom_a, atom_a, :])
+    total_bond = sum(occurrences[pair_idx, :])
 
     # - avoiding to plot empty results
     if all_elements or len(elements_list) == 1:
         if total_bond > 0:
 
             # - saving RDA
-            np.savetxt(atoms_pair + '_rda' + '.dat',
+            np.savetxt(pair + '_rda' + '.dat',
                        np.transpose(
-                           [bond_distance, occurrences[atom_a, atom_a, :]]),
+                           [bond_distance, occurrences[pair_idx, :]]),
                        delimiter=' ',
                        header='distance [Angstrom]   occurrence (total=%i)' % total_bond,
                        fmt='%.6f %28i')
@@ -273,15 +279,14 @@ while atom_a < len(elements_list):
             plt.xlabel('Bond Length [Angstrom]',
                        fontsize=12, fontweight='bold')
 
-            # ax1.plot(bond_distance, occurrences[atom_a,
-            #                                     atom_a, :], label=r'%s' % (atoms_pair))
+            # ax1.plot(bond_distance, occurrences[pair_idx, :], label=r'%s' % (pair))
 
             # smooth curve BSpline, degree k=3, cubic
             smooth = make_interp_spline(
-                bond_distance, occurrences[atom_a, atom_a, :], k=3)
+                bond_distance, occurrences[pair_idx, :], k=3)
             smooth_occurrences = smooth(smooth_bond_distance)
             ax1.plot(smooth_bond_distance,
-                     smooth_occurrences / total_bond, label='%s' % (atoms_pair))
+                     smooth_occurrences / total_bond, label='%s' % (pair))
 
             # - Put a legend below current axis
             plt.legend(loc=0)
@@ -293,15 +298,24 @@ while atom_a < len(elements_list):
     # - for different pair of atoms
     atom_b = atom_a + 1
     while atom_b < len(elements_list):
-        atoms_pair = elements_list[atom_a] + '-' + \
-            elements_list[atom_b]
 
-        total_bond = sum(occurrences[atom_a, atom_b, :])
+        # - finding atomic pair for previous distance
+        pair = str(data_xyz.iloc[atom_a, 0]) + '-' + str(data_xyz.iloc[atom_b, 0])
+        # - pair AB == BA
+        pair_rev = str(data_xyz.iloc[atom_b, 0]) + '-' + str(data_xyz.iloc[atom_a, 0])
+        
+        # - index for pair list
+        if pair in pairs_list:
+            pair_idx = pairs_list.index(pair)
+        elif pair_rev in pairs_list:
+            pair_idx = pairs_list.index(pair_rev)
+
+        total_bond = sum(occurrences[pair_idx, :])
 
         # - saving RDA
-        np.savetxt(atoms_pair + '_rda' + '.dat',
+        np.savetxt(pair + '_rda' + '.dat',
                    np.transpose(
-                       [bond_distance, occurrences[atom_a, atom_b, :]]),
+                       [bond_distance, occurrences[pair_idx, :]]),
                    delimiter=' ',
                    header='distance [Angstrom]   occurrence (total=%i)' % total_bond,
                    fmt='%.6f %28i')
@@ -309,16 +323,17 @@ while atom_a < len(elements_list):
         if total_bond > 0:
 
             # # - saving RDA
-            # np.savetxt(atoms_pair + '_rda' + '.dat',
+            # np.savetxt(pair + '_rda' + '.dat',
             #            np.transpose(
-            #                [bond_distance, occurrences[atom_a, atom_b, :]]),
+            #                [bond_distance, occurrences[pair_idx, :]]),
             #            delimiter=' ',
             #            header='distance [Angstrom]   occurrence (total=%i)' % total_bond,
             #            fmt='%.6f %28i')
 
             # - to plot
             fig = plt.figure()  # inches WxH, figsize=(7, 8)
-            fig.suptitle('Radial Distribution Analisys \n' + r'\small{Total distances= %i}' % total_bond,
+            fig.suptitle('Radial Distribution Analisys \n' + 
+                         r'\small{Total distances= %i}' % total_bond,
                          fontsize=20, fontweight='bold')
             ax1 = plt.subplot()
             ax1.grid()
@@ -329,15 +344,14 @@ while atom_a < len(elements_list):
             plt.xlabel('Bond Length [Angstrom]',
                        fontsize=12, fontweight='bold')
 
-            # ax1.plot(bond_distance,
-            #          occurrences[atom_a, atom_b, :], label=r'%s' % (atoms_pair))
+            # ax1.plot(bond_distance, occurrences[pair_idx, :], label=r'%s' % (pair))
 
             # smooth curve BSpline, degree k=3, cubic
             smooth = make_interp_spline(
-                bond_distance, occurrences[atom_a, atom_b, :], k=3)
+                bond_distance, occurrences[pair_idx, :], k=3)
             smooth_occurrences = smooth(smooth_bond_distance)
             ax1.plot(smooth_bond_distance,
-                     smooth_occurrences / total_bond, label='%s' % (atoms_pair))
+                     smooth_occurrences / total_bond, label='%s' % (pair))
 
             # - Put a legend below current axis
             plt.legend(loc=0)
