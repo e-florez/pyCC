@@ -8,37 +8,33 @@ import matplotlib.ticker as plticker  # - ticks
 import numpy as np
 import sys # to get System-specific parameters
 import os # contains some useful functions on pathnames
-# -  to smooth out your data
-from scipy.interpolate import make_interp_spline, BSpline
+import glob # - Unix style pathname pattern expansion
+from scipy.interpolate import make_interp_spline, BSpline # - to smooth out your data
 
 # -----------------------------------
 # ------ body
 # -----------------------------------
 print(f'\nPlotting Radial Distribution Analisys (RDA)\n')
 
-# # - RDA files to plot
-# if len(sys.argv) <= 1:
-#     rda_input =  input(f"List of files to plot RDA, **separated by space** [Default: all '.dat']: ")
-
-# # - by default reading elements for the first XYZ file
-# all_elements = False
-# if len(input_elements.split()) < 1 or input_elements == 'all':
-#     all_elements = True
-#     elements = pd.read_csv(list_xyz[0], delim_whitespace=True,
-#                            skiprows=2, header=None,
-#                            names=["element", "x-coordinate", "y-coordinate", "z-coordinate"])
-#     elements = elements['element'].tolist()
-# else:
-#     elements = input_elements.split()
-
+# - RDA files to plot
 rda_files = []
-input_arguments = 1
-while input_arguments < len(sys.argv):
-    rda_files.append(sys.argv[input_arguments])
-    input_arguments += 1
+if len(sys.argv) <= 1:
+    input_files =  input(f"List of files to plot RDA, **separated by space** [Default: all '.dat']: ")
+
+    # - by default reading elements for the first XYZ file
+    if len(input_files.split()) < 1:
+        for file_rda in glob.glob('*.dat'):
+            rda_files.append(file_rda)
+    else:
+        rda_files = input_files.split()
+else:
+    input_arguments = 1
+    while input_arguments < len(sys.argv):
+        rda_files.append(sys.argv[input_arguments])
+        input_arguments += 1
 
 if len(rda_files) > 0:
-    print(f'\nList of files to plot RDA: {rda_files}\n')
+    print(f'\nList of files:\n\n{rda_files}\n')
 else:
     exit(f'\n *** ERROR ***\n No files found \n')
 
@@ -76,11 +72,22 @@ for rda in rda_files:
     smooth = make_interp_spline(x, y, k=3)
     smooth_y = smooth(smooth_x)
 
+    # - Bspline fitting
     ax1.plot(smooth_x, smooth_y / total, label=' %s \n Total distances= %i' %(rda, total))
+    
+    # - raw data, no Bspline fitting
     # ax1.plot(x, y, label='%s' %rda)
 
-    # - Put a legend below current axis
-    plt.legend(loc=0)
+    # plt.legend(loc=0)
+    # Put a legend below current axis
+    h = 0.3 + 0.25 * float( ( len(rda_files) / 3 ) - 1)
+    plt.legend(loc='lower center', bbox_to_anchor=(0.5, -h, 0.0, 0.0),
+               fancybox=True, shadow=True, ncol=3, fontsize=9)
+
+    # - Shrink current axis's height by 10% on the bottom
+    box = ax1.get_position()
+    ax1.set_position([box.x0, box.y0 + box.height *
+                      0.05, box.width, box.height * 0.95])
 
 
 # - ENDING the plots

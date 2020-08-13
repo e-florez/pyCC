@@ -47,7 +47,7 @@ for input_xyz in glob.glob('*.xyz'):
         if unique_input_xyz not in list_xyz:
             list_xyz.append(unique_input_xyz)
 
-list_xyz = ["w1s1.xyz"]
+# list_xyz = ["w1s1.xyz"]
 
 # - savig list as a pandas df
 df = pd.DataFrame(list_xyz, columns=['files'])
@@ -229,6 +229,10 @@ for file_xyz in list_xyz:
             atom_b += 1
         atom_a += 1
 
+
+# print('shape', occurrences)
+
+# exit()
 
 # ----------------------------------------------
 
