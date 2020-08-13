@@ -1,8 +1,8 @@
 #!/usr/bin/python3.8
 
-# -----------------------------------
+# ---------------------------------------------------------------------------------------------------------
 # ------ moules
-# -----------------------------------
+# ---------------------------------------------------------------------------------------------------------
 import matplotlib.pyplot as plt
 import matplotlib.ticker as plticker  # - ticks
 import numpy as np
@@ -11,11 +11,12 @@ import os # contains some useful functions on pathnames
 import glob # - Unix style pathname pattern expansion
 from scipy.interpolate import make_interp_spline, BSpline # - to smooth out your data
 
-# -----------------------------------
+# ---------------------------------------------------------------------------------------------------------
 # ------ body
-# -----------------------------------
+# ---------------------------------------------------------------------------------------------------------
 print(f'\nPlotting Radial Distribution Analisys (RDA)\n')
 
+# -----------------------------------------------------------
 # - RDA files to plot
 rda_files = []
 if len(sys.argv) <= 1:
@@ -33,12 +34,14 @@ else:
         rda_files.append(sys.argv[input_arguments])
         input_arguments += 1
 
+# - checking if there is any file to plot
 if len(rda_files) > 0:
     print(f'\nList of files:\n\n{rda_files}\n')
 else:
     exit(f'\n *** ERROR ***\n No files found \n')
 
-# - plotting
+# -----------------------------------------------------------
+# - plotting: defining frames and designing the area to plot
 fig = plt.figure() #figsize=(10, 8))  # inches WxH
 fig.suptitle('Radial Distribution Analisys', fontsize=20) #, fontweight='bold')
 
@@ -49,8 +52,11 @@ ax1.grid()
 plt.ylabel('Relative Number of Ocurrences', fontsize=12) #, fontweight='bold')
 plt.xlabel('Bond Distance [Angstrom]', fontsize=12) #, fontweight='bold')
 
+# - ticks for the x-axis
 ax1.xaxis.set_major_locator(plticker.MultipleLocator(base=0.2))
 
+# -----------------------------------------------------------
+# - loading files to read and plot them
 for rda in rda_files:
     x, y = [], []
     for line in open(rda, 'r'):
@@ -89,7 +95,7 @@ for rda in rda_files:
     ax1.set_position([box.x0, box.y0 + box.height *
                       0.05, box.width, box.height * 0.95])
 
-
+# ---------------------------------------------------------------------------------------------------------
 # - ENDING the plots
 plt.show()
 
