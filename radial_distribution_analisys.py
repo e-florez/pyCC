@@ -108,10 +108,16 @@ if len(sys.argv) < 3:
     else:
         elements = input_elements.split()
 else:
-    input_arguments = 2
-    while input_arguments < len(sys.argv):
-        elements.append(sys.argv[input_arguments])
-        input_arguments += 1
+    if sys.argv[2] == 'all':
+        elements = pd.read_csv(list_xyz[0], delim_whitespace=True,
+                            skiprows=2, header=None,
+                            names=["element", "x-coordinate", "y-coordinate", "z-coordinate"])
+        elements = elements['element'].tolist()
+    else:
+        input_arguments = 2
+        while input_arguments < len(sys.argv):
+            elements.append(sys.argv[input_arguments])
+            input_arguments += 1
 
 # - list of elements (uniques)
 elements_list = [] 
@@ -122,11 +128,10 @@ for atom in elements:
 
 elements_list = [atom.capitalize() for atom in elements_list]
 
-# - checking if there is any file to plot
+ # - list of atom pair from elements list
 if len(elements_list) < 1:
     exit(f'\n *** ERROR ***\nNo atom asked to make the RDA\n')
 else:
-    # - list of atom pair from elements list
     pairs_list = []
     atom_a = 0
     while atom_a < len(elements_list):
@@ -288,7 +293,7 @@ while atom_pair < len(pairs_list):
     # - no distance found
     else:
         print(f'\n*** Warning ***')
-        print(f'NO distance {pair} found in files \n\n{list_xyz}')
+        print(f'NO distance {pair} found in XYZ files')
 
     atom_pair += 1
 

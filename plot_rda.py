@@ -20,31 +20,35 @@ print(f'\nPlotting Radial Distribution Analisys (RDA)\n')
 # - working directory
 print(f"\nCurrent working directory: {os.getcwd()}")
 
-if len(sys.argv) <= 1:    
-    tmp_dir =  input(f'\nDirectory (whit the XYZ files) to make the RDA [default: empty]: ')
-    tmp_dir = tmp_dir.strip()
+##### if uncomment the section to change the working dir, must change 
+##### len(sys.argv) < 3
+##### input_arguments = 
 
-    if tmp_dir == '.' or len(tmp_dir) < 1:
-        working_dir = os.getcwd()
-    else:
-        working_dir = os.getcwd() + '/' + tmp_dir
-else:
-    working_dir = os.getcwd() + '/' + sys.argv[1]
+# if len(sys.argv) <= 1:    
+#     tmp_dir =  input(f'\nDirectory (whit the XYZ files) to make the RDA [default: empty]: ')
+#     tmp_dir = tmp_dir.strip()
 
-print(f'\nWorking directiry: {working_dir}')
+#     if tmp_dir == '.' or len(tmp_dir) < 1:
+#         working_dir = os.getcwd()
+#     else:
+#         working_dir = os.getcwd() + '/' + tmp_dir
+# else:
+#     working_dir = os.getcwd() + '/' + sys.argv[1]
 
-# Check if New path exists
-if os.path.exists(working_dir) :
-    # Change the current working Directory    
-    os.chdir(working_dir)
-else:
-    print(f'\n*** ERROR ***')
-    exit(f"Can't change the Working Directory, {working_dir} doesn't exist")   
+# print(f'\nWorking directiry: {working_dir}')
+
+# # Check if New path exists
+# if os.path.exists(working_dir) :
+#     # Change the current working Directory    
+#     os.chdir(working_dir)
+# else:
+#     print(f'\n*** ERROR ***')
+#     exit(f"Can't change the Working Directory, {working_dir} doesn't exist")   
 
 # -----------------------------------------------------------
 # - RDA files to plot
 rda_files = []
-if len(sys.argv) < 3:
+if len(sys.argv) < 2:
     input_files =  input(f"List of files to plot RDA, **separated by space** [Default: all '.dat']: ")
 
     # - by default reading elements for the first XYZ file
@@ -54,7 +58,7 @@ if len(sys.argv) < 3:
     else:
         rda_files = input_files.split()
 else:
-    input_arguments = 2
+    input_arguments = 1
     while input_arguments < len(sys.argv):
         rda_files.append(sys.argv[input_arguments])
         input_arguments += 1
@@ -62,8 +66,11 @@ else:
 # - checking if there is any file to plot
 if len(rda_files) > 0:
     print(f'\nList of files:\n\n{rda_files}\n')
+    for file_rda in rda_files:
+        if not os.path.exists(file_rda):
+            print(f'\n*** Warinnig ***\n file {file_rda} does not exits \n')
 else:
-    exit(f'\n *** ERROR ***\n No files found \n')
+    exit(f'\n *** ERROR ***\n No files found to plot\n')
 
 # -----------------------------------------------------------
 # - plotting: defining frames and designing the area to plot
@@ -114,8 +121,8 @@ for rda in rda_files:
 
 # plt.legend(loc=0)
 # Put a legend below current axis
-plt.legend(loc='lower center', bbox_to_anchor=(1.3, 0.5, 0.0, 0.0),
-            fancybox=True, shadow=True, ncol=1, fontsize=9)
+plt.legend(loc='lower center', bbox_to_anchor=(1.32, 0.8, 0.0, 0.0),
+            fancybox=True, shadow=True, ncol=1, fontsize=11)
 
 # - Shrink current axis's height by 10% on the bottom
 box = ax1.get_position()
