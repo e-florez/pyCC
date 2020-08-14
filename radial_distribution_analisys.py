@@ -9,31 +9,50 @@
 # ------------------------------------------------------------------------------------
 # ------ moules
 # ------------------------------------------------------------------------------------
-import os.path  # - to check id a file or dir exits -> os.path.exists()
-# -  to smooth out your data
-from scipy.interpolate import make_interp_spline, BSpline
-# - Unix style pathname pattern expansion
-import glob
-# - complete data analysis tool (it can replace matplotlib or numpy, as it is built on top of both)
-import pandas as pd
-# - arrays and matrix manipulation
-import numpy as np
-# - plotting
-import matplotlib.pyplot as plt
-# - runtime configuration (rc) containing the default styles for every plot element you create
-from matplotlib import rc
+import sys # to get System-specific parameters
+import os  # - to check id a file or dir exits -> os.path.exists()
+from scipy.interpolate import make_interp_spline, BSpline # -  to smooth out your data
+import glob # - Unix style pathname pattern expansion
+import pandas as pd # - complete data analysis tool (it can replace matplotlib or numpy, as it is built on top of both)
+import numpy as np # - arrays and matrix manipulation
+import matplotlib.pyplot as plt # - plotting tools
+from matplotlib import rc # - runtime configuration (rc) containing the default styles for every plot element you create
 rc('text', usetex=True)   # --- enable TeX mode for matplotlib
 
 # ------------------------------------------------------------------------------------
 # ------ body
 # ------------------------------------------------------------------------------------
-print(f'\nRadial Distribution Analisys (RDA) for XYZ files\n')
+print(f'\n****************************************************')
+print(f'* Radial Distribution Analisys (RDA) for XYZ files *')
+print(f'****************************************************')
 
-# - list for xyz files
+# - working directory
+print(f"\nCurrent working directory: {os.getcwd()}")
+if len(sys.argv) <= 1:    
+    tmp_dir =  input(f'\nDirectory (whit the XYZ files) to make the RDA [default: empty]: ')
+    tmp_dir = tmp_dir.strip()
+
+    if tmp_dir == '.' or len(tmp_dir) < 1:
+        working_dir = os.getcwd()
+    else:
+        working_dir = os.getcwd() + '/' + tmp_dir
+else:
+    working_dir = os.getcwd() + '/' + sys.argv[1]
+
+print(f'\nWorking directiry: {working_dir}')
+
+# Check if New path exists
+if os.path.exists(working_dir) :
+    # Change the current working Directory    
+    os.chdir(working_dir)
+else:
+    print(f'\n*** ERROR ***')
+    exit(f"Can't change the Working Directory, {working_dir} doesn't exist")   
+
+# - reading files
 repited_list_xyz = []  # repited files (if any)
 list_xyz = []  # unique files
 
-# - reading files
 for input_xyz in glob.glob('*.xyz'):
     name_xyz = input_xyz[:-4]  # deleting file extention
     repited_list_xyz.append(input_xyz)  # creating an array for all xyz files
@@ -44,6 +63,14 @@ for input_xyz in glob.glob('*.xyz'):
             list_xyz.append(unique_input_xyz)
 
 # list_xyz = ["w1s1.xyz"]
+
+# - checking if files exist
+if len(list_xyz) > 0:
+    for input_xyz in list_xyz:
+        if not os.path.exists(input_xyz):
+            print(f'\n*** Warinnig ***\n file {input_xyz} does not exits \n')
+else:
+    exit(f' *** ERROR ***\n No file found to make the RDA \n ')
 
 # - savig list as a pandas df
 df = pd.DataFrame(list_xyz, columns=['files'])
@@ -65,39 +92,39 @@ while num_files < len(list_xyz_to_print):
     num_files += 6
 print()
 
-# - checking if files exist
-if len(list_xyz) > 0:
-    for input_xyz in list_xyz:
-        if not os.path.exists(input_xyz):
-            exit(f' *** ERROR ***\n file {input_xyz} does not exits \n')
-else:
-    exit(f' *** ERROR ***\n any file was found in {list_xyz} \n')
-
+# -------------------------------------------------------------------------------
 # - Elements list to do radial distribution analisys
-input_elements = input(
-    f'List of atoms, **separated by space** [Default: all]: ')
+elements = [] # list of elements
 
-# - by default reading elements for the first XYZ file
-all_elements = False
-if len(input_elements.split()) < 1 or input_elements == 'all':
-    all_elements = True
-    elements = pd.read_csv(list_xyz[0], delim_whitespace=True,
-                           skiprows=2, header=None,
-                           names=["element", "x-coordinate", "y-coordinate", "z-coordinate"])
-    elements = elements['element'].tolist()
+if len(sys.argv) < 3:
+    input_elements =  input(f"List of fatoms to make the RDA, **SYMBOLS separated by space** [Default: all]: ")
+
+    # - by default reading elements for the first XYZ file
+    if len(input_elements.split()) < 1 or input_elements == 'all':
+        elements = pd.read_csv(list_xyz[0], delim_whitespace=True,
+                            skiprows=2, header=None,
+                            names=["element", "x-coordinate", "y-coordinate", "z-coordinate"])
+        elements = elements['element'].tolist()
+    else:
+        elements = input_elements.split()
 else:
-    elements = input_elements.split()
+    input_arguments = 2
+    while input_arguments < len(sys.argv):
+        elements.append(sys.argv[input_arguments])
+        input_arguments += 1
 
-elements_list = []
 # - list of elements (uniques)
+elements_list = [] 
+
 for atom in elements:
     if atom not in elements_list:
         elements_list.append(atom)
 
 elements_list = [atom.capitalize() for atom in elements_list]
 
+# - checking if there is any file to plot
 if len(elements_list) < 1:
-    exit(f'\n *** ERROR ***\nAny atom was asked to make the RDA\n')
+    exit(f'\n *** ERROR ***\nNo atom asked to make the RDA\n')
 else:
     # - list of atom pair from elements list
     pairs_list = []
@@ -157,7 +184,7 @@ for file_xyz in list_xyz:
 
     # - checking coordinates within file
     if data_xyz_all.shape[0] <= 1:
-        print(f'\n*** WARNING *** \n any coordinates were found in {file_xyz}')
+        print(f'\n*** WARNING *** \n No coordinates found in {file_xyz}')
         continue
 
     # - filtering to do the RDA for the atoms in the list (case insensitive)
@@ -167,7 +194,7 @@ for file_xyz in list_xyz:
     # - checking if asking elements are in XYZ file
     if data_xyz.shape[0] < 1:
         print(f'\n*** Warning ***')
-        print(f'elements from {elements_list} were not found in file {file_xyz}')
+        print(f'No elements, from {elements_list}, found in file {file_xyz}')
         continue
         # - Warning: some elements are not in the input list
         # no_elements = data_xyz_all[~data_xyz_all.element.str.capitalize().isin(elements_list)]
@@ -254,25 +281,30 @@ while atom_pair < len(pairs_list):
 
         # - raw data, not Bspline fitting
         # ax1.plot(bond_distance, occurrences[pair_idx, :], label=r'%s' % (pair))
-        # - y axis scale
-        # ax1.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
 
         # - Put a legend below current axis
         plt.legend(loc=0)
-        # - x ticks
-        ax1.xaxis.set_ticks(np.arange(ro, rf, 0.2))
 
     # - no distance found
     else:
         print(f'\n*** Warning ***')
-        print(f' no distance was found for pair {pair} in files {file_xyz}')
+        print(f'NO distance {pair} found in files \n\n{list_xyz}')
 
     atom_pair += 1
+
+# ------------------------------------------------
+# - y axis scale, for raw data
+# ax1.ticklabel_format(axis="y", style="sci", scilimits=(0, 0)
+
+# - x ticks
+ax1.xaxis.set_ticks(np.arange(ro, rf, 0.2))
 
 # ------------------------------------------------------------------------------------
 # - ENDING the plots
 plt.show()
 
-print(f'\n *** DONE ***\n')
+print(f'\n****************************************************')
+print(f'*** DONE ***')
+print(f'****************************************************\n')
 # ---------------------------- END
 exit()

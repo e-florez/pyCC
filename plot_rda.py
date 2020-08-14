@@ -17,9 +17,34 @@ from scipy.interpolate import make_interp_spline, BSpline # - to smooth out your
 print(f'\nPlotting Radial Distribution Analisys (RDA)\n')
 
 # -----------------------------------------------------------
+# - working directory
+print(f"\nCurrent working directory: {os.getcwd()}")
+
+if len(sys.argv) <= 1:    
+    tmp_dir =  input(f'\nDirectory (whit the XYZ files) to make the RDA [default: empty]: ')
+    tmp_dir = tmp_dir.strip()
+
+    if tmp_dir == '.' or len(tmp_dir) < 1:
+        working_dir = os.getcwd()
+    else:
+        working_dir = os.getcwd() + '/' + tmp_dir
+else:
+    working_dir = os.getcwd() + '/' + sys.argv[1]
+
+print(f'\nWorking directiry: {working_dir}')
+
+# Check if New path exists
+if os.path.exists(working_dir) :
+    # Change the current working Directory    
+    os.chdir(working_dir)
+else:
+    print(f'\n*** ERROR ***')
+    exit(f"Can't change the Working Directory, {working_dir} doesn't exist")   
+
+# -----------------------------------------------------------
 # - RDA files to plot
 rda_files = []
-if len(sys.argv) <= 1:
+if len(sys.argv) < 3:
     input_files =  input(f"List of files to plot RDA, **separated by space** [Default: all '.dat']: ")
 
     # - by default reading elements for the first XYZ file
@@ -29,7 +54,7 @@ if len(sys.argv) <= 1:
     else:
         rda_files = input_files.split()
 else:
-    input_arguments = 1
+    input_arguments = 2
     while input_arguments < len(sys.argv):
         rda_files.append(sys.argv[input_arguments])
         input_arguments += 1
@@ -42,7 +67,7 @@ else:
 
 # -----------------------------------------------------------
 # - plotting: defining frames and designing the area to plot
-fig = plt.figure() #figsize=(10, 8))  # inches WxH
+fig = plt.figure(figsize=(10, 8))  # inches WxH
 fig.suptitle('Radial Distribution Analisys', fontsize=20) #, fontweight='bold')
 
 ax1 = plt.subplot(111)
@@ -84,16 +109,17 @@ for rda in rda_files:
     # - raw data, no Bspline fitting
     # ax1.plot(x, y, label='%s' %rda)
 
-    # plt.legend(loc=0)
-    # Put a legend below current axis
-    h = 0.3 + 0.25 * float( ( len(rda_files) / 3 ) - 1)
-    plt.legend(loc='lower center', bbox_to_anchor=(0.5, -h, 0.0, 0.0),
-               fancybox=True, shadow=True, ncol=3, fontsize=9)
+# -----------------------------------------------------------
+# - Ending the plot
 
-    # - Shrink current axis's height by 10% on the bottom
-    box = ax1.get_position()
-    ax1.set_position([box.x0, box.y0 + box.height *
-                      0.05, box.width, box.height * 0.95])
+# plt.legend(loc=0)
+# Put a legend below current axis
+plt.legend(loc='lower center', bbox_to_anchor=(1.3, 0.5, 0.0, 0.0),
+            fancybox=True, shadow=True, ncol=1, fontsize=9)
+
+# - Shrink current axis's height by 10% on the bottom
+box = ax1.get_position()
+ax1.set_position([box.x0, box.y0, box.width * 0.7, box.height])
 
 # ---------------------------------------------------------------------------------------------------------
 # - ENDING the plots
