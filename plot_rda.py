@@ -121,7 +121,7 @@ for rda in rda_files:
 
 # plt.legend(loc=0)
 # Put a legend below current axis
-plt.legend(loc='lower center', bbox_to_anchor=(1.32, 0.8, 0.0, 0.0),
+plt.legend(loc='lower center', bbox_to_anchor=(1.32, 0.6, 0.0, 0.0),
             fancybox=True, shadow=True, ncol=1, fontsize=11)
 
 # - Shrink current axis's height by 10% on the bottom

@@ -13,6 +13,7 @@ import sys # to get System-specific parameters
 import os  # - to check id a file or dir exits -> os.path.exists()
 from scipy.interpolate import make_interp_spline, BSpline # -  to smooth out your data
 import glob # - Unix style pathname pattern expansion
+from natsort import natsorted # Simple yet flexible natural sorting in Python.
 import pandas as pd # - complete data analysis tool (it can replace matplotlib or numpy, as it is built on top of both)
 import numpy as np # - arrays and matrix manipulation
 import matplotlib.pyplot as plt # - plotting tools
@@ -38,8 +39,7 @@ if len(sys.argv) <= 1:
         working_dir = os.getcwd() + '/' + tmp_dir
 else:
     working_dir = os.getcwd() + '/' + sys.argv[1]
-
-print(f'\nWorking directiry: {working_dir}')
+    print(f'\nWorking directiry: {working_dir}')
 
 # Check if New path exists
 if os.path.exists(working_dir) :
@@ -62,6 +62,9 @@ for input_xyz in glob.glob('*.xyz'):
         if unique_input_xyz not in list_xyz:
             list_xyz.append(unique_input_xyz)
 
+# - sorting the input files list
+list_xyz = natsorted(list_xyz)
+
 # list_xyz = ["w1s1.xyz"]
 
 # - checking if files exist
@@ -72,25 +75,14 @@ if len(list_xyz) > 0:
 else:
     exit(f' *** ERROR ***\n No file found to make the RDA \n ')
 
-# - savig list as a pandas df
-df = pd.DataFrame(list_xyz, columns=['files'])
+print(f'\nA total of {len(list_xyz)} XYZ files analized\n')
 
-# - sorting df and re indexing
-df = df.sort_values(by='files', ascending=True).reset_index(drop=True)
+count = 0
+columns = 4
+while count < len(list_xyz):
+    print(f'\t'.join(list_xyz[count:count + columns]))
 
-# - trasposing data to print out
-list_xyz_to_print = df.T.to_string(index=False, header=False).split('.xyz')
-
-print(f'A total of {len(list_xyz)} XYZ files analized')
-print(f'\nFiles (xyz): \n')
-
-# - printing files for the RDA (five columns)
-num_files = 0
-while num_files < len(list_xyz_to_print):
-    print(f'\t\t'.join(list_xyz_to_print[num_files:num_files + 5]).strip())
-
-    num_files += 6
-print()
+    count += (columns + 1)
 
 # -------------------------------------------------------------------------------
 # - Elements list to do radial distribution analisys
@@ -290,19 +282,19 @@ while atom_pair < len(pairs_list):
         # - Put a legend below current axis
         plt.legend(loc=0)
 
+        # ------------------------------------------------
+        # - y axis scale, for raw data
+        # ax1.ticklabel_format(axis="y", style="sci", scilimits=(0, 0)
+        
+        # - x ticks
+        ax1.xaxis.set_ticks(np.arange(ro, rf, 0.2))
+
     # - no distance found
     else:
         print(f'\n*** Warning ***')
-        print(f'NO distance {pair} found in XYZ files')
+        print(f'NO distance {pair} found in XYZ files\n')
 
     atom_pair += 1
-
-# ------------------------------------------------
-# - y axis scale, for raw data
-# ax1.ticklabel_format(axis="y", style="sci", scilimits=(0, 0)
-
-# - x ticks
-ax1.xaxis.set_ticks(np.arange(ro, rf, 0.2))
 
 # ------------------------------------------------------------------------------------
 # - ENDING the plots
