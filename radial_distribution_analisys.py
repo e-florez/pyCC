@@ -28,7 +28,9 @@ print(f'* Radial Distribution Analisys (RDA) for XYZ files *')
 print(f'****************************************************')
 
 # - working directory
-print(f"\nCurrent working directory: {os.getcwd()}")
+
+# print(f"\nCurrent working directory: {os.getcwd()}")
+
 if len(sys.argv) <= 1:    
     tmp_dir =  input(f'\nDirectory (whit the XYZ files) to make the RDA [default: empty]: ')
     tmp_dir = tmp_dir.strip()
@@ -41,7 +43,7 @@ else:
     working_dir = os.getcwd() + '/' + sys.argv[1]
     print(f'\nWorking directiry: {working_dir}')
 
-# Check if New path exists
+# Check if the working dir exists
 if os.path.exists(working_dir) :
     # Change the current working Directory    
     os.chdir(working_dir)
@@ -62,10 +64,13 @@ for input_xyz in glob.glob('*.xyz'):
         if unique_input_xyz not in list_xyz:
             list_xyz.append(unique_input_xyz)
 
+# list_xyz = ["w1s1.xyz"]
+# list_xyz = ["w1s1.xyz", "w2s1.xyz"]
+# list_xyz = ["w1s1.xyz", "w2s1.xyz", "w3s1.xyz"]
+# list_xyz = ["w1s1.xyz", "w2s1.xyz", "w3s1.xyz", "w3s2.xyz"]
+
 # - sorting the input files list
 list_xyz = natsorted(list_xyz)
-
-# list_xyz = ["w1s1.xyz"]
 
 # - checking if files exist
 if len(list_xyz) > 0:
@@ -86,60 +91,96 @@ while count < len(list_xyz):
 
 # -------------------------------------------------------------------------------
 # - Elements list to do radial distribution analisys
+
+def all_elements(file_xyz):
+    """ Function to get atomic pairs from a XYZ file  """
+    elements = pd.read_csv(list_xyz[0], delim_whitespace=True,
+                    skiprows=2, header=None,
+                    names=["element", "x-coordinate", "y-coordinate", "z-coordinate"])
+    
+    elements = elements['element'].tolist()
+
+    # - list of elements (uniques)
+    elements_uniq = [] 
+    for atom in elements:
+        if atom not in elements_uniq:
+            elements_uniq.append(atom)
+
+    elements = []
+    elements = [atoms.capitalize() for atoms in elements_uniq]
+
+    element_list = []
+    atom_a = 0
+    while atom_a < len(elements):
+        element_list.append(elements[atom_a] + '-' + elements[atom_a])
+        atom_b = atom_a + 1
+        while atom_b < len(elements):
+            element_list.append(elements[atom_a] + '-' + elements[atom_b])
+            atom_b += 1
+        atom_a += 1
+
+    return element_list
+
+def sort_input_pairs(elements):
+    """sorting uniques atomic pair A-B from an input list """ 
+    # - deleting comma used to split atomic pairs (if any)
+    elements = [pair.replace(',','') for pair in elements]
+
+    # - creating a list of lists to capitalize each atom
+    elements = [pair.split('-') for pair in elements]
+
+    # - List Comprehension, extending lists within a list
+    elements = [atoms.capitalize() for pair in elements for atoms in pair]
+
+    element_list = []
+    pair = 0
+    while pair < len(elements) - 1:
+        element_list.append(elements[pair] + '-' + elements[pair + 1])
+        pair += 2
+
+    return element_list
+
+
 elements = [] # list of elements
 
 if len(sys.argv) < 3:
-    input_elements =  input(f"List of fatoms to make the RDA, **SYMBOLS separated by space** [Default: all]: ")
+    input_elements =  input(f"\nAtomic pairs to make the RDA [Default: all]:\n**A-B, C-D, ... SYMBOLS** ")
 
     # - by default reading elements for the first XYZ file
     if len(input_elements.split()) < 1 or input_elements == 'all':
-        elements = pd.read_csv(list_xyz[0], delim_whitespace=True,
-                            skiprows=2, header=None,
-                            names=["element", "x-coordinate", "y-coordinate", "z-coordinate"])
-        elements = elements['element'].tolist()
+        pairs_list = all_elements(list_xyz[0])
     else:
         elements = input_elements.split()
+        # - sorting atomic pairs
+        pairs_list = sort_input_pairs(elements)
+
 else:
     if sys.argv[2] == 'all':
-        elements = pd.read_csv(list_xyz[0], delim_whitespace=True,
-                            skiprows=2, header=None,
-                            names=["element", "x-coordinate", "y-coordinate", "z-coordinate"])
-        elements = elements['element'].tolist()
+        pairs_list = all_elements(list_xyz[0]) 
     else:
         input_arguments = 2
         while input_arguments < len(sys.argv):
             elements.append(sys.argv[input_arguments])
             input_arguments += 1
-
-# - list of elements (uniques)
-elements_list = [] 
-
-for atom in elements:
-    if atom not in elements_list:
-        elements_list.append(atom)
-
-elements_list = [atom.capitalize() for atom in elements_list]
+        
+        # - sorting atomic pairs
+        pairs_list = sort_input_pairs(elements)
 
  # - list of atom pair from elements list
-if len(elements_list) < 1:
-    exit(f'\n *** ERROR ***\nNo atom asked to make the RDA\n')
+if len(pairs_list) < 1:
+    exit(f'\n *** ERROR ***\nNo atomic pair asked to make the RDA (e.g. C-C)\n')
 else:
-    pairs_list = []
-    atom_a = 0
-    while atom_a < len(elements_list):
-        atom_b = atom_a + 1
-        pair = str(elements_list[atom_a]) + '-' + str(elements_list[atom_a])
-        pairs_list.append(pair)
-        while atom_b < len(elements_list):
-            pair = str(elements_list[atom_a]) + '-' + str(elements_list[atom_b])
-            pairs_list.append(pair)
-
-            atom_b += 1
-        atom_a += 1
-
     print(f'\nList of atomic pairs to make the RDA: {pairs_list}')
     # - number of atoms pair, (n+1)!/2*(n-1)!
     atom_pairs = len(pairs_list)
+
+# - list of individual atoms 
+elements_list = []
+
+for pair in pairs_list:
+    for atom in pair.split('-'):
+        if atom not in elements_list:
+            elements_list.append(atom)
 
 # -------------------------------------------------------------------------------
 # - defining grid for the Radial Distribution Analysis (number of occurrences)
@@ -219,17 +260,20 @@ for file_xyz in list_xyz:
             # computing euclidean distance
             distance = np.linalg.norm(coordinates_a - coordinates_b)
 
-            if distance <= rf:
+            if distance < rf:
                 # - finding atomic pair for previous distance
                 pair = str(data_xyz.iloc[atom_a, 0]) + '-' + str(data_xyz.iloc[atom_b, 0])
                 # - pair AB == BA
                 pair_rev = str(data_xyz.iloc[atom_b, 0]) + '-' + str(data_xyz.iloc[atom_a, 0])
-                
+
                 # - index for pair list
                 if pair in pairs_list:
                     pair_idx = pairs_list.index(pair)
                 elif pair_rev in pairs_list:
                     pair_idx = pairs_list.index(pair_rev)
+                else:
+                    atom_b += 1
+                    continue
 
                 # Radial distribution analysis
                 distance_hit = int(round((distance - ro) / dr))
@@ -238,6 +282,7 @@ for file_xyz in list_xyz:
 
             atom_b += 1
         atom_a += 1
+# ---------------------------------------------------------
 
 # ----------------------------------------------
 # - bond distance based on  the previous grid for the RDA
@@ -256,7 +301,9 @@ while atom_pair < len(pairs_list):
     # - plotting only if any distance is found
     if total_bond > 0:
         # - saving RDA
-        np.savetxt(pair + '_rda' + '.dat', np.transpose([bond_distance, occurrences[atom_pair, :]]),
+
+        rda_name = pair + '_rda' + '.dat'
+        np.savetxt(rda_name, np.transpose([bond_distance, occurrences[atom_pair, :]]),
                     delimiter=' ', header='distance [Angstrom]   occurrence (total=%i)' % total_bond,
                     fmt='%.6f %28i')
 
@@ -271,8 +318,8 @@ while atom_pair < len(pairs_list):
         plt.ylabel('Relative Number of Ocurrences', fontsize=12, fontweight='bold')
         plt.xlabel('Bond Length [Angstrom]', fontsize=12, fontweight='bold')
 
-        # - smooth curve BSpline, degree k=3, cubic
-        smooth = make_interp_spline(bond_distance, occurrences[atom_pair, :], k=3)
+        # # - smooth curve BSpline, degree k=3, cubic
+        smooth = make_interp_spline(bond_distance, occurrences[atom_pair, :], k=2)
         smooth_occurrences = smooth(smooth_bond_distance)
         ax1.plot(smooth_bond_distance, smooth_occurrences / total_bond, label='%s' % (pair))
 
@@ -284,7 +331,7 @@ while atom_pair < len(pairs_list):
 
         # ------------------------------------------------
         # - y axis scale, for raw data
-        # ax1.ticklabel_format(axis="y", style="sci", scilimits=(0, 0)
+        ax1.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
         
         # - x ticks
         ax1.xaxis.set_ticks(np.arange(ro, rf, 0.2))
@@ -296,9 +343,17 @@ while atom_pair < len(pairs_list):
 
     atom_pair += 1
 
-# ------------------------------------------------------------------------------------
+# # ------------------------------------------------------------------------------------
 # - ENDING the plots
 plt.show()
+
+# - plotting
+# for pair in pairs_list:
+#     rda_name = pair + '_rda' + '.dat'
+
+#     if os.path.exists(rda_name):
+#         os.system('./plot_rda.py ' + rda_name + ' &')
+
 
 print(f'\n****************************************************')
 print(f'*** DONE ***')

@@ -68,7 +68,7 @@ if len(rda_files) > 0:
     print(f'\nList of files:\n\n{rda_files}\n')
     for file_rda in rda_files:
         if not os.path.exists(file_rda):
-            print(f'\n*** Warinnig ***\n file {file_rda} does not exits \n')
+            exit(f'\n*** Warinnig ***\n file {file_rda} does not exits \n')
 else:
     exit(f'\n *** ERROR ***\n No files found to plot\n')
 
