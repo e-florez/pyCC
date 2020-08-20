@@ -250,7 +250,8 @@ for file_xyz in list_xyz:
     if num_atoms != data_xyz.shape[0]:
         num_atoms = data_xyz.shape[0]
 
-    # - Distance between two atoms
+    #--------------------------------------------------------------------
+    # - Computing the Radial Distribution Function
     coordinates_a = np.zeros(3, dtype=float)
     coordinates_b = np.zeros(3, dtype=float)
 
@@ -284,13 +285,19 @@ for file_xyz in list_xyz:
                     atom_b += 1
                     continue
 
+                #------------------------------------------------
                 # Radial distribution analysis
                 distance_hit = int(round((distance - ro) / dr))
                 if distance_hit > 0 and distance_hit < nbins:
                     occurrences[pair_idx, distance_hit] += 1
+                
+                #------------------------------------------------
 
             atom_b += 1
         atom_a += 1
+        #--------------------------------------------------------------------
+
+
 # ---------------------------------------------------------
 
 # ----------------------------------------------
