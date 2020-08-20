@@ -98,6 +98,13 @@ def all_elements(file_xyz):
                     skiprows=2, header=None,
                     names=["element", "x-coordinate", "y-coordinate", "z-coordinate"])
     
+    # - if XYZ file has no coordinates (by mistake)
+    if elements.shape[0] <= 1:
+        elements = []
+        print(f'\n*** WARNING *** \nNo coordinates found in {file_xyz}')
+        return elements
+        # return '*** WARNING *** No coordinates found in ', file_xyz 
+
     elements = elements['element'].tolist()
 
     # - list of elements (uniques)
@@ -140,6 +147,8 @@ def sort_input_pairs(elements):
 
     return element_list
 
+#--------------------------------------------------------------------------
+# - END of functions definition
 
 elements = [] # list of elements
 
@@ -168,7 +177,7 @@ else:
 
  # - list of atom pair from elements list
 if len(pairs_list) < 1:
-    exit(f'\n *** ERROR ***\nNo atomic pair asked to make the RDA (e.g. C-C)\n')
+    exit(f'\n *** ERROR ***\nNo atoms found to make the RDA (e.g. C-C)\n')
 else:
     print(f'\nList of atomic pairs to make the RDA: {pairs_list}')
     # - number of atoms pair, (n+1)!/2*(n-1)!
@@ -222,7 +231,7 @@ for file_xyz in list_xyz:
 
     # - checking coordinates within file
     if data_xyz_all.shape[0] <= 1:
-        print(f'\n*** WARNING *** \n No coordinates found in {file_xyz}')
+        print(f'\n*** WARNING *** \nNo coordinates found in {file_xyz}')
         continue
 
     # - filtering to do the RDA for the atoms in the list (case insensitive)
