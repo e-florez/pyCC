@@ -201,13 +201,21 @@ nbins = int((rf - ro) / dr)  # number of bins for the accurences
 # - points to use BSpline
 bs_points = 100
 
-# - array to storage occurrences
+# - array to storage occurrences for bond distances
 #    ???????????????
 #
 occurrences = np.zeros((atom_pairs, nbins), dtype=int)
 
 print(f'\nRDA with {nbins} bins, grid {dr} between {ro}-{rf} Angstroms')
 print(f'BSpline used for the RDA with {bs_points} points')
+
+# - array to storage occurrences for angles, [0, 180] degrees
+# grid = 0.1 --> 1800 = (180 - 0)/0.1
+delta_angle = 0.1
+nbins_angle = int (180 / delta_angle)
+triplets = 1   # number of different A-X-B
+
+occurrences_angle = np.zeros(nbins_angle, dtype=int)
 
 # -------------------------------------------------------------------------
 # - reading coordinates for XYZ file (importing data with pandas)
@@ -218,7 +226,7 @@ for file_xyz in list_xyz:
     # ------------------------------------------------------------------
     # in a nutshell:
     # with Pandas we have 'num_atoms' lines, each of them has four columns
-    # 'data_xyz.iloc[i,j]', where i=0,1,...,(num_atoms-1) and x=0,1,2,3
+    # 'data_xyz.iloc[i, j]', where i=0,1,...,(num_atoms-1) and j=0,1,2,3
     # As a result, we have:
     #       data_xyz.iloc[i, 0] is the element (string type)
     #       data_xyz.iloc[i, 1] is a coordinate on the x-axis (float type)
@@ -305,29 +313,36 @@ for file_xyz in list_xyz:
             #------------------------------------------------
             # - computing distance matrix
             distance_matrix[atom_a, atom_b] = distance
+            # distance_matrix[atom_b, atom_a] = distance
 
             #------------------------------------------------
             atom_b += 1
         atom_a += 1
 
+    # print(distance_matrix)
+    # print
+    # print(header_distance_matrix)
+    # print
+
+
     #------------------------------------------------
     # - computing angle A-X-B
     # - order matters for the angle A-X-B
     max_distance = 2.5
+    min_distance = 0.1
     coordinates_central = np.zeros(3, dtype=float)
     coordinates_first = np.zeros(3, dtype=float)
     coordinates_second = np.zeros(3, dtype=float)
-    central_first = np.zeros(3, dtype=float)
-    central_second = np.zeros(3, dtype=float)
 
     # angle_list = ["H", "O", "H"]
-    angle_list = ["O", "Hg", "O"]
+    # angle_list = ["O", "Hg", "O"]
+    angle_list = ["Hg", "O", "H"]
 
     first_atom = angle_list[0]
     central_atom = angle_list[1]
     second_atom = angle_list[2]
 
-    # - central atom index from XYZ file
+    # - atom index from XYZ file
     list_idx_central_atom = [i for i, x in enumerate(header_distance_matrix) if x == central_atom]
     list_idx_first_atom = [i for i, x in enumerate(header_distance_matrix) if x == first_atom]
     list_idx_second_atom = [i for i, x in enumerate(header_distance_matrix) if x == second_atom]
@@ -337,41 +352,86 @@ for file_xyz in list_xyz:
         coordinates_central[1] = float(data_xyz.iloc[central, 2])
         coordinates_central[2] = float(data_xyz.iloc[central, 3])
 
+        # - avoiding to count the same pair in reverse orden
+        # - i.e. angle A-X-B = B-X-A, so for angle AB = BA
+        list_pair_angle = []
+
         for first in list_idx_first_atom:
-            if ( distance_matrix[central, first] < max_distance ) and ( distance_matrix[central, first] > 0 ):
+
+            if central == first:
+                continue
+
+            if distance_matrix[central, first] > min_distance \
+                and distance_matrix[central, first] < max_distance:
                 coordinates_first[0] = float(data_xyz.iloc[first, 1])
                 coordinates_first[1] = float(data_xyz.iloc[first, 2])
                 coordinates_first[2] = float(data_xyz.iloc[first, 3])
+            elif distance_matrix[first, central] > min_distance \
+                and distance_matrix[first, central] < max_distance:
+                coordinates_first[0] = float(data_xyz.iloc[first, 1])
+                coordinates_first[1] = float(data_xyz.iloc[first, 2])
+                coordinates_first[2] = float(data_xyz.iloc[first, 3])
+            else:
+                continue
 
-                # - vectorial distance between the central and first atom
-                central_first = np.subtract(coordinates_central, coordinates_first)
+            # - vectorial distance between the central and first atom
+            central_first = np.subtract(coordinates_central, coordinates_first)
 
-                for second in list_idx_second_atom:
-                    if (first != second) and ( distance_matrix[central, second] < max_distance ) and ( distance_matrix[central, second] > 0 ):
-                        coordinates_second[0] = float(data_xyz.iloc[second, 1])
-                        coordinates_second[1] = float(data_xyz.iloc[second, 2])
-                        coordinates_second[2] = float(data_xyz.iloc[second, 3])
+            for second in list_idx_second_atom:
 
-                        # - vectorial distance between the central and second atom
-                        central_second = np.subtract(coordinates_central, coordinates_second)
+                pair_angle = str(first) + str(second)
+                pair_angle_rev = str(second) + str(first)
 
-                        # - computing angle first-central-second
-                        Cos = np.dot(central_first, central_second) / np.linalg.norm(central_first) / np.linalg.norm(central_second)
-                        angle = np.arccos(Cos)
-                        angle_deg = np.degrees(angle)
+                if pair_angle in list_pair_angle \
+                    or pair_angle_rev in list_pair_angle:
+                    continue
+                else:
+                    list_pair_angle.append(pair_angle)
+                    list_pair_angle.append(pair_angle_rev)
+                    
+                if first == second:
+                    continue
 
-                        print(str(data_xyz.iloc[first, 0]), str(data_xyz.iloc[central, 0]), str(data_xyz.iloc[second, 0]))
-                        print
-                        print(angle_deg)
-                        print
+                if distance_matrix[central, second] > min_distance \
+                    and distance_matrix[central, second] < max_distance:
+                    coordinates_second[0] = float(data_xyz.iloc[second, 1])
+                    coordinates_second[1] = float(data_xyz.iloc[second, 2])
+                    coordinates_second[2] = float(data_xyz.iloc[second, 3])
+                elif distance_matrix[second, central] > min_distance \
+                    and distance_matrix[second, central] < max_distance:
+                    coordinates_second[0] = float(data_xyz.iloc[second, 1])
+                    coordinates_second[1] = float(data_xyz.iloc[second, 2])
+                    coordinates_second[2] = float(data_xyz.iloc[second, 3])
+                else:
+                    continue
 
+                # - vectorial distance between the central and second atom
+                central_second = np.subtract(coordinates_central, coordinates_second)
+
+                # - computing angle first-central-second
+                Cos = np.dot(central_first, central_second) \
+                    / np.linalg.norm(central_first) \
+                    / np.linalg.norm(central_second)
+                angle = np.arccos(Cos)
+                angle_deg = np.degrees(angle)
+
+                angle_hit = int(round( (angle_deg) / delta_angle) )
+                if angle_hit > 0 and angle_hit < nbins_angle:
+                    occurrences_angle[angle_hit] += 1
+
+                print(str(data_xyz.iloc[first, 0]), \
+                    str(data_xyz.iloc[central, 0]), \
+                    str(data_xyz.iloc[second, 0]))
+                print
+                print(angle_deg)
+                print
+
+            #     counter_second += 1
+            # counter_first += 1
 
 
 #--------------------------------------------------------------------
 
-# print(distance_matrix)
-# print
-# print(header_distance_matrix)
 # print
 # print(angle_deg)
 # print
