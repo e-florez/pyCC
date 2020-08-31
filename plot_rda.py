@@ -20,11 +20,11 @@ print(f'\nPlotting Radial Distribution Analisys (RDA)\n')
 # - working directory
 print(f"\nCurrent working directory: {os.getcwd()}")
 
-##### if uncomment the section to change the working dir, must change 
+##### if uncomment the section to change the working dir, must change
 ##### len(sys.argv) < 3
-##### input_arguments = 
+##### input_arguments =
 
-# if len(sys.argv) <= 1:    
+# if len(sys.argv) <= 1:
 #     tmp_dir =  input(f'\nDirectory (whit the XYZ files) to make the RDA [default: empty]: ')
 #     tmp_dir = tmp_dir.strip()
 
@@ -39,12 +39,11 @@ print(f"\nCurrent working directory: {os.getcwd()}")
 
 # # Check if New path exists
 # if os.path.exists(working_dir) :
-#     # Change the current working Directory    
+#     # Change the current working Directory
 #     os.chdir(working_dir)
 # else:
 #     print(f'\n*** ERROR ***')
-#     exit(f"Can't change the Working Directory, {working_dir} doesn't exist")   
-
+#     exit(f"Can't change the Working Directory, {working_dir} doesn't exist")
 # -----------------------------------------------------------
 # - RDA files to plot
 rda_files = []
@@ -84,10 +83,7 @@ ax1.grid()
 
 # - legends for the main plot
 plt.ylabel('Relative Number of Ocurrences', fontsize=12) #, fontweight='bold')
-plt.xlabel('Bond Distance [Angstrom]', fontsize=12) #, fontweight='bold')
-
-# - ticks for the x-axis
-ax1.xaxis.set_major_locator(plticker.MultipleLocator(base=0.2))
+# plt.xlabel('Bond Distance [Angstrom]', fontsize=12) #, fontweight='bold')
 
 # -----------------------------------------------------------
 # - loading files to read and plot them
@@ -96,6 +92,8 @@ for rda in rda_files:
     for line in open(rda, 'r'):
         # skipping the header
         if line.startswith("#"):
+            label = [header.title() for header in line.split()]
+            label_x = ' '.join(label[1:3])
             continue
 
         values = [float(s) for s in line.split()]
@@ -114,10 +112,19 @@ for rda in rda_files:
 
     # - Bspline fitting
     ax1.plot(smooth_x, smooth_y / total, label=' %s \n Total distances= %i' %(rda, total))
-    
+
     # - raw data, no Bspline fitting
     # ax1.plot(x, y, label='%s' %rda)
 
+# - ticks for the x-axis
+# delta_x = (x[-1] - x[0]) / 10
+# ax1.xaxis.set_major_locator(plticker.MultipleLocator(base=delta_x))
+ax1.xaxis.set_major_locator(plt.MaxNLocator(12))
+
+if len(label_x) < 1:
+    label_x = input(f'Please, insert a name for x-axis: ')
+
+plt.xlabel(label_x, fontsize=12) #, fontweight='bold')
 # -----------------------------------------------------------
 # - Ending the plot
 

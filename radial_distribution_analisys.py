@@ -64,7 +64,7 @@ for input_xyz in glob.glob('*.xyz'):
         if unique_input_xyz not in list_xyz:
             list_xyz.append(unique_input_xyz)
 
-list_xyz = ["w2s1.xyz"]
+# list_xyz = ["w2s1.xyz"]
 # list_xyz = ["w1s1.xyz", "w2s1.xyz"]
 # list_xyz = ["w1s1.xyz", "w2s1.xyz", "w3s1.xyz"]
 # list_xyz = ["w1s1.xyz", "w2s1.xyz", "w3s1.xyz", "w3s2.xyz"]
@@ -211,8 +211,10 @@ print(f'BSpline used for the RDA with {bs_points} points')
 
 # - array to storage occurrences for angles, [0, 180] degrees
 # grid = 0.1 --> 1800 = (180 - 0)/0.1
-delta_angle = 0.1
-nbins_angle = int (180 / delta_angle)
+delta_angle = 5.0
+min_angle = 0
+max_angle = 190
+nbins_angle = int ( (max_angle - min_angle) / delta_angle)
 triplets = 1   # number of different A-X-B
 
 occurrences_angle = np.zeros(nbins_angle, dtype=int)
@@ -319,24 +321,18 @@ for file_xyz in list_xyz:
             atom_b += 1
         atom_a += 1
 
-    # print(distance_matrix)
-    # print
-    # print(header_distance_matrix)
-    # print
-
-
-    #------------------------------------------------
+    #--------------------------------------------------------------------------------
     # - computing angle A-X-B
     # - order matters for the angle A-X-B
+
+    angle_list = ["H", "O", "H"]
+    # angle_list = ["O", "Hg", "O"]
+
     max_distance = 2.5
     min_distance = 0.1
     coordinates_central = np.zeros(3, dtype=float)
     coordinates_first = np.zeros(3, dtype=float)
     coordinates_second = np.zeros(3, dtype=float)
-
-    # angle_list = ["H", "O", "H"]
-    # angle_list = ["O", "Hg", "O"]
-    angle_list = ["Hg", "O", "H"]
 
     first_atom = angle_list[0]
     central_atom = angle_list[1]
@@ -379,6 +375,9 @@ for file_xyz in list_xyz:
 
             for second in list_idx_second_atom:
 
+                if first == second:
+                    continue
+
                 pair_angle = str(first) + str(second)
                 pair_angle_rev = str(second) + str(first)
 
@@ -388,9 +387,6 @@ for file_xyz in list_xyz:
                 else:
                     list_pair_angle.append(pair_angle)
                     list_pair_angle.append(pair_angle_rev)
-                    
-                if first == second:
-                    continue
 
                 if distance_matrix[central, second] > min_distance \
                     and distance_matrix[central, second] < max_distance:
@@ -419,29 +415,24 @@ for file_xyz in list_xyz:
                 if angle_hit > 0 and angle_hit < nbins_angle:
                     occurrences_angle[angle_hit] += 1
 
-                print(str(data_xyz.iloc[first, 0]), \
-                    str(data_xyz.iloc[central, 0]), \
-                    str(data_xyz.iloc[second, 0]))
-                print
-                print(angle_deg)
-                print
-
-            #     counter_second += 1
-            # counter_first += 1
-
-
 #--------------------------------------------------------------------
+# - bond angle based on the previous grid for the RDA
+bond_angle = np.linspace(min_angle, max_angle, nbins_angle)
+# - to smooth the curve (BSpline)
+smooth_bond_angle = np.linspace(min_angle, max_angle, nbins_angle * bs_points)
 
-# print
-# print(angle_deg)
-# print
+total_angles = sum(occurrences_angle)
+
+if total_angles > 0:
+    ada_name =  '-'.join(angle_list) + '_ada' + '.dat'
+    np.savetxt(ada_name, np.transpose([bond_angle, occurrences_angle]),
+                delimiter=' ', header='Angle [degrees]   occurrence (total=%i)' % total_angles,
+                fmt='%.6f %28i')
 
 
-exit()
 
-# ---------------------------------------------------------
 
-# ----------------------------------------------
+#---------------------------------------------------------------------------------------
 # - bond distance based on  the previous grid for the RDA
 bond_distance = np.linspace(ro, rf, nbins)
 # - to smooth the curve (BSpline)
@@ -464,34 +455,35 @@ while atom_pair < len(pairs_list):
                     delimiter=' ', header='distance [Angstrom]   occurrence (total=%i)' % total_bond,
                     fmt='%.6f %28i')
 
-        # - to plot
-        fig = plt.figure()  # inches WxH, figsize=(7, 8)
-        fig.suptitle('Radial Distribution Analisys \n' + r'\small{Total distances= %i}' % total_bond,
-                        fontsize=20, fontweight='bold')
-        ax1 = plt.subplot()
-        ax1.grid()
+        # # ------------------------------------------------
+        # # - to plot
+        # fig = plt.figure()  # inches WxH, figsize=(7, 8)
+        # fig.suptitle('Radial Distribution Analisys \n' + r'\small{Total distances= %i}' % total_bond,
+        #                 fontsize=20, fontweight='bold')
+        # ax1 = plt.subplot()
+        # ax1.grid()
 
-        # - legends for the main plot
-        plt.ylabel('Relative Number of Ocurrences', fontsize=12, fontweight='bold')
-        plt.xlabel('Bond Length [Angstrom]', fontsize=12, fontweight='bold')
+        # # - legends for the main plot
+        # plt.ylabel('Relative Number of Ocurrences', fontsize=12, fontweight='bold')
+        # plt.xlabel('Bond Length [Angstrom]', fontsize=12, fontweight='bold')
 
-        # # - smooth curve BSpline, degree k=3, cubic
-        smooth = make_interp_spline(bond_distance, occurrences[atom_pair, :], k=2)
-        smooth_occurrences = smooth(smooth_bond_distance)
-        ax1.plot(smooth_bond_distance, smooth_occurrences / total_bond, label='%s' % (pair))
+        # # # - smooth curve BSpline, degree k=3, cubic
+        # smooth = make_interp_spline(bond_distance, occurrences[atom_pair, :], k=2)
+        # smooth_occurrences = smooth(smooth_bond_distance)
+        # ax1.plot(smooth_bond_distance, smooth_occurrences / total_bond, label='%s' % (pair))
 
-        # - raw data, not Bspline fitting
-        # ax1.plot(bond_distance, occurrences[pair_idx, :], label=r'%s' % (pair))
+        # # - raw data, not Bspline fitting
+        # # ax1.plot(bond_distance, occurrences[pair_idx, :], label=r'%s' % (pair))
 
-        # - Put a legend below current axis
-        plt.legend(loc=0)
+        # # - Put a legend below current axis
+        # plt.legend(loc=0)
 
-        # ------------------------------------------------
-        # - y axis scale, for raw data
-        ax1.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
+        # # ------------------------------------------------
+        # # - y axis scale, for raw data
+        # ax1.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
         
-        # - x ticks
-        ax1.xaxis.set_ticks(np.arange(ro, rf, 0.2))
+        # # - x ticks
+        # ax1.xaxis.set_ticks(np.arange(ro, rf, 0.2))
 
     # - no distance found
     else:
