@@ -111,7 +111,7 @@ for rda in rda_files:
     smooth_y = smooth(smooth_x)
 
     # - Bspline fitting
-    ax1.plot(smooth_x, smooth_y / total, label=' %s \n Total distances= %i' %(rda, total))
+    ax1.plot(smooth_x, smooth_y / total, label=' %s \n Total= %i' %(rda, total))
 
     # - raw data, no Bspline fitting
     # ax1.plot(x, y, label='%s' %rda)

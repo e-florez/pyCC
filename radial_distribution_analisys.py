@@ -64,7 +64,7 @@ for input_xyz in glob.glob('*.xyz'):
         if unique_input_xyz not in list_xyz:
             list_xyz.append(unique_input_xyz)
 
-list_xyz = ["w4s1.xyz"]
+# list_xyz = ["w4s1.xyz"]
 # list_xyz = ["w1s1.xyz", "w2s1.xyz"]
 # list_xyz = ["w1s1.xyz", "w2s1.xyz", "w3s1.xyz"]
 # list_xyz = ["w1s1.xyz", "w2s1.xyz", "w3s1.xyz", "w3s2.xyz"]
@@ -217,7 +217,16 @@ max_angle = 190
 nbins_angle = int ( (max_angle - min_angle) / delta_angle)
 
 occurrences_angle = np.zeros(nbins_angle, dtype=int)
-occurrences_dihedral_angle = np.zeros(nbins_angle, dtype=int)
+
+# - array to storage occurrences for DIHEDRAL angles, [0, 360] degrees
+# grid = 0.1 --> 3600 = (3600 - 0)/0.1
+delta_angle = 5.0
+min_dihedral_angle = 0
+max_dihedral_angle = 360
+
+nbins_dihedral_angle = int ( (max_dihedral_angle - min_dihedral_angle) / delta_angle)
+
+occurrences_dihedral_angle = np.zeros(nbins_dihedral_angle, dtype=int)
 
 # -------------------------------------------------------------------------
 # - reading coordinates for XYZ file (importing data with pandas)
@@ -375,15 +384,9 @@ for file_xyz in list_xyz:
             if distance_matrix[central, first] > min_distance \
                 and distance_matrix[central, first] < max_distance:
                 pass
-                # coordinates_first[0] = float(data_xyz.iloc[first, 1])
-                # coordinates_first[1] = float(data_xyz.iloc[first, 2])
-                # coordinates_first[2] = float(data_xyz.iloc[first, 3])
             elif distance_matrix[first, central] > min_distance \
                 and distance_matrix[first, central] < max_distance:
                 pass
-                # coordinates_first[0] = float(data_xyz.iloc[first, 1])
-                # coordinates_first[1] = float(data_xyz.iloc[first, 2])
-                # coordinates_first[2] = float(data_xyz.iloc[first, 3])
             else:
                 continue
 
@@ -412,15 +415,9 @@ for file_xyz in list_xyz:
                 if distance_matrix[central, second] > min_distance \
                     and distance_matrix[central, second] < max_distance:
                     pass
-                    # coordinates_second[0] = float(data_xyz.iloc[second, 1])
-                    # coordinates_second[1] = float(data_xyz.iloc[second, 2])
-                    # coordinates_second[2] = float(data_xyz.iloc[second, 3])
                 elif distance_matrix[second, central] > min_distance \
                     and distance_matrix[second, central] < max_distance:
                     pass
-                    # coordinates_second[0] = float(data_xyz.iloc[second, 1])
-                    # coordinates_second[1] = float(data_xyz.iloc[second, 2])
-                    # coordinates_second[2] = float(data_xyz.iloc[second, 3])
                 else:
                     continue
 
@@ -495,12 +492,6 @@ for file_xyz in list_xyz:
         coordinates_first[1] = float(data_xyz.iloc[first, 2])
         coordinates_first[2] = float(data_xyz.iloc[first, 3])
 
-        # - avoiding to count the same pair in reverse orden
-        # - i.e. angle A-X-B = B-X-A, so for angle AB = BA
-        list_pair_angle = []
-
-
-
         for central in list_idx_central_atom:
 
             if central == first:
@@ -532,7 +523,6 @@ for file_xyz in list_xyz:
 
                 if distance_matrix[central, second] > min_distance \
                     and distance_matrix[central, second] < max_distance:
-                    pass
                     distance_second = distance_matrix[central, second]
                 elif distance_matrix[second, central] > min_distance \
                     and distance_matrix[second, central] < max_distance:
@@ -540,26 +530,24 @@ for file_xyz in list_xyz:
                 else:
                     continue
 
-                min_second = min(min_second, distance_second)
+                if min_second != min(min_second, distance_second):
+                    min_second = min(min_second, distance_second)
 
-            # - selecting the nearest
-            matrix_index = np.where(distance_matrix == min_second)
-            second = int(matrix_index[1])
+                    choose_second = second
 
-            coordinates_second[0] = float(data_xyz.iloc[second, 1])
-            coordinates_second[1] = float(data_xyz.iloc[second, 2])
-            coordinates_second[2] = float(data_xyz.iloc[second, 3])
+                    coordinates_second[0] = float(data_xyz.iloc[second, 1])
+                    coordinates_second[1] = float(data_xyz.iloc[second, 2])
+                    coordinates_second[2] = float(data_xyz.iloc[second, 3])
 
             # - vectorial distance between the central and second atom
             central_second = np.subtract(coordinates_central, coordinates_second)
-
 
             # - initial value to choose the min
             min_third = 10000
 
             for third in list_idx_third_atom:
 
-                if first == third or second == third or central == third:
+                if first == third or central == third or choose_second == third:
                     continue
 
                 if distance_matrix[central, third] > min_distance \
@@ -571,18 +559,12 @@ for file_xyz in list_xyz:
                 else:
                     continue
 
-                min_third = min(min_third, distance_third)
+                if min_third != min(min_third, distance_third):
+                    min_third = min(min_third, distance_third)
 
-            # - selecting the nearest
-            matrix_index = np.where(distance_matrix == min_third)
-            # third = int(matrix_index[1])
-            third = matrix_index
-
-            exit(matrix_index)
-
-            coordinates_third[0] = float(data_xyz.iloc[third, 1])
-            coordinates_third[1] = float(data_xyz.iloc[third, 2])
-            coordinates_third[2] = float(data_xyz.iloc[third, 3])
+                    coordinates_third[0] = float(data_xyz.iloc[third, 1])
+                    coordinates_third[1] = float(data_xyz.iloc[third, 2])
+                    coordinates_third[2] = float(data_xyz.iloc[third, 3])
 
             # - vectorial distance between the central and third atom
             central_third = np.subtract(coordinates_central, coordinates_third)
@@ -597,19 +579,6 @@ for file_xyz in list_xyz:
             p3 = coordinates_second
             p4 = coordinates_third
 
-            # print(f'\nidx : \n{matrix_index}\n')
-
-            print(f"header: \n{header_distance_matrix}")
-            np.set_printoptions(precision=2)
-            print(f'matrix: \n{distance_matrix}')
-
-            print(f'\np1: \n{list_idx_first_atom} \n{first} \n{p1}')
-            print(f'\np2: \n{list_idx_central_atom} \n{central} \n{p2}')
-            print(f'\np3: \n{list_idx_second_atom} \n{second} \n{p3}')
-            print(f'\np4: \n{list_idx_third_atom} \n{third} \n{p4}')
-
-            exit ()
-
             dihedral_angle_deg = dh.dihedral(p1, p2, p3, p4)
 
             dihedral_angle_hit = int(round( (dihedral_angle_deg) / delta_angle) )
@@ -620,17 +589,20 @@ for file_xyz in list_xyz:
             # print(f'dihedral: {dihedral_angle_deg}')
             # print()
 
-
-
-
     #--------------------------------------------------------------------
-
-
-# exit()
 
 #---------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------
 # - bond angle based on the previous grid for the RDA
+
+print(f'')
+print(f'Angular Distribution Analisys for:')
+print(f'')
+print(f'   {angle_list[1]}')
+print(f'  /  \\')
+print(f' {angle_list[0]}    {angle_list[2]}')
+print(f'')
+
 bond_angle = np.linspace(min_angle, max_angle, nbins_angle)
 
 total_angles = sum(occurrences_angle)
@@ -645,14 +617,30 @@ else:
     print(f'\n*** Warning ***')
     print(f'NO angle {ada_name} found in XYZ files\n')
 
+
+#-------------------------------------------------------------------
 # - dihedral angle
+
+print(f'')
+print(f'Angular Distribution Analisys for Dihedral angle:')
+print(f'')
+print(f'          {dihedral_list[2]}')
+print(f'         /')
+print(f'  {dihedral_list[0]}----{dihedral_list[1]}')
+print(f'         \\')
+print(f'          {dihedral_list[3]}')
+print(f'')
+
+bond_angle = np.linspace(min_dihedral_angle, max_dihedral_angle, nbins_dihedral_angle)
+
 total_dihedral_angles = sum(occurrences_dihedral_angle)
 
-dihedral_ada_name =  '-'.join(angle_list) + '_dihedral_ada' + '.dat'
+dihedral_ada_name =  '-'.join(angle_list) + '_dada' + '.dat'
 
 if total_dihedral_angles > 0:
     np.savetxt(dihedral_ada_name, np.transpose([bond_angle, occurrences_dihedral_angle]),
-                delimiter=' ', header='Angle [degrees]   occurrence (total=%i)' % total_angles,
+                delimiter=' ', header='Angle [degrees]   occurrence (total=%i)' \
+                                                    % total_dihedral_angles,
                 fmt='%.6f %28i')
 else:
     print(f'\n*** Warning ***')

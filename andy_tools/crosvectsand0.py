@@ -20,9 +20,9 @@ p3 = [2.3259447762, -0.7989195366, 0.1773102636]
 p4 = [2.3259447157,  0.7989197348, 0.1773102636]
   
 # Calculate coordinates for vectors q1, q2 and q3
-A = np.subtract(p2,p1) # b - a
-B = np.subtract(p3,p2) # c - b
-C = np.subtract(p4,p3) # d - c
+A = np.subtract(p2, p3) # b - a
+B = np.subtract(p2, p4) # c - b
+C = np.subtract(p1, p2) # d - c
 
 
 D = np.cross(A,B)

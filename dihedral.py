@@ -29,10 +29,6 @@ def dihedral(p1, p2, p3, p4):
     q1_x_q2 = np.cross(q1, q2)
     q2_x_q3 = np.cross(q2, q3)
 
-    # print(f'q1_x_q2: {q1_x_q2}')
-    # print(f'q2_x_q3: {q2_x_q3}')
-
-
     # Calculate normal vectors
     n1 = q1_x_q2 / np.sqrt(np.dot(q1_x_q2, q1_x_q2))
     n2 = q2_x_q3 / np.sqrt(np.dot(q2_x_q3, q2_x_q3))
