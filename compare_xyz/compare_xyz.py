@@ -632,12 +632,12 @@ for file_xyz in list_xyz:
 
 
 # -----------------------------------------------------------
-
-# - radial, angular, and dihedral distribution, respectively
-distribution_list = ["rda_", "ada_", "dada_"]
-
-count = 0
-for distribution in distribution_list:
+def plot_histogram(files_data):
+    """
+    ploting histograms
+    """
+    if len(glob.glob(files_data)) < 1:
+        return
 
     # -----------------------------------------------------------
     # - plotting: defining frames and designing the area to plot
@@ -651,15 +651,8 @@ for distribution in distribution_list:
     plt.ylabel('Relative Number of Ocurrences', fontsize=12) #, fontweight='bold')
     # plt.xlabel('Bond Distance [Angstrom]', fontsize=12) #, fontweight='bold')
 
-    if distribution == "rda_":
-        while count < len(pairs_list):
-            file_dat = distribution + '*' + pairs_list[count] + '.dat'
-            count += 1
-    else:
-        file_dat = distribution + '*.dat'
-
     # - loading files to read and plot them
-    for file_to_plot in glob.glob(file_dat):
+    for file_to_plot in glob.glob(files_data):
 
         name_file = file_to_plot.split('_')
         name_file = '-'.join(name_file[1:3])
@@ -690,18 +683,11 @@ for distribution in distribution_list:
         # - Bspline fitting
         ax1.plot(smooth_x, smooth_y / total, label=' %s \n Total= %i' %(name_file, total))
 
-        # - raw data, no Bspline fitting
-        # ax1.plot(x, y, label='%s' %rda)
-
-    # - ticks for the x-axis
-    # delta_x = (x[-1] - x[0]) / 10
-    # ax1.xaxis.set_major_locator(plticker.MultipleLocator(base=delta_x))
+    # ------------------------------------
     ax1.xaxis.set_major_locator(plt.MaxNLocator(12))
 
-    if len(label_x) < 1:
-        label_x = input(f'Please, insert a name for x-axis: ')
-
-    plt.xlabel(label_x, fontsize=12) #, fontweight='bold')
+    # plt.xlabel(label_x, fontsize=12) #, fontweight='bold')
+    plt.xlabel('No label', fontsize=12) #, fontweight='bold')
     # -----------------------------------------------------------
     # - Ending the plot
 
@@ -714,10 +700,27 @@ for distribution in distribution_list:
     box = ax1.get_position()
     ax1.set_position([box.x0, box.y0, box.width * 0.7, box.height])
 
-
-    # ---------------------------------------------------------------------------------------------------------
     # - ENDING the plots
-    plt.show()
+    return plt.show()
+
+# ---------------------------------------------------------------------------------------------------------
+# - radial, angular, and dihedral distribution, respectively
+distribution_list = ["rda_", "ada_", "dada_"]
+
+count = 0
+for distribution in distribution_list:
+
+    list_file_data = []
+    if distribution == "rda_":
+        while count < len(pairs_list):
+            list_file_data.append(distribution + '*' + pairs_list[count] + '.dat')
+            count += 1
+    else:
+        list_file_data.append(distribution + '*.dat')
+
+    for files_data in list_file_data:
+
+        plot_histogram(files_data)
 
 print(f'\n****************************************************')
 print(f'*** DONE ***')
