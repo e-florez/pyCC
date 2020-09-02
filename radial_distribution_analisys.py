@@ -64,7 +64,7 @@ for input_xyz in glob.glob('*.xyz'):
         if unique_input_xyz not in list_xyz:
             list_xyz.append(unique_input_xyz)
 
-# list_xyz = ["w4s1.xyz"]
+# list_xyz = ["w6s23.xyz"]
 # list_xyz = ["w1s1.xyz", "w2s1.xyz"]
 # list_xyz = ["w1s1.xyz", "w2s1.xyz", "w3s1.xyz"]
 # list_xyz = ["w1s1.xyz", "w2s1.xyz", "w3s1.xyz", "w3s2.xyz"]
@@ -591,6 +591,8 @@ for file_xyz in list_xyz:
 
     #--------------------------------------------------------------------
 
+# exit()
+
 #---------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------
 # - bond angle based on the previous grid for the RDA
@@ -607,7 +609,7 @@ bond_angle = np.linspace(min_angle, max_angle, nbins_angle)
 
 total_angles = sum(occurrences_angle)
 
-ada_name =  '-'.join(angle_list) + '_ada' + '.dat'
+ada_name =  'ada_' + '-'.join(angle_list) + '.dat'
 
 if total_angles > 0:
     np.savetxt(ada_name, np.transpose([bond_angle, occurrences_angle]),
@@ -635,7 +637,7 @@ bond_angle = np.linspace(min_dihedral_angle, max_dihedral_angle, nbins_dihedral_
 
 total_dihedral_angles = sum(occurrences_dihedral_angle)
 
-dihedral_ada_name =  '-'.join(angle_list) + '_dada' + '.dat'
+dihedral_ada_name = 'dada_' + '-'.join(dihedral_list) + '.dat'
 
 if total_dihedral_angles > 0:
     np.savetxt(dihedral_ada_name, np.transpose([bond_angle, occurrences_dihedral_angle]),
@@ -664,7 +666,7 @@ while atom_pair < len(pairs_list):
     if total_bond > 0:
         # - saving RDA
 
-        rda_name = pair + '_rda' + '.dat'
+        rda_name = 'rda_' + pair + '.dat'
         np.savetxt(rda_name, np.transpose([bond_distance, occurrences[atom_pair, :]]),
                     delimiter=' ', header='distance [Angstrom]   occurrence (total=%i)' % total_bond,
                     fmt='%.6f %28i')
@@ -695,7 +697,7 @@ while atom_pair < len(pairs_list):
         # # ------------------------------------------------
         # # - y axis scale, for raw data
         # ax1.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
-        
+
         # # - x ticks
         # ax1.xaxis.set_ticks(np.arange(ro, rf, 0.2))
 

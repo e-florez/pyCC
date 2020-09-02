@@ -76,7 +76,7 @@ else:
 # -----------------------------------------------------------
 # - plotting: defining frames and designing the area to plot
 fig = plt.figure(figsize=(10, 8))  # inches WxH
-fig.suptitle('Radial Distribution Analisys', fontsize=20) #, fontweight='bold')
+fig.suptitle('Distribution Analisys', fontsize=20) #, fontweight='bold')
 
 ax1 = plt.subplot(111)
 ax1.grid()
