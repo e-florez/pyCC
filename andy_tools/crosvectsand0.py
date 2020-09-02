@@ -31,6 +31,6 @@ print ("Vector perpendicular al plano formado por ",A," y ",B," : ",D)
 #Coseno entre 2 vectores
 Cos = np.dot(D,C)/norm(D)/norm(C)
 angle = np.arccos(Cos)
-angle = np.degrees(angle)
+angle = np.degrees(angle) + 90
 #print ("Ángulo en radianes entre ",D," y ",C," : ",angle)
 print ("Ángulo: ",angle)
