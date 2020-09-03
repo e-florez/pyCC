@@ -1,15 +1,7 @@
+import numpy as np
 
-import matplotlib.pyplot as plt
+arr = np.array([1, 2, 3, 4, 5, 4, 4])
 
-x, y = [], []
-for line in open("O-H_rda.dat", 'r'):
-   # skipping the header
-   if line.startswith("#"):
-       continue
+x = np.where(arr == 4)
 
-   values = [float(s) for s in line.split()]
-   x.append(values[0])
-   y.append(values[1])
-
-plt.plot(x, y, label='O-H_rda.dat')
-plt.show()
+print(x)

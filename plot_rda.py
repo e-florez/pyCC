@@ -20,11 +20,11 @@ print(f'\nPlotting Radial Distribution Analisys (RDA)\n')
 # - working directory
 print(f"\nCurrent working directory: {os.getcwd()}")
 
-##### if uncomment the section to change the working dir, must change 
+##### if uncomment the section to change the working dir, must change
 ##### len(sys.argv) < 3
-##### input_arguments = 
+##### input_arguments =
 
-# if len(sys.argv) <= 1:    
+# if len(sys.argv) <= 1:
 #     tmp_dir =  input(f'\nDirectory (whit the XYZ files) to make the RDA [default: empty]: ')
 #     tmp_dir = tmp_dir.strip()
 
@@ -39,12 +39,11 @@ print(f"\nCurrent working directory: {os.getcwd()}")
 
 # # Check if New path exists
 # if os.path.exists(working_dir) :
-#     # Change the current working Directory    
+#     # Change the current working Directory
 #     os.chdir(working_dir)
 # else:
 #     print(f'\n*** ERROR ***')
-#     exit(f"Can't change the Working Directory, {working_dir} doesn't exist")   
-
+#     exit(f"Can't change the Working Directory, {working_dir} doesn't exist")
 # -----------------------------------------------------------
 # - RDA files to plot
 rda_files = []
@@ -65,27 +64,26 @@ else:
 
 # - checking if there is any file to plot
 if len(rda_files) > 0:
-    print(f'\nList of files:\n\n{rda_files}\n')
+    # print(f'\nList of files:\n\n{rda_files}\n')
+    print(f'\nList of files:\n')
+    print('\n'.join(rda_files))
     for file_rda in rda_files:
         if not os.path.exists(file_rda):
-            print(f'\n*** Warinnig ***\n file {file_rda} does not exits \n')
+            exit(f'\n*** Warinnig ***\n file {file_rda} does not exits \n')
 else:
     exit(f'\n *** ERROR ***\n No files found to plot\n')
 
 # -----------------------------------------------------------
 # - plotting: defining frames and designing the area to plot
 fig = plt.figure(figsize=(10, 8))  # inches WxH
-fig.suptitle('Radial Distribution Analisys', fontsize=20) #, fontweight='bold')
+fig.suptitle('Distribution Analisys', fontsize=20) #, fontweight='bold')
 
 ax1 = plt.subplot(111)
 ax1.grid()
 
 # - legends for the main plot
 plt.ylabel('Relative Number of Ocurrences', fontsize=12) #, fontweight='bold')
-plt.xlabel('Bond Distance [Angstrom]', fontsize=12) #, fontweight='bold')
-
-# - ticks for the x-axis
-ax1.xaxis.set_major_locator(plticker.MultipleLocator(base=0.2))
+# plt.xlabel('Bond Distance [Angstrom]', fontsize=12) #, fontweight='bold')
 
 # -----------------------------------------------------------
 # - loading files to read and plot them
@@ -94,6 +92,8 @@ for rda in rda_files:
     for line in open(rda, 'r'):
         # skipping the header
         if line.startswith("#"):
+            label = [header.title() for header in line.split()]
+            label_x = ' '.join(label[1:3])
             continue
 
         values = [float(s) for s in line.split()]
@@ -111,11 +111,20 @@ for rda in rda_files:
     smooth_y = smooth(smooth_x)
 
     # - Bspline fitting
-    ax1.plot(smooth_x, smooth_y / total, label=' %s \n Total distances= %i' %(rda, total))
-    
+    ax1.plot(smooth_x, smooth_y / total, label=' %s \n Total= %i' %(rda, total))
+
     # - raw data, no Bspline fitting
     # ax1.plot(x, y, label='%s' %rda)
 
+# - ticks for the x-axis
+# delta_x = (x[-1] - x[0]) / 10
+# ax1.xaxis.set_major_locator(plticker.MultipleLocator(base=delta_x))
+ax1.xaxis.set_major_locator(plt.MaxNLocator(12))
+
+if len(label_x) < 1:
+    label_x = input(f'Please, insert a name for x-axis: ')
+
+plt.xlabel(label_x, fontsize=12) #, fontweight='bold')
 # -----------------------------------------------------------
 # - Ending the plot
 
