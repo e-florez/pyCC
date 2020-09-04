@@ -253,7 +253,7 @@ print(f'BSpline used for the RDA with {bs_points} points')
 
 # - array to storage occurrences for angles, [0, 180] degrees
 # grid = 0.1 --> 1800 = (180 - 0)/0.1
-delta_angle = 5.0
+delta_angle = 2.0
 min_angle = 0
 max_angle = 190
 nbins_angle = int ( (max_angle - min_angle) / delta_angle)
@@ -262,7 +262,7 @@ nbins_angle = int ( (max_angle - min_angle) / delta_angle)
 
 # - array to storage occurrences for DIHEDRAL angles, [0, 360] degrees
 # grid = 0.1 --> 3600 = (3600 - 0)/0.1
-delta_angle = 5.0
+delta_angle = 2.0
 min_dihedral_angle = 0
 max_dihedral_angle = 360
 
@@ -406,15 +406,15 @@ for file_xyz in list_xyz:
     #     1   2
     # - order matters!
 
-    max_distance = 2.5
+    max_distance = 3.0
     min_distance = 0.1
     coordinates_central = np.zeros(3, dtype=float)
     coordinates_first = np.zeros(3, dtype=float)
     coordinates_second = np.zeros(3, dtype=float)
 
-    angle_list = ["H", "O", "H"]
+    # angle_list = ["H", "O", "H"]
     # angle_list = ["H", "O", "Hg"]
-    # angle_list = ["O", "Hg", "O"]
+    angle_list = ["O", "Hg", "O"]
 
     # print(f'')
     # print(f'Angular Distribution Analisys for:')
@@ -510,7 +510,9 @@ for file_xyz in list_xyz:
                 if angle_hit > 0 and angle_hit < nbins_angle:
                     occurrences_angle[angle_hit] += 1
 
-                # print(angle_deg)
+                # print()
+                # print(f'angle: {angle_deg}')
+                # print()
 
     histogram_dictionary[ada] = occurrences_angle
 
@@ -523,7 +525,7 @@ for file_xyz in list_xyz:
     #          3
     # - order matters!
 
-    max_distance = 2.5
+    max_distance = 3.0
     min_distance = 0.1
 
     coordinates_first = np.zeros(3, dtype=float)
@@ -588,6 +590,8 @@ for file_xyz in list_xyz:
             min_second = 10000
 
             for second in list_idx_second_atom:
+
+                # choose_second = second
 
                 if first == second or central == second:
                     continue
@@ -671,8 +675,16 @@ for file_xyz in list_xyz:
 #---------------------------------------------------------------------------------------
 # - plotting: defining frames and designing the area to plot
 def plot_histogram(dictionary, x_axis, x_label, subtitle):
-    """
+    """plotting a Histogram with BSpline
 
+    Args:
+        dictionary ([dict, numpy 1D array]): 1D arrays with the occurrences for every key
+        x_axis ([numpy 1D array): 1D array with the X-axis matching the previous array dimension
+        x_label ([str]): Label for the X-axis
+        subtitle ([str]): Subtitle to describe more precisely the plot
+
+    Returns:
+        [matplotlib]: a 2D plot using matplotlib
     """
 
     x = x_axis
@@ -687,7 +699,7 @@ def plot_histogram(dictionary, x_axis, x_label, subtitle):
     ax1.grid()
 
     # - legends for the main plot
-    plt.ylabel('Relative Number of Ocurrences', fontsize=12) #, fontweight='bold')
+    plt.ylabel('Relative Number of Ocurrences', fontsize=14) #, fontweight='bold')
     # plt.xlabel('Bond Distance [Angstrom]', fontsize=12) #, fontweight='bold')
 
     files_to_plot = list(dictionary.keys())
@@ -722,7 +734,7 @@ def plot_histogram(dictionary, x_axis, x_label, subtitle):
 
         count += 1
     # ------------------------------------
-    ax1.xaxis.set_major_locator(plt.MaxNLocator(12))
+    ax1.xaxis.set_major_locator(plt.MaxNLocator(14))
 
     plt.xlabel(x_label, fontsize=12) #, fontweight='bold')
     # plt.xlabel('No label', fontsize=12) #, fontweight='bold')
@@ -786,7 +798,7 @@ for pair in pairs_list:
 
     plot_histogram(dictionary, x_axis, x_label, subtitle)
 
-#-------------------------------------------
+# #-------------------------------------------
 # - plotting ADA
 
 ada_dictionary = {}
@@ -795,12 +807,13 @@ for data_file in list_ada:
     if sum(distance_array) > 0:
         ada_dictionary[data_file] = distance_array
 
-dictionary = ada_dictionary
-x_axis = np.linspace(min_angle, max_angle, nbins_angle)
-x_label = 'Angle [Degrees]'
-subtitle = '-'.join(angle_list)
+if len(ada_dictionary) > 0:
+    dictionary = ada_dictionary
+    x_axis = np.linspace(min_angle, max_angle, nbins_angle)
+    x_label = 'Angle [Degrees]'
+    subtitle = '-'.join(angle_list)
 
-plot_histogram(dictionary, x_axis, x_label, subtitle)
+    plot_histogram(dictionary, x_axis, x_label, subtitle)
 
 #-------------------------------------------
 # - plotting DADA
@@ -811,12 +824,18 @@ for data_file in list_dada:
     if sum(distance_array) > 0:
         dada_dictionary[data_file] = distance_array
 
+
 dictionary = dada_dictionary
 x_axis = np.linspace(min_dihedral_angle, max_dihedral_angle, nbins_dihedral_angle)
 x_label = 'Dihedral Angle [Degrees]'
 subtitle = '-'.join(dihedral_list)
 
 plot_histogram(dictionary, x_axis, x_label, subtitle)
+
+# --------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------
 
 print(f'\n****************************************************')
 print(f'*** DONE ***')
