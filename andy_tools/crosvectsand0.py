@@ -91,6 +91,7 @@ else :
 NO = int(NAW/3)
 d1 = out
 dihedros = np.zeros((NO))
+print (f"Cantidad de dihedros : ",NO)
 for i in range(NO):
     dihedros[i] = d1[i]
     print(f"dihedro : ",dihedros[i]) 
