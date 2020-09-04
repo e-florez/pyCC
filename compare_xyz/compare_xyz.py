@@ -88,7 +88,7 @@ for unique_input_xyz in repited_list_xyz:
 # list_xyz = ["w1s1.xyz", "w2s1.xyz", "w3s1.xyz", "w3s2.xyz"]
 
 # - sorting the input files list
-list_xyz = natsorted(list_xyz)
+# list_xyz = natsorted(list_xyz)
 
 # - checking if files exist
 if len(list_xyz) > 0:
@@ -140,20 +140,113 @@ while atom_a < len(elements_list):
 
 atom_pairs = len(pairs_list)
 
+
+# --------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------
+
+
+#---------------------------------------------------------------------------------------
+# - bond distance based on  the previous grid for the RDA
+
+def save_distance():
+
+    bond_distance = np.linspace(ro, rf, nbins)
+
+    # - saving
+    atom_pair = 0
+    while atom_pair < len(pairs_list):
+        # - atom pair from the list
+        pair = pairs_list[atom_pair]
+        total_bond = sum(occurrences[atom_pair, :])
+
+        # - plotting only if any distance is found
+        if total_bond > 0:
+            # - saving RDA
+
+            rda_name = 'rda_' + name_xyz + '_' + pair + '.dat'
+            np.savetxt(rda_name, np.transpose([bond_distance, occurrences[atom_pair, :]]),
+                        delimiter=' ', header='distance [Angstrom]   occurrence (total=%i)' % total_bond,
+                        fmt='%.6f %28i')
+        # - no distance found
+        # else:
+        #     print(f'\n*** Warning ***')
+        #     print(f'NO distance {pair} found in XYZ files\n')
+
+        atom_pair += 1
+
+#---------------------------------------------------------------------------------------
+# - bond angle based on the previous grid for the RDA
+
+def save_angle():
+    # print(f'')
+    # print(f'Angular Distribution Analisys for:')
+    # print(f'')
+    # print(f'   {angle_list[1]}')
+    # print(f'  /  \\')
+    # print(f' {angle_list[0]}    {angle_list[2]}')
+    # print(f'')
+
+    bond_angle = np.linspace(min_angle, max_angle, nbins_angle)
+
+    total_angles = sum(occurrences_angle)
+
+    ada_name =  'ada_' + name_xyz + '_' + '-'.join(angle_list) + '.dat'
+
+    if total_angles > 0:
+        np.savetxt(ada_name, np.transpose([bond_angle, occurrences_angle]),
+                    delimiter=' ', header='Angle [degrees]   occurrence (total=%i)' % total_angles,
+                    fmt='%.6f %28i')
+    # else:
+    #     print(f'\n*** Warning ***')
+    #     print(f'NO angle {ada_name} found in XYZ files\n')
+
+
+#-------------------------------------------------------------------
+# - dihedral angle
+def save_dihedral():
+    # print(f'')
+    # print(f'Angular Distribution Analisys for Dihedral angle:')
+    # print(f'')
+    # print(f'          {dihedral_list[2]}')
+    # print(f'         /')
+    # print(f'  {dihedral_list[0]}----{dihedral_list[1]}')
+    # print(f'         \\')
+    # print(f'          {dihedral_list[3]}')
+    # print(f'')
+
+    bond_angle = np.linspace(min_dihedral_angle, max_dihedral_angle, nbins_dihedral_angle)
+
+    total_dihedral_angles = sum(occurrences_dihedral_angle)
+
+    dihedral_ada_name = 'dada_' + name_xyz + '_' + '-'.join(dihedral_list) + '.dat'
+
+    if total_dihedral_angles > 0:
+        np.savetxt(dihedral_ada_name, np.transpose([bond_angle, occurrences_dihedral_angle]),
+                    delimiter=' ', header='Angle [degrees]   occurrence (total=%i)' \
+                                                        % total_dihedral_angles,
+                    fmt='%.6f %28i')
+    # else:
+    #     print(f'\n*** Warning ***')
+    #     print(f'NO dihedral angle {ada_name} found in XYZ files\n')
+
+# ------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------
+
+
 # -------------------------------------------------------------------------------
 # - defining grid for the Radial Distribution Analysis (number of occurrences)
 ro = 0.6    # smallest interactomic distance
 rf = 3.5   # largest interactomic distance
-dr = 0.05   # grid points
+dr = 0.05  # grid points
 nbins = int((rf - ro) / dr)  # number of bins for the accurences
 
 # - points to use BSpline
 bs_points = 100
 
 # - array to storage occurrences for bond distances
-#    ???????????????
-#
-occurrences = np.zeros((atom_pairs, nbins), dtype=int)
+# occurrences = np.zeros((atom_pairs, nbins), dtype=int)
 
 print(f'\nRDA with {nbins} bins, grid {dr} between {ro}-{rf} Angstroms')
 print(f'BSpline used for the RDA with {bs_points} points')
@@ -165,7 +258,7 @@ min_angle = 0
 max_angle = 190
 nbins_angle = int ( (max_angle - min_angle) / delta_angle)
 
-occurrences_angle = np.zeros(nbins_angle, dtype=int)
+# occurrences_angle = np.zeros(nbins_angle, dtype=int)
 
 # - array to storage occurrences for DIHEDRAL angles, [0, 360] degrees
 # grid = 0.1 --> 3600 = (3600 - 0)/0.1
@@ -175,7 +268,14 @@ max_dihedral_angle = 360
 
 nbins_dihedral_angle = int ( (max_dihedral_angle - min_dihedral_angle) / delta_angle)
 
-occurrences_dihedral_angle = np.zeros(nbins_dihedral_angle, dtype=int)
+# occurrences_dihedral_angle = np.zeros(nbins_dihedral_angle, dtype=int)
+
+list_rda = []
+list_ada = []
+list_dada = []
+
+# - saving ocurrences arrays for each XYZ file into a Dictionary
+histogram_dictionary = {}
 
 # -------------------------------------------------------------------------
 # - reading coordinates for XYZ file (importing data with pandas)
@@ -183,6 +283,21 @@ for file_xyz in list_xyz:
 
     name_xyz = file_xyz[:-4]  # deleting file extention
 
+    rda = name_xyz + "_distance"
+    ada = name_xyz + "_angle"
+    dada = name_xyz + "_dihedral"
+
+    # - list of files to analise
+    list_rda.append(rda)  # distances
+    list_ada.append(ada)  # plane angles
+    list_dada.append(dada)  # dihedral angles
+
+    # - initializing main arrays to save distributions
+    occurrences = np.zeros((atom_pairs, nbins), dtype=int)
+    occurrences_angle = np.zeros(nbins_angle, dtype=int)
+    occurrences_dihedral_angle = np.zeros(nbins_dihedral_angle, dtype=int)
+
+    # - importing data from XYZ
     num_atoms = pd.read_csv(file_xyz, nrows=1, header=None)
     num_atoms = int(num_atoms.iloc[0])
 
@@ -282,6 +397,8 @@ for file_xyz in list_xyz:
             atom_b += 1
         atom_a += 1
 
+    histogram_dictionary[rda] = occurrences
+
     #--------------------------------------------------------------------------------
     # - computing angle 1-C-2
     #       C
@@ -295,9 +412,9 @@ for file_xyz in list_xyz:
     coordinates_first = np.zeros(3, dtype=float)
     coordinates_second = np.zeros(3, dtype=float)
 
-    # angle_list = ["H", "O", "H"]
+    angle_list = ["H", "O", "H"]
     # angle_list = ["H", "O", "Hg"]
-    angle_list = ["O", "Hg", "O"]
+    # angle_list = ["O", "Hg", "O"]
 
     # print(f'')
     # print(f'Angular Distribution Analisys for:')
@@ -394,6 +511,8 @@ for file_xyz in list_xyz:
                     occurrences_angle[angle_hit] += 1
 
                 # print(angle_deg)
+
+    histogram_dictionary[ada] = occurrences_angle
 
     #--------------------------------------------------------------------
     # - computing DIHEDRAL angle X-YAB
@@ -541,108 +660,28 @@ for file_xyz in list_xyz:
             # print(f'dihedral: {dihedral_angle_deg}')
             # print()
 
+    histogram_dictionary[dada] = occurrences_dihedral_angle
+
+    #--------------------------------------------------------------------
     #--------------------------------------------------------------------
 
-    # exit()
+# exit()
 
-    #---------------------------------------------------------------------------------------
-    #---------------------------------------------------------------------------------------
-    # - bond distance based on  the previous grid for the RDA
-    bond_distance = np.linspace(ro, rf, nbins)
-
-    # - saving
-    atom_pair = 0
-    while atom_pair < len(pairs_list):
-        # - atom pair from the list
-        pair = pairs_list[atom_pair]
-        total_bond = sum(occurrences[atom_pair, :])
-
-        # - plotting only if any distance is found
-        if total_bond > 0:
-            # - saving RDA
-
-            rda_name = 'rda_' + name_xyz + '_' + pair + '.dat'
-            np.savetxt(rda_name, np.transpose([bond_distance, occurrences[atom_pair, :]]),
-                        delimiter=' ', header='distance [Angstrom]   occurrence (total=%i)' % total_bond,
-                        fmt='%.6f %28i')
-        # - no distance found
-        # else:
-        #     print(f'\n*** Warning ***')
-        #     print(f'NO distance {pair} found in XYZ files\n')
-
-        atom_pair += 1
-
-    #---------------------------------------------------------------------------------------
-    # - bond angle based on the previous grid for the RDA
-
-    # print(f'')
-    # print(f'Angular Distribution Analisys for:')
-    # print(f'')
-    # print(f'   {angle_list[1]}')
-    # print(f'  /  \\')
-    # print(f' {angle_list[0]}    {angle_list[2]}')
-    # print(f'')
-
-    bond_angle = np.linspace(min_angle, max_angle, nbins_angle)
-
-    total_angles = sum(occurrences_angle)
-
-    ada_name =  'ada_' + name_xyz + '_' + '-'.join(angle_list) + '.dat'
-
-    if total_angles > 0:
-        np.savetxt(ada_name, np.transpose([bond_angle, occurrences_angle]),
-                    delimiter=' ', header='Angle [degrees]   occurrence (total=%i)' % total_angles,
-                    fmt='%.6f %28i')
-    # else:
-    #     print(f'\n*** Warning ***')
-    #     print(f'NO angle {ada_name} found in XYZ files\n')
-
-
-    #-------------------------------------------------------------------
-    # - dihedral angle
-
-    # print(f'')
-    # print(f'Angular Distribution Analisys for Dihedral angle:')
-    # print(f'')
-    # print(f'          {dihedral_list[2]}')
-    # print(f'         /')
-    # print(f'  {dihedral_list[0]}----{dihedral_list[1]}')
-    # print(f'         \\')
-    # print(f'          {dihedral_list[3]}')
-    # print(f'')
-
-    bond_angle = np.linspace(min_dihedral_angle, max_dihedral_angle, nbins_dihedral_angle)
-
-    total_dihedral_angles = sum(occurrences_dihedral_angle)
-
-    dihedral_ada_name = 'dada_' + name_xyz + '_' + '-'.join(dihedral_list) + '.dat'
-
-    if total_dihedral_angles > 0:
-        np.savetxt(dihedral_ada_name, np.transpose([bond_angle, occurrences_dihedral_angle]),
-                    delimiter=' ', header='Angle [degrees]   occurrence (total=%i)' \
-                                                        % total_dihedral_angles,
-                    fmt='%.6f %28i')
-    # else:
-    #     print(f'\n*** Warning ***')
-    #     print(f'NO dihedral angle {ada_name} found in XYZ files\n')
-
-    # # ------------------------------------------------------------------------------------
-
-
-
-
-# -----------------------------------------------------------
-def plot_histogram(files_data):
+#---------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------
+# - plotting: defining frames and designing the area to plot
+def plot_histogram(dictionary, x_axis, x_label, subtitle):
     """
-    ploting histograms
-    """
-    if len(glob.glob(files_data)) < 1:
-        return
 
-    # -----------------------------------------------------------
+    """
+
+    x = x_axis
+    x_label = x_label
+    subtitle = subtitle
+
     # - plotting: defining frames and designing the area to plot
-    fig = plt.figure(figsize=(10, 8))  # inches WxH
-    fig.suptitle('Distribution Analisys', fontsize=20) #, fontweight='bold')
+    fig = plt.figure(figsize=(10, 6))  # inches WxH
+    fig.suptitle('Distribution Analisys \n' + subtitle, fontsize=20) #, fontweight='bold')
 
     ax1 = plt.subplot(111)
     ax1.grid()
@@ -651,24 +690,22 @@ def plot_histogram(files_data):
     plt.ylabel('Relative Number of Ocurrences', fontsize=12) #, fontweight='bold')
     # plt.xlabel('Bond Distance [Angstrom]', fontsize=12) #, fontweight='bold')
 
-    # - loading files to read and plot them
-    for file_to_plot in glob.glob(files_data):
+    files_to_plot = list(dictionary.keys())
 
-        name_file = file_to_plot.split('_')
-        name_file = '-'.join(name_file[1:3])
-        name_file = name_file[:-4]
+    # - renaming for file names with PATH included
+    new_names = []
+    for item in files_to_plot:
+        new_names.append(item.split('/')[-1])
 
-        x, y = [], []
-        for line in open(file_to_plot, 'r'):
-            # skipping the header
-            if line.startswith("#"):
-                label = [header.title() for header in line.split()]
-                label_x = ' '.join(label[1:3])
-                continue
+    count = 0
+    while count < len(files_to_plot):
 
-            values = [float(s) for s in line.split()]
-            x.append(values[0])
-            y.append(values[1])
+        name_file = new_names[count]
+        file_xyz = name_file.split('_')[0]
+
+        y = list(dictionary.values())[count]
+        if len(x) < 1:
+            x = np.linspace(0, 100, len(y) - 1)
 
         # total number of distances
         total = sum(y)
@@ -681,13 +718,14 @@ def plot_histogram(files_data):
         smooth_y = smooth(smooth_x)
 
         # - Bspline fitting
-        ax1.plot(smooth_x, smooth_y / total, label=' %s \n Total= %i' %(name_file, total))
+        ax1.plot(smooth_x, smooth_y / total, label=' %s \n Total= %i' %(file_xyz, total))
 
+        count += 1
     # ------------------------------------
     ax1.xaxis.set_major_locator(plt.MaxNLocator(12))
 
-    # plt.xlabel(label_x, fontsize=12) #, fontweight='bold')
-    plt.xlabel('No label', fontsize=12) #, fontweight='bold')
+    plt.xlabel(x_label, fontsize=12) #, fontweight='bold')
+    # plt.xlabel('No label', fontsize=12) #, fontweight='bold')
     # -----------------------------------------------------------
     # - Ending the plot
 
@@ -702,25 +740,83 @@ def plot_histogram(files_data):
 
     # - ENDING the plots
     return plt.show()
+#----------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------
 
-# ---------------------------------------------------------------------------------------------------------
-# - radial, angular, and dihedral distribution, respectively
-distribution_list = ["rda_", "ada_", "dada_"]
+# - deleting empty arrays
+rda_dictionary = {}
+new_pairs_list = []
 
-count = 0
-for distribution in distribution_list:
+atom_pair = 0
+while atom_pair < len(pairs_list):
+    for data_file in list_rda:
+        distance_array = histogram_dictionary[data_file]
 
-    list_file_data = []
-    if distribution == "rda_":
-        while count < len(pairs_list):
-            list_file_data.append(distribution + '*' + pairs_list[count] + '.dat')
-            count += 1
-    else:
-        list_file_data.append(distribution + '*.dat')
+        if sum(distance_array[atom_pair, :]) > 0:
+            file_name = data_file + '_' + pairs_list[atom_pair]
+            new_pairs_list.append(pairs_list[atom_pair]) # del pair whit no distance
+            rda_dictionary[file_name] = distance_array[atom_pair, :]
 
-    for files_data in list_file_data:
+    atom_pair += 1
 
-        plot_histogram(files_data)
+#-------------------------------------------
+# - plotting RDA
+
+# - deleting duplicates
+pairs_list = []
+for pair in new_pairs_list:
+    if pair not in pairs_list:
+        pairs_list.append(pair)
+
+for pair in pairs_list:
+    dict_to_plot = {}
+    for data_file in list_rda:
+        file_name = data_file + '_' + pair
+
+        try:
+            dict_to_plot[file_name] = rda_dictionary[file_name]
+        except KeyError:
+            continue
+
+    dictionary = dict_to_plot
+    x_axis = np.linspace(ro, rf, nbins)
+    x_label = 'Bond Distance [Angstrom]'
+    subtitle = pair
+
+    plot_histogram(dictionary, x_axis, x_label, subtitle)
+
+#-------------------------------------------
+# - plotting ADA
+
+ada_dictionary = {}
+for data_file in list_ada:
+    distance_array = histogram_dictionary[data_file]
+    if sum(distance_array) > 0:
+        ada_dictionary[data_file] = distance_array
+
+dictionary = ada_dictionary
+x_axis = np.linspace(min_angle, max_angle, nbins_angle)
+x_label = 'Angle [Degrees]'
+subtitle = '-'.join(angle_list)
+
+plot_histogram(dictionary, x_axis, x_label, subtitle)
+
+#-------------------------------------------
+# - plotting DADA
+
+dada_dictionary = {}
+for data_file in list_dada:
+    distance_array = histogram_dictionary[data_file]
+    if sum(distance_array) > 0:
+        dada_dictionary[data_file] = distance_array
+
+dictionary = dada_dictionary
+x_axis = np.linspace(min_dihedral_angle, max_dihedral_angle, nbins_dihedral_angle)
+x_label = 'Dihedral Angle [Degrees]'
+subtitle = '-'.join(dihedral_list)
+
+plot_histogram(dictionary, x_axis, x_label, subtitle)
 
 print(f'\n****************************************************')
 print(f'*** DONE ***')
