@@ -7,6 +7,7 @@
 
 import tools as tl
 import numpy as np
+<<<<<<< HEAD
 
 #Lectura de archivo xyz
 namesxyz = tl.filesxyz()
