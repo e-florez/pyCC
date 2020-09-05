@@ -64,7 +64,9 @@ for input_xyz in glob.glob('*.xyz'):
         if unique_input_xyz not in list_xyz:
             list_xyz.append(unique_input_xyz)
 
-list_xyz = ["w1s1.xyz"]
+# list_xyz = ["w1s1.xyz"]
+# list_xyz = ["w2s1.xyz"]
+list_xyz = ["w6s23.xyz"]
 # list_xyz = ["w1s1.xyz", "w2s1.xyz"]
 # list_xyz = ["w1s1.xyz", "w2s1.xyz", "w3s1.xyz"]
 # list_xyz = ["w1s1.xyz", "w2s1.xyz", "w3s1.xyz", "w3s2.xyz"]
@@ -347,14 +349,6 @@ for file_xyz in list_xyz:
     # angle_list = ["H", "O", "Hg"]
     angle_list = ["O", "Hg", "O"]
 
-    # print(f'')
-    # print(f'Angular Distribution Analisys for:')
-    # print(f'')
-    # print(f'   {angle_list[1]}')
-    # print(f'  /  \\')
-    # print(f' {angle_list[0]}    {angle_list[2]}')
-    # print(f'')
-
     first_atom = angle_list[0]
     central_atom = angle_list[1]
     second_atom = angle_list[2]
@@ -455,22 +449,12 @@ for file_xyz in list_xyz:
     max_distance = 2.5
     min_distance = 0.1
 
+    dihedral_list = ["Hg", "O", "H", "H"]
+
     coordinates_first = np.zeros(3, dtype=float)
     coordinates_central = np.zeros(3, dtype=float)
     coordinates_second = np.zeros(3, dtype=float)
     coordinates_third = np.zeros(3, dtype=float)
-
-    dihedral_list = ["Hg", "O", "H", "H"]
-
-    # print(f'')
-    # print(f'Angular Distribution Analisys for Dihedral angle:')
-    # print(f'')
-    # print(f'          {dihedral_list[2]}')
-    # print(f'         /')
-    # print(f'  {dihedral_list[0]}----{dihedral_list[1]}')
-    # print(f'         \\')
-    # print(f'          {dihedral_list[3]}')
-    # print(f'')
 
     first_atom = dihedral_list[0]
     central_atom = dihedral_list[1]
@@ -531,8 +515,8 @@ for file_xyz in list_xyz:
                     continue
 
                 if min_second != min(min_second, distance_second):
-                    min_second = min(min_second, distance_second)
 
+                    min_second = min(min_second, distance_second)
                     choose_second = second
 
                     coordinates_second[0] = float(data_xyz.iloc[second, 1])
@@ -572,22 +556,35 @@ for file_xyz in list_xyz:
             #--------------------------------------------------------------
             # - computing dihedral angle (using cross product)
 
-            import dihedral as dh
-
             p1 = coordinates_first
             p2 = coordinates_central
             p3 = coordinates_second
             p4 = coordinates_third
 
-            dihedral_angle_deg = dh.dihedral(p1, p2, p3, p4)
+            # - distance must be larger than zero
+            compute_dihedral = False
 
-            dihedral_angle_hit = int(round( (dihedral_angle_deg) / delta_angle) )
-            if dihedral_angle_hit > 0 and dihedral_angle_hit < nbins_angle:
-                occurrences_dihedral_angle[dihedral_angle_hit] += 1
+            if np.linalg.norm(p1) < 0.1 or np.linalg.norm(p2) < 0.1 or \
+                np.linalg.norm(p3) < 0.1 or np.linalg.norm(p4) < 0.1:
+                compute_dihedral = False
+            else:
+                compute_dihedral = True
 
-#             print()
-#             print(f'dihedral: {dihedral_angle_deg}')
-#             print()
+            if compute_dihedral:
+                # # - Cesar's script to compute the dihedral angle
+                import dihedral as dh
+                dihedral_angle_deg = dh.dihedral(p1, p2, p3, p4)
+
+                # import dihedral2 as dh
+                # dihedral_angle_deg = dh.dihedral(p1, p2, p3, p4)
+
+                dihedral_angle_hit = int(round( (dihedral_angle_deg) / delta_angle) )
+                if dihedral_angle_hit > 0 and dihedral_angle_hit < nbins_angle:
+                    occurrences_dihedral_angle[dihedral_angle_hit] += 1
+
+#                 print()
+#                 print(f'dihedral: {dihedral_angle_deg}')
+#                 print()
 
 #     #--------------------------------------------------------------------
 
@@ -597,21 +594,22 @@ for file_xyz in list_xyz:
 #---------------------------------------------------------------------------------------
 # - bond angle based on the previous grid for the RDA
 
-print(f'')
-print(f'Angular Distribution Analisys for:')
-print(f'')
-print(f'   {angle_list[1]}')
-print(f'  /  \\')
-print(f' {angle_list[0]}    {angle_list[2]}')
-print(f'')
-
-bond_angle = np.linspace(min_angle, max_angle, nbins_angle)
-
 total_angles = sum(occurrences_angle)
 
 ada_name =  'ada_' + '-'.join(angle_list) + '.dat'
 
 if total_angles > 0:
+
+    print(f'')
+    print(f'Angular Distribution Analisys for:')
+    print(f'')
+    print(f'   {angle_list[1]}')
+    print(f'  /  \\')
+    print(f' {angle_list[0]}    {angle_list[2]}')
+    print(f'')
+
+    bond_angle = np.linspace(min_angle, max_angle, nbins_angle)
+
     np.savetxt(ada_name, np.transpose([bond_angle, occurrences_angle]),
                 delimiter=' ', header='Angle [degrees]   occurrence (total=%i)' % total_angles,
                 fmt='%.6f %28i')
@@ -623,30 +621,31 @@ else:
 #-------------------------------------------------------------------
 # - dihedral angle
 
-print(f'')
-print(f'Angular Distribution Analisys for Dihedral angle:')
-print(f'')
-print(f'          {dihedral_list[2]}')
-print(f'         /')
-print(f'  {dihedral_list[0]}----{dihedral_list[1]}')
-print(f'         \\')
-print(f'          {dihedral_list[3]}')
-print(f'')
-
-bond_angle = np.linspace(min_dihedral_angle, max_dihedral_angle, nbins_dihedral_angle)
-
 total_dihedral_angles = sum(occurrences_dihedral_angle)
 
 dihedral_ada_name = 'dada_' + '-'.join(dihedral_list) + '.dat'
 
 if total_dihedral_angles > 0:
+
+    print(f'')
+    print(f'Angular Distribution Analisys for Dihedral angle:')
+    print(f'')
+    print(f'          {dihedral_list[2]}')
+    print(f'         /')
+    print(f'  {dihedral_list[0]}----{dihedral_list[1]}')
+    print(f'         \\')
+    print(f'          {dihedral_list[3]}')
+    print(f'')
+
+    bond_angle = np.linspace(min_dihedral_angle, max_dihedral_angle, nbins_dihedral_angle)
+
     np.savetxt(dihedral_ada_name, np.transpose([bond_angle, occurrences_dihedral_angle]),
                 delimiter=' ', header='Angle [degrees]   occurrence (total=%i)' \
                                                     % total_dihedral_angles,
                 fmt='%.6f %28i')
 else:
     print(f'\n*** Warning ***')
-    print(f'NO dihedral angle {ada_name} found in XYZ files\n')
+    print(f'NO dihedral angle {dihedral_ada_name} found in XYZ files\n')
 
 #---------------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------

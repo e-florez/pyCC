@@ -239,7 +239,7 @@ def save_dihedral():
 # - defining grid for the Radial Distribution Analysis (number of occurrences)
 ro = 0.6    # smallest interactomic distance
 rf = 3.5   # largest interactomic distance
-dr = 0.05  # grid points
+dr = 0.01  # grid points
 nbins = int((rf - ro) / dr)  # number of bins for the accurences
 
 # - points to use BSpline
@@ -253,7 +253,7 @@ print(f'BSpline used for the RDA with {bs_points} points')
 
 # - array to storage occurrences for angles, [0, 180] degrees
 # grid = 0.1 --> 1800 = (180 - 0)/0.1
-delta_angle = 2.0
+delta_angle = 1.0
 min_angle = 0
 max_angle = 190
 nbins_angle = int ( (max_angle - min_angle) / delta_angle)
@@ -262,7 +262,7 @@ nbins_angle = int ( (max_angle - min_angle) / delta_angle)
 
 # - array to storage occurrences for DIHEDRAL angles, [0, 360] degrees
 # grid = 0.1 --> 3600 = (3600 - 0)/0.1
-delta_angle = 2.0
+delta_angle = 1.0
 min_dihedral_angle = 0
 max_dihedral_angle = 360
 
@@ -647,18 +647,31 @@ for file_xyz in list_xyz:
             #--------------------------------------------------------------
             # - computing dihedral angle (using cross product)
 
-            import dihedral as dh
-
             p1 = coordinates_first
             p2 = coordinates_central
             p3 = coordinates_second
             p4 = coordinates_third
 
-            dihedral_angle_deg = dh.dihedral(p1, p2, p3, p4)
+            # - distance must be larger than zero
+            compute_dihedral = False
 
-            dihedral_angle_hit = int(round( (dihedral_angle_deg) / delta_angle) )
-            if dihedral_angle_hit > 0 and dihedral_angle_hit < nbins_angle:
-                occurrences_dihedral_angle[dihedral_angle_hit] += 1
+            if np.linalg.norm(p1) < 0.1 or np.linalg.norm(p2) < 0.1 or \
+                np.linalg.norm(p3) < 0.1 or np.linalg.norm(p4) < 0.1:
+                compute_dihedral = False
+            else:
+                compute_dihedral = True
+
+            if compute_dihedral:
+                # # - Cesar's script to compute the dihedral angle
+                import dihedral as dh
+                dihedral_angle_deg = dh.dihedral(p1, p2, p3, p4)
+
+                # import dihedral2 as dh
+                # dihedral_angle_deg = dh.dihedral(p1, p2, p3, p4)
+
+                dihedral_angle_hit = int(round( (dihedral_angle_deg) / delta_angle) )
+                if dihedral_angle_hit > 0 and dihedral_angle_hit < nbins_angle:
+                    occurrences_dihedral_angle[dihedral_angle_hit] += 1
 
             # print()
             # print(f'dihedral: {dihedral_angle_deg}')

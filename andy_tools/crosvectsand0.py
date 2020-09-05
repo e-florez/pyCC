@@ -7,7 +7,6 @@
 
 import tools as tl
 import numpy as np
-<<<<<<< HEAD
 
 #Lectura de archivo xyz
 namesxyz = tl.filesxyz()
@@ -32,7 +31,7 @@ MXYZ = out[1]
 #print ("Átomos en",namesxyz," : ",NALA)
 #vatom = input(f"Átomo del vertice del angulo (Simbolo): ") #Faltaria además darle una etiqueta para eligir
 #rmax  = float(input(f"Distancia máxima al vertice : "))    #entre los mismos átomos el que se quiere, por ahora
-                                                           #solo sería con vatom = Hg
+                                                            #solo sería con vatom = Hg
 vatom = "Hg"
 rmax = 2.35
 # Se calcula las distancias de todos los átomos con respecto

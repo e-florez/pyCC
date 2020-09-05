@@ -2,21 +2,21 @@
 
 def dihedral(p1, p2, p3, p4):
     """ ------------------------------------------
-    # August  2020
-    #               cesar.ibarguen@udea.edu.co
-    #
-    # computing DIHEDRAL angle
-    #          p3
-    #         /
-    #  p1----p2
-    #         \
-    #          p4
-    # - order matters!
+    August  2020
+                cesar.ibarguen@udea.edu.co
+
+    computing DIHEDRAL angle
+            p3
+            /
+    p1----p2
+            \
+            p4
+    - order matters!
     # ------------------------------------------
     """
-    # LIBRERIES
+    # # LIBRERIES
     import numpy as np
-    import math
+    # import math
 
     #--------------- Body ------------
 
@@ -29,26 +29,18 @@ def dihedral(p1, p2, p3, p4):
     q1_x_q2 = np.cross(q1, q2)
     q2_x_q3 = np.cross(q2, q3)
 
+    # - protecting for and zero division
+    if np.linalg.norm(q1_x_q2) < 0.1 or \
+        np.linalg.norm(q2_x_q3) < 0.1:
+        return 0
+
     # Calculate normal vectors
-    n1 = q1_x_q2 / np.sqrt(np.dot(q1_x_q2, q1_x_q2))
-    n2 = q2_x_q3 / np.sqrt(np.dot(q2_x_q3, q2_x_q3))
+    n1 = q1_x_q2 / np.linalg.norm(q1_x_q2)
+    n2 = q2_x_q3 / np.linalg.norm(q2_x_q3)
 
-    # Orthogonal_unit_vectors(n2,q2):
-    #     "Function to calculate orthogonal unit vectors"
-    # Calculate unit vectors
-    u1 = n2
-    u3 = q2 / ( np.sqrt(np.dot(q2, q2)) )
-    u2 = np.cross(u3, u1)
+    cos_theta = np.dot(n1, n2)
 
-    # Calc_dihedral_angle(n1,u1,u2,u3)
-    # Calculate cosine and sine
-    cos_theta = np.dot(n1, u1)
-    sin_theta = np.dot(n1, u2)
-
-    # Calculate theta
-    theta = -math.atan2(sin_theta, cos_theta)
-
+    theta = np.arccos(cos_theta)
     theta_deg = abs(np.degrees(theta))
 
     return theta_deg
-
