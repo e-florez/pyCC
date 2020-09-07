@@ -653,13 +653,13 @@ for file_xyz in list_xyz:
             p4 = coordinates_third
 
             # - distance must be larger than zero
-            compute_dihedral = False
+            # compute_dihedral = False
 
-            if np.linalg.norm(p1) < 0.1 or np.linalg.norm(p2) < 0.1 or \
-                np.linalg.norm(p3) < 0.1 or np.linalg.norm(p4) < 0.1:
-                compute_dihedral = False
-            else:
-                compute_dihedral = True
+            # if np.linalg.norm(p1) < 0.1 or np.linalg.norm(p2) < 0.1 or \
+            #     np.linalg.norm(p3) < 0.1 or np.linalg.norm(p4) < 0.1:
+            #     compute_dihedral = False
+            # else:
+            compute_dihedral = True
 
             if compute_dihedral:
                 # # - Cesar's script to compute the dihedral angle
@@ -720,7 +720,8 @@ def plot_histogram(dictionary, x_axis, x_label, subtitle):
     # - renaming for file names with PATH included
     new_names = []
     for item in files_to_plot:
-        new_names.append(item.split('/')[-1])
+        # new_names.append(item.split('/')[-1])
+        new_names.append(item.split(' ')[-1])
 
     count = 0
     while count < len(files_to_plot):
@@ -811,7 +812,7 @@ for pair in pairs_list:
 
     plot_histogram(dictionary, x_axis, x_label, subtitle)
 
-# #-------------------------------------------
+#-------------------------------------------
 # - plotting ADA
 
 ada_dictionary = {}
@@ -836,7 +837,6 @@ for data_file in list_dada:
     distance_array = histogram_dictionary[data_file]
     if sum(distance_array) > 0:
         dada_dictionary[data_file] = distance_array
-
 
 dictionary = dada_dictionary
 x_axis = np.linspace(min_dihedral_angle, max_dihedral_angle, nbins_dihedral_angle)
