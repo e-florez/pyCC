@@ -3,6 +3,12 @@
 *.out
 *.tgz
 
+# bash script to transfor output files to XYZ
+geometry*.sh
+
+# Directories for OUTPUT files from main softwares
+log_files/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
