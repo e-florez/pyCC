@@ -1,3 +1,8 @@
+#OUTPUT files from Gaussian (.log) and Dirac (.out and .tgz)
+*.log
+*.out
+*.tgz
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

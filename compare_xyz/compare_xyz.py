@@ -13,7 +13,6 @@ import sys # to get System-specific parameters
 import os  # - to check id a file or dir exits -> os.path.exists()
 from scipy.interpolate import make_interp_spline, BSpline # -  to smooth out your data
 import glob # - Unix style pathname pattern expansion
-from natsort import natsorted # Simple yet flexible natural sorting in Python.
 import pandas as pd # - complete data analysis tool (it can replace matplotlib or numpy, as it is built on top of both)
 import numpy as np # - arrays and matrix manipulation
 import matplotlib.pyplot as plt # - plotting tools
@@ -86,9 +85,6 @@ for unique_input_xyz in repited_list_xyz:
 # list_xyz = ["w1s1.xyz", "w2s1.xyz"]
 # list_xyz = ["w1s1.xyz", "w2s1.xyz", "w3s1.xyz"]
 # list_xyz = ["w1s1.xyz", "w2s1.xyz", "w3s1.xyz", "w3s2.xyz"]
-
-# - sorting the input files list
-# list_xyz = natsorted(list_xyz)
 
 # - checking if files exist
 if len(list_xyz) > 0:
