@@ -66,7 +66,7 @@ for input_xyz in glob.glob('*.xyz'):
 
 # list_xyz = ["w1s1.xyz"]
 # list_xyz = ["w2s1.xyz"]
-list_xyz = ["w6s23.xyz"]
+# list_xyz = ["w6s23.xyz"]
 # list_xyz = ["w1s1.xyz", "w2s1.xyz"]
 # list_xyz = ["w1s1.xyz", "w2s1.xyz", "w3s1.xyz"]
 # list_xyz = ["w1s1.xyz", "w2s1.xyz", "w3s1.xyz", "w3s2.xyz"]
