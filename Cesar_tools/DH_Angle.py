@@ -2,7 +2,8 @@
 
 # ------------------------------------------
 # August  2020
-#               cesar.ibarguen@udea.edu.co
+#               cesar-ibarguen@udea.edu.co 
+# 		cesar-b29@hotmail.com  github user: cesar-ibarguen 
 #
 # It is short python3.8 script to compute dihedral
 # angles in degrees for given sets of four atoms. 
