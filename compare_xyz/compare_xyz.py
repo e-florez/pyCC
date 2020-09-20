@@ -13,7 +13,6 @@ import sys # to get System-specific parameters
 import os  # - to check id a file or dir exits -> os.path.exists()
 from scipy.interpolate import make_interp_spline, BSpline # -  to smooth out your data
 import glob # - Unix style pathname pattern expansion
-from natsort import natsorted # Simple yet flexible natural sorting in Python.
 import pandas as pd # - complete data analysis tool (it can replace matplotlib or numpy, as it is built on top of both)
 import numpy as np # - arrays and matrix manipulation
 import matplotlib.pyplot as plt # - plotting tools
@@ -86,9 +85,6 @@ for unique_input_xyz in repited_list_xyz:
 # list_xyz = ["w1s1.xyz", "w2s1.xyz"]
 # list_xyz = ["w1s1.xyz", "w2s1.xyz", "w3s1.xyz"]
 # list_xyz = ["w1s1.xyz", "w2s1.xyz", "w3s1.xyz", "w3s2.xyz"]
-
-# - sorting the input files list
-# list_xyz = natsorted(list_xyz)
 
 # - checking if files exist
 if len(list_xyz) > 0:
@@ -239,7 +235,7 @@ def save_dihedral():
 # - defining grid for the Radial Distribution Analysis (number of occurrences)
 ro = 0.6    # smallest interactomic distance
 rf = 3.5   # largest interactomic distance
-dr = 0.05  # grid points
+dr = 0.01  # grid points
 nbins = int((rf - ro) / dr)  # number of bins for the accurences
 
 # - points to use BSpline
@@ -253,7 +249,7 @@ print(f'BSpline used for the RDA with {bs_points} points')
 
 # - array to storage occurrences for angles, [0, 180] degrees
 # grid = 0.1 --> 1800 = (180 - 0)/0.1
-delta_angle = 2.0
+delta_angle = 1.0
 min_angle = 0
 max_angle = 190
 nbins_angle = int ( (max_angle - min_angle) / delta_angle)
@@ -262,7 +258,7 @@ nbins_angle = int ( (max_angle - min_angle) / delta_angle)
 
 # - array to storage occurrences for DIHEDRAL angles, [0, 360] degrees
 # grid = 0.1 --> 3600 = (3600 - 0)/0.1
-delta_angle = 2.0
+delta_angle = 1.0
 min_dihedral_angle = 0
 max_dihedral_angle = 360
 
@@ -647,18 +643,31 @@ for file_xyz in list_xyz:
             #--------------------------------------------------------------
             # - computing dihedral angle (using cross product)
 
-            import dihedral as dh
-
             p1 = coordinates_first
             p2 = coordinates_central
             p3 = coordinates_second
             p4 = coordinates_third
 
-            dihedral_angle_deg = dh.dihedral(p1, p2, p3, p4)
+            # - distance must be larger than zero
+            # compute_dihedral = False
 
-            dihedral_angle_hit = int(round( (dihedral_angle_deg) / delta_angle) )
-            if dihedral_angle_hit > 0 and dihedral_angle_hit < nbins_angle:
-                occurrences_dihedral_angle[dihedral_angle_hit] += 1
+            # if np.linalg.norm(p1) < 0.1 or np.linalg.norm(p2) < 0.1 or \
+            #     np.linalg.norm(p3) < 0.1 or np.linalg.norm(p4) < 0.1:
+            #     compute_dihedral = False
+            # else:
+            compute_dihedral = True
+
+            if compute_dihedral:
+                # # - Cesar's script to compute the dihedral angle
+                import dihedral as dh
+                dihedral_angle_deg = dh.dihedral(p1, p2, p3, p4)
+
+                # import dihedral2 as dh
+                # dihedral_angle_deg = dh.dihedral(p1, p2, p3, p4)
+
+                dihedral_angle_hit = int(round( (dihedral_angle_deg) / delta_angle) )
+                if dihedral_angle_hit > 0 and dihedral_angle_hit < nbins_angle:
+                    occurrences_dihedral_angle[dihedral_angle_hit] += 1
 
             # print()
             # print(f'dihedral: {dihedral_angle_deg}')
@@ -707,7 +716,8 @@ def plot_histogram(dictionary, x_axis, x_label, subtitle):
     # - renaming for file names with PATH included
     new_names = []
     for item in files_to_plot:
-        new_names.append(item.split('/')[-1])
+        # new_names.append(item.split('/')[-1])
+        new_names.append(item.split(' ')[-1])
 
     count = 0
     while count < len(files_to_plot):
@@ -798,7 +808,7 @@ for pair in pairs_list:
 
     plot_histogram(dictionary, x_axis, x_label, subtitle)
 
-# #-------------------------------------------
+#-------------------------------------------
 # - plotting ADA
 
 ada_dictionary = {}
@@ -823,7 +833,6 @@ for data_file in list_dada:
     distance_array = histogram_dictionary[data_file]
     if sum(distance_array) > 0:
         dada_dictionary[data_file] = distance_array
-
 
 dictionary = dada_dictionary
 x_axis = np.linspace(min_dihedral_angle, max_dihedral_angle, nbins_dihedral_angle)
