@@ -24,7 +24,7 @@ rc('text', usetex=True)   # --- enable TeX mode for matplotlib
 # ------ body
 # ------------------------------------------------------------------------------------
 print(f'\n****************************************************')
-print(f'* Radial Distribution Analisys (RDA) for XYZ files *')
+print(f'* Radial Distribution Analisys (RDA) for XYZ files *')   #Borrar lo de Radial
 print(f'****************************************************')
 
 # - working directory
