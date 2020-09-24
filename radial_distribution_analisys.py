@@ -20,6 +20,7 @@ import matplotlib.pyplot as plt # - plotting tools
 from matplotlib import rc # - runtime configuration (rc) containing the default styles for every plot element you create
 rc('text', usetex=True)   # --- enable TeX mode for matplotlib
 
+import functions as fn
 # ------------------------------------------------------------------------------------
 # ------ body
 # ------------------------------------------------------------------------------------
@@ -31,25 +32,33 @@ print(f'****************************************************')
 
 # print(f"\nCurrent working directory: {os.getcwd()}")
 
-if len(sys.argv) <= 1:
-    tmp_dir =  input(f'\nDirectory (whit the XYZ files) to make the RDA [default: empty]: ')
-    tmp_dir = tmp_dir.strip()
+#Get path of Working Directory or Ask
+working_dir = fn.wd(sys.argv)
 
-    if tmp_dir == '.' or len(tmp_dir) < 1:
-        working_dir = os.getcwd()
-    else:
-        working_dir = os.getcwd() + '/' + tmp_dir
-else:
-    working_dir = os.getcwd() + '/' + sys.argv[1]
-    print(f'\nWorking directiry: {working_dir}')
+#Chage to Working Directory
+fn.cdpaht(working_dir)
+
+##########################Lineas transladadas a functions.py
+#if len(sys.argv) <= 1:
+#    tmp_dir =  input(f'\nDirectory (whit the XYZ files) to make the RDA [default: empty]: ')
+#    tmp_dir = tmp_dir.strip()
+
+#    if tmp_dir == '.' or len(tmp_dir) < 1:
+#        working_dir = os.getcwd()
+#    else:
+#        working_dir = os.getcwd() + '/' + tmp_dir
+#else:
+#    working_dir = os.getcwd() + '/' + sys.argv[1]
+#    print(f'\nWorking directiry: {working_dir}')
 
 # Check if the working dir exists
-if os.path.exists(working_dir) :
-    # Change the current working Directory
-    os.chdir(working_dir)
-else:
-    print(f'\n*** ERROR ***')
-    exit(f"Can't change the Working Directory, {working_dir} doesn't exist")
+#if os.path.exists(working_dir) :
+# Change the current working Directory
+#    os.chdir(working_dir)
+#else:
+#    print(f'\n*** ERROR ***')
+#    exit(f"Can't change the Working Directory, {working_dir} doesn't exist")
+##########################Lineas transladadas a functions.py
 
 # - reading files
 repited_list_xyz = []  # repited files (if any)
