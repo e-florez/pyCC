@@ -36,7 +36,7 @@ print(f'****************************************************')
 working_dir = fn.wd(sys.argv)
 
 #Chage to Working Directory
-fn.cdpaht(working_dir)
+fn.cdpath(working_dir)
 
 ##########################Lineas transladadas a functions.py
 #if len(sys.argv) <= 1:

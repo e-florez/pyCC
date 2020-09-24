@@ -22,7 +22,7 @@ def wd (path):
 
     return working_dir
 
-def cdpaht (working_dir) :
+def cdpath (working_dir) :
     """[summary]
     Change to working directory
     Args:
