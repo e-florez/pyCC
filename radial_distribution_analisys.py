@@ -101,60 +101,63 @@ while count < len(list_xyz):
 # -------------------------------------------------------------------------------
 # - Elements list to do radial distribution analisys
 
-def all_elements(file_xyz):
-    """ Function to get atomic pairs from a XYZ file  """
-    elements = pd.read_csv(list_xyz[0], delim_whitespace=True,
-                    skiprows=2, header=None,
-                    names=["element", "x-coordinate", "y-coordinate", "z-coordinate"])
+###############################Filas transladadas a functions.py
+#def all_elements(file_xyz):
+#    """ Function to get atomic pairs from a XYZ file  """
+#    elements = pd.read_csv(list_xyz[0], delim_whitespace=True,
+#                    skiprows=2, header=None,
+#                    names=["element", "x-coordinate", "y-coordinate", "z-coordinate"])
 
     # - if XYZ file has no coordinates (by mistake)
-    if elements.shape[0] <= 1:
-        elements = []
-        print(f'\n*** WARNING *** \nNo coordinates found in {file_xyz}')
-        return elements
+#    if elements.shape[0] <= 1:
+#        elements = []
+#        print(f'\n*** WARNING *** \nNo coordinates found in {file_xyz}')
+#        return elements
         # return '*** WARNING *** No coordinates found in ', file_xyz
 
-    elements = elements['element'].tolist()
+#    elements = elements['element'].tolist()
 
     # - list of elements (uniques)
-    elements_uniq = []
-    for atom in elements:
-        if atom not in elements_uniq:
-            elements_uniq.append(atom)
+#    elements_uniq = []
+#    for atom in elements:
+#        if atom not in elements_uniq:
+#            elements_uniq.append(atom)
 
-    elements = []
-    elements = [atoms.capitalize() for atoms in elements_uniq]
+#    elements = []
+#    elements = [atoms.capitalize() for atoms in elements_uniq]
 
-    element_list = []
-    atom_a = 0
-    while atom_a < len(elements):
-        element_list.append(elements[atom_a] + '-' + elements[atom_a])
-        atom_b = atom_a + 1
-        while atom_b < len(elements):
-            element_list.append(elements[atom_a] + '-' + elements[atom_b])
-            atom_b += 1
-        atom_a += 1
+#    element_list = []
+#    atom_a = 0
+#    while atom_a < len(elements):
+#        element_list.append(elements[atom_a] + '-' + elements[atom_a])
+#        atom_b = atom_a + 1
+#        while atom_b < len(elements):
+#            element_list.append(elements[atom_a] + '-' + elements[atom_b])
+#            atom_b += 1
+#        atom_a += 1
 
-    return element_list
+#    return element_list
 
-def sort_input_pairs(elements):
-    """sorting uniques atomic pair A-B from an input list """
+#def sort_input_pairs(elements):
+#    """sorting uniques atomic pair A-B from an input list """
     # - deleting comma used to split atomic pairs (if any)
-    elements = [pair.replace(',','') for pair in elements]
+#    elements = [pair.replace(',','') for pair in elements]
 
     # - creating a list of lists to capitalize each atom
-    elements = [pair.split('-') for pair in elements]
+#    elements = [pair.split('-') for pair in elements]
 
     # - List Comprehension, extending lists within a list
-    elements = [atoms.capitalize() for pair in elements for atoms in pair]
+#    elements = [atoms.capitalize() for pair in elements for atoms in pair]
 
-    element_list = []
-    pair = 0
-    while pair < len(elements) - 1:
-        element_list.append(elements[pair] + '-' + elements[pair + 1])
-        pair += 2
+#    element_list = []
+#    pair = 0
+#    while pair < len(elements) - 1:
+#        element_list.append(elements[pair] + '-' + elements[pair + 1])
+#        pair += 2
 
-    return element_list
+#    return element_list
+###############################Filas transladadas a functions.py
+
 
 #--------------------------------------------------------------------------
 # - END of functions definition
@@ -166,15 +169,15 @@ if len(sys.argv) < 3:
 
     # - by default reading elements for the first XYZ file
     if len(input_elements.split()) < 1 or input_elements == 'all':
-        pairs_list = all_elements(list_xyz[0])
+        pairs_list = fn.all_elements(list_xyz[0])
     else:
         elements = input_elements.split()
         # - sorting atomic pairs
-        pairs_list = sort_input_pairs(elements)
+        pairs_list = fn.sort_input_pairs(elements)
 
 else:
     if sys.argv[2] == 'all':
-        pairs_list = all_elements(list_xyz[0])
+        pairs_list = fn.all_elements(list_xyz[0])
     else:
         input_arguments = 2
         while input_arguments < len(sys.argv):
@@ -182,7 +185,7 @@ else:
             input_arguments += 1
 
         # - sorting atomic pairs
-        pairs_list = sort_input_pairs(elements)
+        pairs_list = fn.sort_input_pairs(elements)
 
 # - list of atom pair from elements list
 if len(pairs_list) < 1:
