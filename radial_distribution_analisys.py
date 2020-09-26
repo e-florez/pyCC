@@ -9,15 +9,18 @@
 # ------------------------------------------------------------------------------------
 # ------ modules
 # ------------------------------------------------------------------------------------
-import sys # to get System-specific parameters
+import sys  # to get System-specific parameters
 import os  # - to check id a file or dir exits -> os.path.exists()
-from scipy.interpolate import make_interp_spline, BSpline # -  to smooth out your data
-import glob # - Unix style pathname pattern expansion
-from natsort import natsorted # Simple yet flexible natural sorting in Python.
-import pandas as pd # - complete data analysis tool (it can replace matplotlib or numpy, as it is built on top of both)
-import numpy as np # - arrays and matrix manipulation
-import matplotlib.pyplot as plt # - plotting tools
-from matplotlib import rc # - runtime configuration (rc) containing the default styles for every plot element you create
+# -  to smooth out your data
+from scipy.interpolate import make_interp_spline, BSpline
+import glob  # - Unix style pathname pattern expansion
+from natsort import natsorted  # Simple yet flexible natural sorting in Python.
+# - complete data analysis tool (it can replace matplotlib or numpy, as it is built on top of both)
+import pandas as pd
+import numpy as np  # - arrays and matrix manipulation
+import matplotlib.pyplot as plt  # - plotting tools
+# - runtime configuration (rc) containing the default styles for every plot element you create
+from matplotlib import rc
 rc('text', usetex=True)   # --- enable TeX mode for matplotlib
 
 # ------------------------------------------------------------------------------------
@@ -32,7 +35,8 @@ print(f'****************************************************')
 # print(f"\nCurrent working directory: {os.getcwd()}")
 
 if len(sys.argv) <= 1:
-    tmp_dir =  input(f'\nDirectory (whit the XYZ files) to make the RDA [default: empty]: ')
+    tmp_dir = input(
+        f'\nDirectory (whit the XYZ files) to make the RDA [default: empty]: ')
     tmp_dir = tmp_dir.strip()
 
     if tmp_dir == '.' or len(tmp_dir) < 1:
@@ -44,7 +48,7 @@ else:
     print(f'\nWorking directiry: {working_dir}')
 
 # Check if the working dir exists
-if os.path.exists(working_dir) :
+if os.path.exists(working_dir):
     # Change the current working Directory
     os.chdir(working_dir)
 else:
@@ -94,11 +98,12 @@ while count < len(list_xyz):
 # -------------------------------------------------------------------------------
 # - Elements list to do radial distribution analisys
 
+
 def all_elements(file_xyz):
     """ Function to get atomic pairs from a XYZ file  """
     elements = pd.read_csv(list_xyz[0], delim_whitespace=True,
-                    skiprows=2, header=None,
-                    names=["element", "x-coordinate", "y-coordinate", "z-coordinate"])
+                           skiprows=2, header=None,
+                           names=["element", "x-coordinate", "y-coordinate", "z-coordinate"])
 
     # - if XYZ file has no coordinates (by mistake)
     if elements.shape[0] <= 1:
@@ -130,10 +135,11 @@ def all_elements(file_xyz):
 
     return element_list
 
+
 def sort_input_pairs(elements):
     """sorting uniques atomic pair A-B from an input list """
     # - deleting comma used to split atomic pairs (if any)
-    elements = [pair.replace(',','') for pair in elements]
+    elements = [pair.replace(',', '') for pair in elements]
 
     # - creating a list of lists to capitalize each atom
     elements = [pair.split('-') for pair in elements]
@@ -149,13 +155,15 @@ def sort_input_pairs(elements):
 
     return element_list
 
-#--------------------------------------------------------------------------
+# --------------------------------------------------------------------------
 # - END of functions definition
 
-elements = [] # list of elements
+
+elements = []  # list of elements
 
 if len(sys.argv) < 3:
-    input_elements =  input(f"\nAtomic pairs to make the RDA [Default: all]:\n**A-B, C-D, ... SYMBOLS** ")
+    input_elements = input(
+        f"\nAtomic pairs to make the RDA [Default: all]:\n**A-B, C-D, ... SYMBOLS** ")
 
     # - by default reading elements for the first XYZ file
     if len(input_elements.split()) < 1 or input_elements == 'all':
@@ -216,7 +224,7 @@ print(f'BSpline used for the RDA with {bs_points} points')
 delta_angle = 5.0
 min_angle = 0
 max_angle = 190
-nbins_angle = int ( (max_angle - min_angle) / delta_angle)
+nbins_angle = int((max_angle - min_angle) / delta_angle)
 
 occurrences_angle = np.zeros(nbins_angle, dtype=int)
 
@@ -226,7 +234,8 @@ delta_angle = 5.0
 min_dihedral_angle = 0
 max_dihedral_angle = 360
 
-nbins_dihedral_angle = int ( (max_dihedral_angle - min_dihedral_angle) / delta_angle)
+nbins_dihedral_angle = int(
+    (max_dihedral_angle - min_dihedral_angle) / delta_angle)
 
 occurrences_dihedral_angle = np.zeros(nbins_dihedral_angle, dtype=int)
 
@@ -247,8 +256,8 @@ for file_xyz in list_xyz:
     #       data_xyz.iloc[i, 3] is a coordinate on the z-axis (float type)
     # ------------------------------------------------------------------
     data_xyz_all = pd.read_csv(file_xyz, delim_whitespace=True,
-                                skiprows=2, header=None,
-                                names=["element", "x-coordinate", "y-coordinate", "z-coordinate"])
+                               skiprows=2, header=None,
+                               names=["element", "x-coordinate", "y-coordinate", "z-coordinate"])
 
     # - checking coordinates within file
     if data_xyz_all.shape[0] <= 1:
@@ -279,7 +288,7 @@ for file_xyz in list_xyz:
     # - the header for the distnces matrix
     header_distance_matrix = []
 
-    #--------------------------------------------------------------------
+    # --------------------------------------------------------------------
     # - Computing the Radial Distribution Function
     coordinates_a = np.zeros(3, dtype=float)
     coordinates_b = np.zeros(3, dtype=float)
@@ -302,13 +311,15 @@ for file_xyz in list_xyz:
             # - computing euclidean distance
             distance = np.linalg.norm(coordinates_a - coordinates_b)
 
-            #------------------------------------------------
+            # ------------------------------------------------
             # - Radial distribution analysis
             if distance < rf:
                 # - finding atomic pair for previous distance
-                pair = str(data_xyz.iloc[atom_a, 0]) + '-' + str(data_xyz.iloc[atom_b, 0])
+                pair = str(data_xyz.iloc[atom_a, 0]) + \
+                    '-' + str(data_xyz.iloc[atom_b, 0])
                 # - pair AB == BA
-                pair_rev = str(data_xyz.iloc[atom_b, 0]) + '-' + str(data_xyz.iloc[atom_a, 0])
+                pair_rev = str(data_xyz.iloc[atom_b, 0]) + \
+                    '-' + str(data_xyz.iloc[atom_a, 0])
 
                 # - index for pair list
                 if pair in pairs_list:
@@ -323,16 +334,16 @@ for file_xyz in list_xyz:
                 if distance_hit > 0 and distance_hit < nbins:
                     occurrences[pair_idx, distance_hit] += 1
 
-            #------------------------------------------------
+            # ------------------------------------------------
             # - computing distance matrix
             distance_matrix[atom_a, atom_b] = distance
             # distance_matrix[atom_b, atom_a] = distance
 
-            #------------------------------------------------
+            # ------------------------------------------------
             atom_b += 1
         atom_a += 1
 
-    #--------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------------
     # - computing angle 1-C-2
     #       C
     #      / \
@@ -354,12 +365,12 @@ for file_xyz in list_xyz:
     second_atom = angle_list[2]
 
     # - atom index from XYZ file
-    list_idx_central_atom = [i for i, x in enumerate(header_distance_matrix) \
-                                    if x == central_atom]
-    list_idx_first_atom = [i for i, x in enumerate(header_distance_matrix) \
-                                if x == first_atom]
-    list_idx_second_atom = [i for i, x in enumerate(header_distance_matrix) \
-                                if x == second_atom]
+    list_idx_central_atom = [i for i, x in enumerate(header_distance_matrix)
+                             if x == central_atom]
+    list_idx_first_atom = [i for i, x in enumerate(header_distance_matrix)
+                           if x == first_atom]
+    list_idx_second_atom = [i for i, x in enumerate(header_distance_matrix)
+                            if x == second_atom]
 
     for central in list_idx_central_atom:
         coordinates_central[0] = float(data_xyz.iloc[central, 1])
@@ -376,10 +387,10 @@ for file_xyz in list_xyz:
                 continue
 
             if distance_matrix[central, first] > min_distance \
-                and distance_matrix[central, first] < max_distance:
+                    and distance_matrix[central, first] < max_distance:
                 pass
             elif distance_matrix[first, central] > min_distance \
-                and distance_matrix[first, central] < max_distance:
+                    and distance_matrix[first, central] < max_distance:
                 pass
             else:
                 continue
@@ -400,17 +411,17 @@ for file_xyz in list_xyz:
                 pair_angle_rev = str(second) + str(first)
 
                 if pair_angle in list_pair_angle \
-                    or pair_angle_rev in list_pair_angle:
+                        or pair_angle_rev in list_pair_angle:
                     continue
                 else:
                     list_pair_angle.append(pair_angle)
                     list_pair_angle.append(pair_angle_rev)
 
                 if distance_matrix[central, second] > min_distance \
-                    and distance_matrix[central, second] < max_distance:
+                        and distance_matrix[central, second] < max_distance:
                     pass
                 elif distance_matrix[second, central] > min_distance \
-                    and distance_matrix[second, central] < max_distance:
+                        and distance_matrix[second, central] < max_distance:
                     pass
                 else:
                     continue
@@ -420,24 +431,26 @@ for file_xyz in list_xyz:
                 coordinates_second[2] = float(data_xyz.iloc[second, 3])
 
                 # - vectorial distance between the central and second atom
-                central_second = np.subtract(coordinates_central, coordinates_second)
+                central_second = np.subtract(
+                    coordinates_central, coordinates_second)
 
-                #-----------------------------------------------------------------------
+                # -----------------------------------------------------------------------
                 # - computing angle first-central-second (using dot product)
                 norm_second = np.linalg.norm(central_second)
                 norm_first = np.linalg.norm(central_first)
-                Cos = np.dot(central_first, central_second) / norm_first / norm_second
+                Cos = np.dot(central_first, central_second) / \
+                    norm_first / norm_second
 
                 angle = np.arccos(Cos)
                 angle_deg = np.degrees(angle)
 
-                angle_hit = int(round( (angle_deg) / delta_angle) )
+                angle_hit = int(round((angle_deg) / delta_angle))
                 if angle_hit > 0 and angle_hit < nbins_angle:
                     occurrences_angle[angle_hit] += 1
 
                 # print(angle_deg)
 
-    #--------------------------------------------------------------------
+    # --------------------------------------------------------------------
     # - computing DIHEDRAL angle X-YAB
     #          2
     #         /
@@ -462,14 +475,14 @@ for file_xyz in list_xyz:
     third_atom = dihedral_list[3]
 
     # - atom index from XYZ file
-    list_idx_central_atom = [i for i, x in enumerate(header_distance_matrix) \
-                                    if x == central_atom]
-    list_idx_first_atom = [i for i, x in enumerate(header_distance_matrix) \
-                                if x == first_atom]
-    list_idx_second_atom = [i for i, x in enumerate(header_distance_matrix) \
-                                if x == second_atom]
-    list_idx_third_atom = [i for i, x in enumerate(header_distance_matrix) \
-                                if x == third_atom]
+    list_idx_central_atom = [i for i, x in enumerate(header_distance_matrix)
+                             if x == central_atom]
+    list_idx_first_atom = [i for i, x in enumerate(header_distance_matrix)
+                           if x == first_atom]
+    list_idx_second_atom = [i for i, x in enumerate(header_distance_matrix)
+                            if x == second_atom]
+    list_idx_third_atom = [i for i, x in enumerate(header_distance_matrix)
+                           if x == third_atom]
 
     for first in list_idx_first_atom:
         coordinates_first[0] = float(data_xyz.iloc[first, 1])
@@ -482,10 +495,10 @@ for file_xyz in list_xyz:
                 continue
 
             if distance_matrix[central, first] > min_distance \
-                and distance_matrix[central, first] < max_distance:
+                    and distance_matrix[central, first] < max_distance:
                 pass
             elif distance_matrix[first, central] > min_distance \
-                and distance_matrix[first, central] < max_distance:
+                    and distance_matrix[first, central] < max_distance:
                 pass
             else:
                 continue
@@ -506,10 +519,10 @@ for file_xyz in list_xyz:
                     continue
 
                 if distance_matrix[central, second] > min_distance \
-                    and distance_matrix[central, second] < max_distance:
+                        and distance_matrix[central, second] < max_distance:
                     distance_second = distance_matrix[central, second]
                 elif distance_matrix[second, central] > min_distance \
-                    and distance_matrix[second, central] < max_distance:
+                        and distance_matrix[second, central] < max_distance:
                     distance_second = distance_matrix[second, central]
                 else:
                     continue
@@ -524,7 +537,8 @@ for file_xyz in list_xyz:
                     coordinates_second[2] = float(data_xyz.iloc[second, 3])
 
             # - vectorial distance between the central and second atom
-            central_second = np.subtract(coordinates_central, coordinates_second)
+            central_second = np.subtract(
+                coordinates_central, coordinates_second)
 
             # - initial value to choose the min
             min_third = 10000
@@ -535,10 +549,10 @@ for file_xyz in list_xyz:
                     continue
 
                 if distance_matrix[central, third] > min_distance \
-                    and distance_matrix[central, third] < max_distance:
+                        and distance_matrix[central, third] < max_distance:
                     distance_third = distance_matrix[central, third]
                 elif distance_matrix[third, central] > min_distance \
-                    and distance_matrix[third, central] < max_distance:
+                        and distance_matrix[third, central] < max_distance:
                     distance_third = distance_matrix[third, central]
                 else:
                     continue
@@ -553,7 +567,7 @@ for file_xyz in list_xyz:
             # - vectorial distance between the central and third atom
             central_third = np.subtract(coordinates_central, coordinates_third)
 
-            #--------------------------------------------------------------
+            # --------------------------------------------------------------
             # - computing dihedral angle (using cross product)
 
             p1 = coordinates_first
@@ -565,7 +579,7 @@ for file_xyz in list_xyz:
             compute_dihedral = False
 
             if np.linalg.norm(p1) < 0.1 or np.linalg.norm(p2) < 0.1 or \
-                np.linalg.norm(p3) < 0.1 or np.linalg.norm(p4) < 0.1:
+                    np.linalg.norm(p3) < 0.1 or np.linalg.norm(p4) < 0.1:
                 compute_dihedral = False
             else:
                 compute_dihedral = True
@@ -578,7 +592,8 @@ for file_xyz in list_xyz:
                 # import dihedral2 as dh
                 # dihedral_angle_deg = dh.dihedral(p1, p2, p3, p4)
 
-                dihedral_angle_hit = int(round( (dihedral_angle_deg) / delta_angle) )
+                dihedral_angle_hit = int(
+                    round((dihedral_angle_deg) / delta_angle))
                 if dihedral_angle_hit > 0 and dihedral_angle_hit < nbins_angle:
                     occurrences_dihedral_angle[dihedral_angle_hit] += 1
 
@@ -587,16 +602,123 @@ for file_xyz in list_xyz:
 #                 print()
 
 #     #--------------------------------------------------------------------
+#     #--------------------------------------------------------------------
+    # atom transfer according to Stern-limbach model
 
-# exit()
+    max_distance = 2.0
+    min_distance = 0.5
 
-#---------------------------------------------------------------------------------------
-#---------------------------------------------------------------------------------------
+    transfer_list = ["O", "H", "O"]
+
+    coordinates_first = np.zeros(3, dtype=float)
+    coordinates_central = np.zeros(3, dtype=float)
+    coordinates_second = np.zeros(3, dtype=float)
+
+    first_atom = transfer_list[0]
+    central_atom = transfer_list[1]
+    second_atom = transfer_list[2]
+
+    # - atom index from XYZ file
+    list_idx_central_atom = [i for i, x in enumerate(header_distance_matrix)
+                             if x == central_atom]
+    list_idx_first_atom = [i for i, x in enumerate(header_distance_matrix)
+                           if x == first_atom]
+    list_idx_second_atom = [i for i, x in enumerate(header_distance_matrix)
+                            if x == second_atom]
+
+    for central in list_idx_central_atom:
+        coordinates_central[0] = float(data_xyz.iloc[central, 1])
+        coordinates_central[1] = float(data_xyz.iloc[central, 2])
+        coordinates_central[2] = float(data_xyz.iloc[central, 3])
+
+        # - initial value to choose the min
+        min_first = 10000
+
+        for first in list_idx_first_atom:
+
+            if central == first:
+                continue
+
+            if distance_matrix[central, first] > min_distance \
+                    and distance_matrix[central, first] < max_distance:
+                distance_first = distance_matrix[central, first]
+            elif distance_matrix[first, central] > min_distance \
+                    and distance_matrix[first, central] < max_distance:
+                distance_first = distance_matrix[first, central]
+            else:
+                continue
+
+            if min_first != min(min_first, distance_first):
+                min_first = min(min_first, distance_first)
+                choose_first = first
+
+                coordinates_first[0] = float(data_xyz.iloc[first, 1])
+                coordinates_first[1] = float(data_xyz.iloc[first, 2])
+                coordinates_first[2] = float(data_xyz.iloc[first, 3])
+
+        # - vectorial distance between the central and first atom
+        r1 = np.linalg.norm(np.subtract(
+            coordinates_central, coordinates_first))
+
+        if r1 > max_distance:
+            continue
+
+        # - initial value to choose the min
+        min_second = 10000
+
+        for second in list_idx_second_atom:
+
+            if choose_first == second or central == second:
+                continue
+
+            if distance_matrix[central, second] > min_distance \
+                    and distance_matrix[central, second] < max_distance:
+                distance_second = distance_matrix[central, second]
+            elif distance_matrix[second, central] > min_distance \
+                    and distance_matrix[second, central] < max_distance:
+                distance_second = distance_matrix[second, central]
+            else:
+                continue
+
+            if min_second != min(min_second, distance_second):
+                min_second = min(min_second, distance_second)
+
+                coordinates_second[0] = float(data_xyz.iloc[second, 1])
+                coordinates_second[1] = float(data_xyz.iloc[second, 2])
+                coordinates_second[2] = float(data_xyz.iloc[second, 3])
+
+        # - vectorial distance between the central and second atom
+        r2 = np.linalg.norm(np.subtract(
+            coordinates_central, coordinates_second))
+
+        if r2 > max_distance:
+            continue
+
+        # - atoms transfer analysis compute q1 = 0.5 * (r1 - r2) and q2 = r1 + r2
+        q1 = 0.5 * (r1 - r2)
+        q2 = r1 + r2
+
+        print()
+        print()
+        print(r1)
+        print(r2)
+        print()
+
+
+#     #--------------------------------------------------------------------
+#     #--------------------------------------------------------------------
+#     #--------------------------------------------------------------------
+
+
+exit()
+
+# ---------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------
 # - bond angle based on the previous grid for the RDA
 
 total_angles = sum(occurrences_angle)
 
-ada_name =  'ada_' + '-'.join(angle_list) + '.dat'
+ada_name = 'ada_' + '-'.join(angle_list) + '.dat'
 
 if total_angles > 0:
 
@@ -611,14 +733,14 @@ if total_angles > 0:
     bond_angle = np.linspace(min_angle, max_angle, nbins_angle)
 
     np.savetxt(ada_name, np.transpose([bond_angle, occurrences_angle]),
-                delimiter=' ', header='Angle [degrees]   occurrence (total=%i)' % total_angles,
-                fmt='%.6f %28i')
+               delimiter=' ', header='Angle [degrees]   occurrence (total=%i)' % total_angles,
+               fmt='%.6f %28i')
 else:
     print(f'\n*** Warning ***')
     print(f'NO angle {ada_name} found in XYZ files\n')
 
 
-#-------------------------------------------------------------------
+# -------------------------------------------------------------------
 # - dihedral angle
 
 total_dihedral_angles = sum(occurrences_dihedral_angle)
@@ -637,18 +759,19 @@ if total_dihedral_angles > 0:
     print(f'          {dihedral_list[3]}')
     print(f'')
 
-    bond_angle = np.linspace(min_dihedral_angle, max_dihedral_angle, nbins_dihedral_angle)
+    bond_angle = np.linspace(
+        min_dihedral_angle, max_dihedral_angle, nbins_dihedral_angle)
 
     np.savetxt(dihedral_ada_name, np.transpose([bond_angle, occurrences_dihedral_angle]),
-                delimiter=' ', header='Angle [degrees]   occurrence (total=%i)' \
-                                                    % total_dihedral_angles,
-                fmt='%.6f %28i')
+               delimiter=' ', header='Angle [degrees]   occurrence (total=%i)'
+               % total_dihedral_angles,
+               fmt='%.6f %28i')
 else:
     print(f'\n*** Warning ***')
     print(f'NO dihedral angle {dihedral_ada_name} found in XYZ files\n')
 
-#---------------------------------------------------------------------------------------
-#---------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------
 # - bond distance based on  the previous grid for the RDA
 bond_distance = np.linspace(ro, rf, nbins)
 # - to smooth the curve (BSpline)
@@ -667,8 +790,8 @@ while atom_pair < len(pairs_list):
 
         rda_name = 'rda_' + pair + '.dat'
         np.savetxt(rda_name, np.transpose([bond_distance, occurrences[atom_pair, :]]),
-                    delimiter=' ', header='distance [Angstrom]   occurrence (total=%i)' % total_bond,
-                    fmt='%.6f %28i')
+                   delimiter=' ', header='distance [Angstrom]   occurrence (total=%i)' % total_bond,
+                   fmt='%.6f %28i')
 
         # # ------------------------------------------------
         # # - to plot
