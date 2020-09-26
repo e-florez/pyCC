@@ -70,7 +70,8 @@ for input_xyz in glob.glob('*.xyz'):
 
 # list_xyz = ["w1s1.xyz"]
 # list_xyz = ["w2s1.xyz"]
-list_xyz = ["w6s23.xyz"]
+# list_xyz = ["w6s23.xyz
+# "]
 # list_xyz = ["w1s1.xyz", "w2s1.xyz"]
 # list_xyz = ["w1s1.xyz", "w2s1.xyz", "w3s1.xyz"]
 # list_xyz = ["w1s1.xyz", "w2s1.xyz", "w3s1.xyz", "w3s2.xyz"]
@@ -619,9 +620,42 @@ for file_xyz in list_xyz:
 
     # --------------------------------------------------------------------
 
+print()
+print(natural_bond_coordinates)
+print()
+print()
+
 # exit()
 
 # ---------------------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------------------
+# - bond angle based on the previous grid for the RDA
+
+total_transfer = len(natural_bond_coordinates)
+
+triplets = '-'.join(transfer_list)
+transfer_name = 'transfer_' + '-'.join(transfer_list) + '.dat'
+
+if total_transfer > 0:
+
+    print(f'')
+    print(
+        f'Atoms transfer analysis ({triplets}) according to Stern-Limbach model (q1, q2):')
+    print(
+        f'Transfer of atoms {transfer_list[1]} ' +
+        f'between {transfer_list[0]} and {transfer_list[2]}, ' +
+        f'where q1=0.5*(r1-r2) and q2=r1+r2, ' +
+        f'r1: distance[{transfer_list[0]}{transfer_list[1]}] and r2: distance[{transfer_list[1]}{transfer_list[2]}]')
+    print(f'')
+
+    np.savetxt(transfer_name, natural_bond_coordinates,
+               delimiter=' ', header='q1 [Angstrom]    q2 [Angstrom]',
+               fmt='%15.10f %15.10f')
+else:
+    print(f'\n*** Warning ***')
+    print(f'No distance (q1, q2) found for {triplets} in XYZ files\n')
+
 # ---------------------------------------------------------------------------------------
 # - bond angle based on the previous grid for the RDA
 
