@@ -216,7 +216,7 @@ bs_points = 100
 #
 occurrences = np.zeros((atom_pairs, nbins), dtype=int)
 
-print(f'\nRDA with {nbins} bins, grid {dr} between {ro}-{rf} Angstroms')
+print(f'\nRDA with {nbins} bins, grid {dr} between {ro}-{rf} \\AAs')
 print(f'BSpline used for the RDA with {bs_points} points')
 
 # - array to storage occurrences for angles, [0, 180] degrees
@@ -659,14 +659,14 @@ else:
 # ---------------------------------------------------------------------------
 # - Stern-Limbach plot
 fig = plt.figure(figsize=(10, 8))  # inches WxH
-fig.suptitle(f'Stern-Limbach for {transfer_list[0]}-{transfer_list[1]}---{transfer_list[2]}', fontsize=20) #, fontweight='bold')
+fig.suptitle(f'Stern-Limbach for {transfer_list[0]}--{transfer_list[1]}$\cdots${transfer_list[2]}', fontsize=20) #, fontweight='bold')
 
 ax1 = plt.subplot(111)
 ax1.grid()
 
 # - legends for the main plot
-plt.xlabel('q1=(r1-r2)/2 [Angstrom]', fontsize=18) #, fontweight='bold')
-plt.ylabel('q2=r1+r2 [Angstrom]', fontsize=18) #, fontweight='bold')
+plt.xlabel('$q_1=(r_1-r_2)/2$ [\\AA]', fontsize=18) #, fontweight='bold')
+plt.ylabel('$q_2=r_1+r_2$ [\\AA]', fontsize=18) #, fontweight='bold')
 
 # - loading files to read and plot them
 x, y = [], []
@@ -674,7 +674,7 @@ for q1, q2 in natural_bond_coordinates:
     x.append(q1)
     y.append(q2)
 
-ax1.plot(x, y, 'o', label='Transfer %s--%s-----%s' %(transfer_list[0], transfer_list[1], transfer_list[2]))
+ax1.plot(x, y, 'o', label='Transfer %s--%s $\cdots$ %s' %(transfer_list[0], transfer_list[1], transfer_list[2]))
 
 ax1.xaxis.set_major_locator(plt.MaxNLocator(12))
 
@@ -773,7 +773,7 @@ while atom_pair < len(pairs_list):
 
         rda_name = 'rda_' + pair + '.dat'
         np.savetxt(rda_name, np.transpose([bond_distance, occurrences[atom_pair, :]]),
-                   delimiter=' ', header='distance [Angstrom]   occurrence (total=%i)' % total_bond,
+                   delimiter=' ', header='distance [\\AA]   occurrence (total=%i)' % total_bond,
                    fmt='%.6f %28i')
 
         # # ------------------------------------------------
@@ -786,7 +786,7 @@ while atom_pair < len(pairs_list):
 
         # # - legends for the main plot
         # plt.ylabel('Relative Number of Ocurrences', fontsize=12, fontweight='bold')
-        # plt.xlabel('Bond Length [Angstrom]', fontsize=12, fontweight='bold')
+        # plt.xlabel('Bond Length [\\AA]', fontsize=12, fontweight='bold')
 
         # # # - smooth curve BSpline, degree k=3, cubic
         # smooth = make_interp_spline(bond_distance, occurrences[atom_pair, :], k=2)
