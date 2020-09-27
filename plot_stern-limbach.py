@@ -15,36 +15,9 @@ from itertools import cycle # - lines style in a for loop
 # ---------------------------------------------------------------------------------------------------------
 # ------ body
 # ---------------------------------------------------------------------------------------------------------
-print(f'\nPlotting Radial Distribution Analisys (pfile)\n')
-
-# -----------------------------------------------------------
 # - working directory
 print(f"\nCurrent working directory: {os.getcwd()}")
 
-##### if uncomment the section to change the working dir, must change
-##### len(sys.argv) < 3
-##### input_arguments =
-
-# if len(sys.argv) <= 1:
-#     tmp_dir =  input(f'\nDirectory (whit the XYZ files) to make the pfile [default: empty]: ')
-#     tmp_dir = tmp_dir.strip()
-
-#     if tmp_dir == '.' or len(tmp_dir) < 1:
-#         working_dir = os.getcwd()
-#     else:
-#         working_dir = os.getcwd() + '/' + tmp_dir
-# else:
-#     working_dir = os.getcwd() + '/' + sys.argv[1]
-
-# print(f'\nWorking directiry: {working_dir}')
-
-# # Check if New path exists
-# if os.path.exists(working_dir) :
-#     # Change the current working Directory
-#     os.chdir(working_dir)
-# else:
-#     print(f'\n*** ERROR ***')
-#     exit(f"Can't change the Working Directory, {working_dir} doesn't exist")
 # -----------------------------------------------------------
 # - pfile files to plot
 plot_files = []
@@ -75,18 +48,36 @@ else:
     exit(f'\n *** ERROR ***\n No files found to plot\n')
 
 # -----------------------------------------------------------
-# - plotting: defining frames and designing the area to plot
 # - Stern-Limbach plot
-fig = plt.figure(figsize=(10, 8))  # inches WxH
-# fig.suptitle(f'Stern-Limbach for {transfer_list[0]}--{transfer_list[1]}$\cdots${transfer_list[2]}', fontsize=20) #, fontweight='bold')
-fig.suptitle(f'Stern-Limbach', fontsize=25) #, fontweight='bold')
+# -----------------------------------------------------------
 
-ax1 = plt.subplot(111)
+# - plotting: defining frames and designing the area to plot
+fig = plt.figure(figsize=(10, 8))  # inches WxH
+# fig.suptitle(f'Stern-Limbach', fontsize=25) #, fontweight='bold')
+
+ax1 = plt.subplot()
 ax1.grid()
 
 # - legends for the main plot
-plt.xlabel('$q_1=(r_1-r_2)/2$ [Angstrom]', fontsize=18) #, fontweight='bold')
-plt.ylabel('$q_2=r_1+r_2$ [Angstrom]', fontsize=18) #, fontweight='bold')
+# plt.xlabel('$q_1=(r_1-r_2)/2$ [Angstrom]', fontsize=18) #, fontweight='bold')
+# plt.ylabel('$q_2=r_1+r_2$ [Angstrom]', fontsize=18) #, fontweight='bold')
+plt.xlabel('$q_1=(r_1-r_2) /2$   $[\\AA]$', fontsize=18) #, fontweight='bold')
+plt.ylabel('$q_2=r_1+r_2$   $[\\AA]$', fontsize=18) #, fontweight='bold')
+
+# - adding an extra text on the plot
+ax1.text(-0.45, 2.3, r'A $-$ X $\cdots\rightarrow$B',
+        color='black', fontsize=35,
+        rotation=0, va='center', bbox=dict(facecolor='white', edgecolor='none'))
+ax1.text(-0.41, 2.35, '$r_1$',
+        color='black', fontsize=20,
+        rotation=0, va='center', bbox=dict(facecolor='white', edgecolor='none'))
+ax1.text(-0.31, 2.35, '$r_2$',
+        color='black', fontsize=20,
+        rotation=0, va='center', bbox=dict(facecolor='white', edgecolor='none'))
+
+ax1.text(-0.15, 2.3, r'Atom transfer $q_1\rightarrow$0',
+        color='black', fontsize=14,
+        rotation=0, va='center', bbox=dict(facecolor='white', edgecolor='none'))
 
 # -markers
 lines = ['o', '^', 'v', '<', '>', 's', 'd'] #, 'h', 'p', 'D', 'H']
@@ -114,6 +105,8 @@ for pfile in plot_files:
         m, b = np.polyfit(x, y, 1)
         ax1.plot(x, m*np.array(x) + b, '-', linewidth=3, color='black', label='%s' %(name))
     else:
+        name = name.split('/')[1:]
+        name = '/'.join(name)
         ax1.plot(x, y, next(linecycler), markerfacecolor='none', markeredgewidth=2, label='%s' %(name))
 
     ax1.xaxis.set_major_locator(plt.MaxNLocator(12))
@@ -121,14 +114,7 @@ for pfile in plot_files:
 # -----------------------------------------------------------
 # - Ending the plot
 
-plt.legend(loc=0, fontsize=18)
-# Put a legend below current axis
-# plt.legend(loc='lower center', bbox_to_anchor=(1.32, 0.6, 0.0, 0.0),
-#             fancybox=True, shadow=True, ncol=1, fontsize=11)
-
-# # - Shrink current axis's height by 10% on the bottom
-# box = ax1.get_position()
-# ax1.set_position([box.x0, box.y0, box.width * 0.7, box.height])
+plt.legend(loc=1, fontsize=16)
 
 # ---------------------------------------------------------------------------------------------------------
 # - ENDING the plots
