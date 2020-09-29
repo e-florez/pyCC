@@ -7,7 +7,9 @@
 *geometry*.sh
 
 # Directories for OUTPUT files from main softwares
-*log_files/
+**/log_files/
+**/org_files/
+**/*_files/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

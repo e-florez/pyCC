@@ -69,6 +69,7 @@ def atom_transfer(transfer_list, header_distance_matrix, data_xyz, distance_matr
         # - initial value to choose the min
         min_first = 10000
 
+        choose_first = 0
         for first in list_idx_first_atom:
 
             if central == first:

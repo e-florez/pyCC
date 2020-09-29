@@ -87,7 +87,11 @@ linecycler = cycle(lines)
 # - loading files to read and plot them
 for pfile in plot_files:
     name = pfile.split('/')[:-1]
-    name = '/'.join(name)
+    if len(name) < 2:
+        name = name[0]
+    else:
+        name = name[1:]
+        name = '/'.join(name)
 
     x, y = [], []
     for line in open(pfile, 'r'):
@@ -101,12 +105,10 @@ for pfile in plot_files:
         x.append(values[0])
         y.append(values[1])
 
-    if pfile == 'water_hexamer/transfer_O-H-O.dat':
+    if pfile == 'water/w6/transfer_O-H-O.dat':
         m, b = np.polyfit(x, y, 1)
         ax1.plot(x, m*np.array(x) + b, '-', linewidth=3, color='black', label='%s' %(name))
     else:
-        name = name.split('/')[1:]
-        name = '/'.join(name)
         ax1.plot(x, y, next(linecycler), markerfacecolor='none', markeredgewidth=2, label='%s' %(name))
 
     ax1.xaxis.set_major_locator(plt.MaxNLocator(12))
