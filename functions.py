@@ -1,18 +1,24 @@
+#!/usr/bin/env python3
+# ------------------------------------------------------------------------------------
+# July 2020
+#   edisonffh@gmail.com
+# September 2020
+#   danianescobarv@gmail.com
+# ------------------------------------------------------------------------------------
 
 import os  # - to check id a file or dir exits -> os.path.exists()
 import pandas as pd # - complete data analysis tool (it can replace matplotlib or numpy, as it is built on top of both)
 
-def wd (path):
+def working_path (path):
     """[summary]
     Get path of working directory from variable path or ask
-    Args:
-        Input:
-            path (string) : with or no path of working directory
-        Output:
-            working_dir (string) : path of working directory
+    Input:
+        path (string) : with or no path of working directory
+    Output:
+        working_dir (string) : path of working directory
     """
 
-    if len(path) <= 1:
+    if len(path) <= 1 :
         tmp_dir =  input(f'\nDirectory (whit the XYZ files) to make the RDA [default: empty]: ')
         tmp_dir = tmp_dir.strip()
 
@@ -20,16 +26,23 @@ def wd (path):
             working_dir = os.getcwd()
         else:
             working_dir = os.getcwd() + '/' + tmp_dir
+    elif path[1] == '.' :
+        working_dir = os.getcwd()
+        print(f'\nWorking directiry: {working_dir}')
     else:
-        working_dir = os.getcwd() + '/' + path[1]
+        #working_dir = os.getcwd() + '/' + path[1]
+        #La idea de pedir el path, es poner toda la dirección y
+        #en el caso de hacer la evaluación dentro de la misma
+        #carpeta que se esta parado se pone un .
+        working_dir = path[1]
         print(f'\nWorking directiry: {working_dir}')
 
     return working_dir
 
-def cdpath (working_dir) :
+def cd_path (working_dir) :
     """[summary]
     Change to working directory
-    Args:
+    Input:
         working_dir (string): path of directory with .xyz
     """
     # Check if the working dir exists
@@ -45,11 +58,10 @@ def all_elements(file_xyz):
     """[summary]
     Function to get atomic pairs from a XYZ file,
     when it is selected all the elements and verification.
-    Args:
-        Input:
-            file_xyz (list): name of the .xyz
-        Output:
-            element_list (list): pairs of elements unique
+    Input:
+        file_xyz (list): name of the .xyz
+    Output:
+        element_list (list): pairs of elements unique
     """
 
     #bug: Cuando en el xyz se pone en minúscula el símbolo del
@@ -90,15 +102,13 @@ def all_elements(file_xyz):
 
     return element_list
 
-
 def sort_input_pairs(elements):
     """[summary]
     Sorting uniques atomic pair A-B from an input list
-    Args:
-        Input:
-            elements (list): pairs of elements from input
-        Output:
-            element_lsit (list): pairs of elements unique
+    Input:
+        elements (list): pairs of elements from input
+    Output:
+        element_lsit (list): pairs of elements unique
     """
 
     # - Deleting comma used to split atomic pairs (if any)
@@ -106,42 +116,32 @@ def sort_input_pairs(elements):
 
     cont = 0
     elements_list = []
-    while cont < len(elements):
-        pair1 = elements[cont]
-        if cont != len(elements)-1:
-            cont1 = cont + 1
-        else:
-            cont1 = cont - 1
-        while cont1 < len(elements):
-            if pair1 != elements[cont1] :
-                i = 0
-                cont2 = 0
-                for i in range(len(elements_list)):
-                    a1p1   = pair1.split('-')[0]
-                    a2p1   = pair1.split('-')[1]
-                    pair1r = a2p1 + '-' + a1p1
-                    if pair1 == elements_list[i] or pair1r == elements_list[i]:
-                        cont2 = 1
-                if len(elements_list) == 0 or cont2 == 0 :
-                    elements_list.append(pair1)
-                    cont1 = len(elements)
+    if len(elements) == 1:
+        elements_list = elements
+    else:
+        while cont < len(elements):
+            pair1 = elements[cont]
+            if cont != len(elements)-1:
+                cont1 = cont + 1
+            else:
+                cont1 = cont - 1
+            while cont1 < len(elements):
+                if pair1 != elements[cont1] :
+                    i = 0
+                    cont2 = 0
+                    for i in range(len(elements_list)):
+                        a1p1   = pair1.split('-')[0]
+                        a2p1   = pair1.split('-')[1]
+                        pair1r = a2p1 + '-' + a1p1
+                        if pair1 == elements_list[i] or pair1r == elements_list[i]:
+                            cont2 = 1
+                    if len(elements_list) == 0 or cont2 == 0 :
+                        elements_list.append(pair1)
+                        cont1 = len(elements)
+                    else:
+                        cont1 += 1
                 else:
                     cont1 += 1
-            else:
-                cont1 += 1
-        cont += 1
+            cont += 1
 
-    #print ('uniq ',elements_uniq)
-    # - Creating a list of lists to capitalize each atom
-    #elements = [pair.split('-') for pair in elements]
-    #print ('3 : ',elements)
-    # - List Comprehension, extending lists within a list Hg-O, Hg-Hg, Hg-O, O-H
-    #elements = [atoms.capitalize() for pair in elements for atoms in pair]
-    #print ('4 : ',elements)
-    #element_list = []
-    #pair = 0
-    #while pair < len(elements) - 1:
-    #    element_list.append(elements[pair] + '-' + elements[pair + 1])
-    #    pair += 2
-    #print ("5:",elements_list)
     return elements_list

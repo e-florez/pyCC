@@ -2,8 +2,13 @@
 # ------------------------------------------------------------------------------------
 # July 2020
 #   edisonffh@gmail.com
-#
-# python3.8 script to compute bond length frecuency; a Radial Distribution Analisys (RDA)
+# September 2020
+#   danianescobarv@gmail.com
+# python3.8 script to compute:
+# 1) Bond length frequency
+# 2) Angle frequency
+# 3) Dihedral frequency
+# Radial, Angle, and Dihedral Distribution Analisys (RADDA)
 # ------------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------------
@@ -25,7 +30,9 @@ import functions as fn
 # ------ body
 # ------------------------------------------------------------------------------------
 print(f'\n****************************************************')
-print(f'* Radial Distribution Analisys (RDA) for XYZ files *')   #Borrar lo de Radial
+print(f'*    Radial, Angle, and Dihedral       *')
+print(f'* Distribution Analisys for XYZ files  *')   #Borrar lo de Radial
+print(f'*              "RADDA"                 *')
 print(f'****************************************************')
 
 # - working directory
@@ -33,10 +40,10 @@ print(f'****************************************************')
 # print(f"\nCurrent working directory: {os.getcwd()}")
 
 #Get path of Working Directory or Ask
-working_dir = fn.wd(sys.argv)
+working_dir = fn.working_path(sys.argv)
 
 #Chage to Working Directory
-fn.cdpath(working_dir)
+fn.cd_path(working_dir)
 
 ##########################Lineas transladadas a functions.py
 #if len(sys.argv) <= 1:
