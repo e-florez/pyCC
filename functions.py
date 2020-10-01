@@ -116,19 +116,24 @@ def sort_input_pairs(elements):
 
     cont = 0
     elements_list = []
+    #When there is alone a term in elements
     if len(elements) == 1:
         elements_list = elements
+    #When there are several terms in elements
     else:
         while cont < len(elements):
             pair1 = elements[cont]
+            #Comparing pair1 with the other terms in elements
             if cont != len(elements)-1:
                 cont1 = cont + 1
             else:
                 cont1 = cont - 1
+            #Comparing with pairs already accepted like different
             while cont1 < len(elements):
                 if pair1 != elements[cont1] :
                     i = 0
                     cont2 = 0
+                    #Comparing with A-B and B-A
                     for i in range(len(elements_list)):
                         a1p1   = pair1.split('-')[0]
                         a2p1   = pair1.split('-')[1]
@@ -136,6 +141,7 @@ def sort_input_pairs(elements):
                         if pair1 == elements_list[i] or pair1r == elements_list[i]:
                             cont2 = 1
                     if len(elements_list) == 0 or cont2 == 0 :
+                        #Save unique pairs
                         elements_list.append(pair1)
                         cont1 = len(elements)
                     else:
