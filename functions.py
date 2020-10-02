@@ -22,10 +22,10 @@ def working_path (path):
         tmp_dir =  input(f'\nDirectory (whit the XYZ files) to make the RDA [default: empty]: ')
         tmp_dir = tmp_dir.strip()
 
-        if tmp_dir == '.' or len(tmp_dir) < 1:
-            working_dir = os.getcwd()
-        else:
-            working_dir = os.getcwd() + '/' + tmp_dir
+        #if tmp_dir == '.' or len(tmp_dir) < 1:
+        #    working_dir = os.getcwd()
+        #else:
+        #    working_dir = os.getcwd() + '/' + tmp_dir
     elif path[1] == '.' :
         working_dir = os.getcwd()
         print(f'\nWorking directiry: {working_dir}')
