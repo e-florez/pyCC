@@ -2,12 +2,17 @@
 # ------------------------------------------------------------------------------------
 # July 2020
 #   edisonffh@gmail.com
-#
-# python3.8 script to compute bond length frecuency; a Radial Distribution Analisys (RDA)
+# September 2020
+#   danianescobarv@gmail.com
+# python3.8 script to compute:
+# 1) Bond length frequency
+# 2) Angle frequency
+# 3) Dihedral frequency
+# Radial, Angle, and Dihedral Distribution Analisys (RADDA)
 # ------------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------------
-# ------ modules
+# ------ moules
 # ------------------------------------------------------------------------------------
 import sys  # to get System-specific parameters
 import os  # - to check id a file or dir exits -> os.path.exists()
@@ -23,37 +28,47 @@ import matplotlib.pyplot as plt  # - plotting tools
 from matplotlib import rc
 rc('text', usetex=True)   # --- enable TeX mode for matplotlib
 
+import functions as fn
 # ------------------------------------------------------------------------------------
 # ------ body
 # ------------------------------------------------------------------------------------
 print(f'\n****************************************************')
-print(f'* Radial Distribution Analisys (RDA) for XYZ files *')
+print(f'*    Radial, Angle, and Dihedral       *')
+print(f'* Distribution Analisys for XYZ files  *')   #Borrar lo de Radial
+print(f'*              "RADDA"                 *')
 print(f'****************************************************')
 
 # - working directory
 
 # print(f"\nCurrent working directory: {os.getcwd()}")
 
-if len(sys.argv) <= 1:
-    tmp_dir = input(
-        f'\nDirectory (whit the XYZ files) to make the RDA [default: empty]: ')
-    tmp_dir = tmp_dir.strip()
+#Get path of Working Directory or Ask
+working_dir = fn.working_path(sys.argv)
 
-    if tmp_dir == '.' or len(tmp_dir) < 1:
-        working_dir = os.getcwd()
-    else:
-        working_dir = os.getcwd() + '/' + tmp_dir
-else:
-    working_dir = os.getcwd() + '/' + sys.argv[1]
-    print(f'\nWorking directiry: {working_dir}')
+#Chage to Working Directory
+fn.cd_path(working_dir)
+
+##########################Lineas transladadas a functions.py
+#if len(sys.argv) <= 1:
+#    tmp_dir =  input(f'\nDirectory (whit the XYZ files) to make the RDA [default: empty]: ')
+#    tmp_dir = tmp_dir.strip()
+
+#    if tmp_dir == '.' or len(tmp_dir) < 1:
+#        working_dir = os.getcwd()
+#    else:
+#        working_dir = os.getcwd() + '/' + tmp_dir
+#else:
+#    working_dir = os.getcwd() + '/' + sys.argv[1]
+#    print(f'\nWorking directiry: {working_dir}')
 
 # Check if the working dir exists
-if os.path.exists(working_dir):
-    # Change the current working Directory
-    os.chdir(working_dir)
-else:
-    print(f'\n*** ERROR ***')
-    exit(f"Can't change the Working Directory, {working_dir} doesn't exist")
+#if os.path.exists(working_dir) :
+# Change the current working Directory
+#    os.chdir(working_dir)
+#else:
+#    print(f'\n*** ERROR ***')
+#    exit(f"Can't change the Working Directory, {working_dir} doesn't exist")
+##########################Lineas transladadas a functions.py
 
 # - reading files
 repited_list_xyz = []  # repited files (if any)
@@ -68,9 +83,8 @@ for input_xyz in glob.glob('*.xyz'):
         if unique_input_xyz not in list_xyz:
             list_xyz.append(unique_input_xyz)
 
-# list_xyz = ["w1s1.xyz"]
-# list_xyz = ["w2s1.xyz"]
-# list_xyz = ["w6s23.xyz"]
+list_xyz = ["w3s2.xyz"]
+
 # list_xyz = ["w1s1.xyz", "w2s1.xyz"]
 # list_xyz = ["w1s1.xyz", "w2s1.xyz", "w3s1.xyz"]
 # list_xyz = ["w1s1.xyz", "w2s1.xyz", "w3s1.xyz", "w3s2.xyz"]
@@ -98,62 +112,66 @@ while count < len(list_xyz):
 # -------------------------------------------------------------------------------
 # - Elements list to do radial distribution analisys
 
+###############################Filas transladadas a functions.py
+#def all_elements(file_xyz):
+#    """ Function to get atomic pairs from a XYZ file  """
+#    elements = pd.read_csv(list_xyz[0], delim_whitespace=True,
+#                    skiprows=2, header=None,
+#                    names=["element", "x-coordinate", "y-coordinate", "z-coordinate"])
 
-def all_elements(file_xyz):
-    """ Function to get atomic pairs from a XYZ file  """
-    elements = pd.read_csv(list_xyz[0], delim_whitespace=True,
-                           skiprows=2, header=None,
-                           names=["element", "x-coordinate", "y-coordinate", "z-coordinate"])
 
     # - if XYZ file has no coordinates (by mistake)
-    if elements.shape[0] <= 1:
-        elements = []
-        print(f'\n*** WARNING *** \nNo coordinates found in {file_xyz}')
-        return elements
+#    if elements.shape[0] <= 1:
+#        elements = []
+#        print(f'\n*** WARNING *** \nNo coordinates found in {file_xyz}')
+#        return elements
         # return '*** WARNING *** No coordinates found in ', file_xyz
 
-    elements = elements['element'].tolist()
+#    elements = elements['element'].tolist()
 
     # - list of elements (uniques)
-    elements_uniq = []
-    for atom in elements:
-        if atom not in elements_uniq:
-            elements_uniq.append(atom)
 
-    elements = []
-    elements = [atoms.capitalize() for atoms in elements_uniq]
+#    elements_uniq = []
+#    for atom in elements:
+#        if atom not in elements_uniq:
+#            elements_uniq.append(atom)
 
-    element_list = []
-    atom_a = 0
-    while atom_a < len(elements):
-        element_list.append(elements[atom_a] + '-' + elements[atom_a])
-        atom_b = atom_a + 1
-        while atom_b < len(elements):
-            element_list.append(elements[atom_a] + '-' + elements[atom_b])
-            atom_b += 1
-        atom_a += 1
+#    elements = []
+#    elements = [atoms.capitalize() for atoms in elements_uniq]
 
-    return element_list
+#    element_list = []
+#    atom_a = 0
+#    while atom_a < len(elements):
+#        element_list.append(elements[atom_a] + '-' + elements[atom_a])
+#        atom_b = atom_a + 1
+#        while atom_b < len(elements):
+#            element_list.append(elements[atom_a] + '-' + elements[atom_b])
+#            atom_b += 1
+#        atom_a += 1
 
+#    return element_list
 
-def sort_input_pairs(elements):
-    """sorting uniques atomic pair A-B from an input list """
+#def sort_input_pairs(elements):
+#    """sorting uniques atomic pair A-B from an input list """
     # - deleting comma used to split atomic pairs (if any)
-    elements = [pair.replace(',', '') for pair in elements]
+#    elements = [pair.replace(',','') for pair in elements]
+
 
     # - creating a list of lists to capitalize each atom
-    elements = [pair.split('-') for pair in elements]
+#    elements = [pair.split('-') for pair in elements]
 
     # - List Comprehension, extending lists within a list
-    elements = [atoms.capitalize() for pair in elements for atoms in pair]
+#    elements = [atoms.capitalize() for pair in elements for atoms in pair]
 
-    element_list = []
-    pair = 0
-    while pair < len(elements) - 1:
-        element_list.append(elements[pair] + '-' + elements[pair + 1])
-        pair += 2
+#    element_list = []
+#    pair = 0
+#    while pair < len(elements) - 1:
+#        element_list.append(elements[pair] + '-' + elements[pair + 1])
+#        pair += 2
 
-    return element_list
+#    return element_list
+###############################Filas transladadas a functions.py
+
 
 # --------------------------------------------------------------------------
 # - END of functions definition
@@ -167,15 +185,15 @@ if len(sys.argv) < 3:
 
     # - by default reading elements for the first XYZ file
     if len(input_elements.split()) < 1 or input_elements == 'all':
-        pairs_list = all_elements(list_xyz[0])
+        pairs_list = fn.all_elements(list_xyz[0])
     else:
         elements = input_elements.split()
         # - sorting atomic pairs
-        pairs_list = sort_input_pairs(elements)
+        pairs_list = fn.sort_input_pairs(elements)
 
 else:
     if sys.argv[2] == 'all':
-        pairs_list = all_elements(list_xyz[0])
+        pairs_list = fn.all_elements(list_xyz[0])
     else:
         input_arguments = 2
         while input_arguments < len(sys.argv):
@@ -183,7 +201,7 @@ else:
             input_arguments += 1
 
         # - sorting atomic pairs
-        pairs_list = sort_input_pairs(elements)
+        pairs_list = fn.sort_input_pairs(elements)
 
 # - list of atom pair from elements list
 if len(pairs_list) < 1:
@@ -363,6 +381,14 @@ for file_xyz in list_xyz:
     # angle_list = ["H", "O", "Hg"]
     angle_list = ["O", "Hg", "O"]
 
+    # print(f'')
+    # print(f'Angular Distribution Analisys for:')
+    # print(f'')
+    # print(f'   {angle_list[1]}')
+    # print(f'  /  \\')
+    # print(f' {angle_list[0]}    {angle_list[2]}')
+    # print(f'')
+
     first_atom = angle_list[0]
     central_atom = angle_list[1]
     second_atom = angle_list[2]
@@ -465,12 +491,22 @@ for file_xyz in list_xyz:
     max_distance = 2.5
     min_distance = 0.1
 
-    dihedral_list = ["Hg", "O", "H", "H"]
-
     coordinates_first = np.zeros(3, dtype=float)
     coordinates_central = np.zeros(3, dtype=float)
     coordinates_second = np.zeros(3, dtype=float)
     coordinates_third = np.zeros(3, dtype=float)
+
+    dihedral_list = ["Hg", "O", "H", "H"]
+
+    # print(f'')
+    # print(f'Angular Distribution Analisys for Dihedral angle:')
+    # print(f'')
+    # print(f'          {dihedral_list[2]}')
+    # print(f'         /')
+    # print(f'  {dihedral_list[0]}----{dihedral_list[1]}')
+    # print(f'         \\')
+    # print(f'          {dihedral_list[3]}')
+    # print(f'')
 
     first_atom = dihedral_list[0]
     central_atom = dihedral_list[1]
@@ -531,8 +567,8 @@ for file_xyz in list_xyz:
                     continue
 
                 if min_second != min(min_second, distance_second):
-
                     min_second = min(min_second, distance_second)
+
                     choose_second = second
 
                     coordinates_second[0] = float(data_xyz.iloc[second, 1])
@@ -573,13 +609,14 @@ for file_xyz in list_xyz:
             # --------------------------------------------------------------
             # - computing dihedral angle (using cross product)
 
+            import dihedral as dh
+
             p1 = coordinates_first
             p2 = coordinates_central
             p3 = coordinates_second
             p4 = coordinates_third
 
-            # - distance must be larger than zero
-            compute_dihedral = False
+            dihedral_angle_deg = dh.dihedral(p1, p2, p3, p4)
 
             if np.linalg.norm(p1) < 0.1 or np.linalg.norm(p2) < 0.1 or \
                     np.linalg.norm(p3) < 0.1 or np.linalg.norm(p4) < 0.1:
@@ -699,22 +736,21 @@ plt.show()
 # ---------------------------------------------------------------------------------------
 # - bond angle based on the previous grid for the RDA
 
+print(f'')
+print(f'Angular Distribution Analisys for:')
+print(f'')
+print(f'   {angle_list[1]}')
+print(f'  /  \\')
+print(f' {angle_list[0]}    {angle_list[2]}')
+print(f'')
+
+bond_angle = np.linspace(min_angle, max_angle, nbins_angle)
+
 total_angles = sum(occurrences_angle)
 
 ada_name = 'ada_' + '-'.join(angle_list) + '.dat'
 
 if total_angles > 0:
-
-    print(f'')
-    print(f'Angular Distribution Analisys for:')
-    print(f'')
-    print(f'   {angle_list[1]}')
-    print(f'  /  \\')
-    print(f' {angle_list[0]}    {angle_list[2]}')
-    print(f'')
-
-    bond_angle = np.linspace(min_angle, max_angle, nbins_angle)
-
     np.savetxt(ada_name, np.transpose([bond_angle, occurrences_angle]),
                delimiter=' ', header='Angle [degrees]   occurrence (total=%i)' % total_angles,
                fmt='%.6f %28i')
@@ -725,6 +761,18 @@ else:
 
 # -------------------------------------------------------------------
 # - dihedral angle
+
+print(f'')
+print(f'Angular Distribution Analisys for Dihedral angle:')
+print(f'')
+print(f'          {dihedral_list[2]}')
+print(f'         /')
+print(f'  {dihedral_list[0]}----{dihedral_list[1]}')
+print(f'         \\')
+print(f'          {dihedral_list[3]}')
+print(f'')
+
+bond_angle = np.linspace(min_dihedral_angle, max_dihedral_angle, nbins_dihedral_angle)
 
 total_dihedral_angles = sum(occurrences_dihedral_angle)
 
@@ -751,7 +799,7 @@ if total_dihedral_angles > 0:
                fmt='%.6f %28i')
 else:
     print(f'\n*** Warning ***')
-    print(f'NO dihedral angle {dihedral_ada_name} found in XYZ files\n')
+    print(f'NO dihedral angle {ada_name} found in XYZ files\n')
 
 # ---------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------

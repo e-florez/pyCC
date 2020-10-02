@@ -1,12 +1,8 @@
 #!/usr/bin/python3
 
 # Programa Creado Por Andy Zapata - IMIT 2020
-# Realiza el producto cruz entre 2 vectores y 
-# con el vector resultante, calcula el angulo
-# entre éste y otro vector 
 
 import numpy as np
-from numpy.linalg import norm
 import glob # - Unix style pathname pattern expansion (Edison)
 import math as mh
 
@@ -22,7 +18,7 @@ def filesxyz () :
         list_xyz = input_xyz[:-4]  # deleting file extention
 
     return list_xyz
-#=================================================================================================# 
+#=================================================================================================#
 def LXYZ (NXYZ) :
     """
     Get Number of atoms, labels and coordenates of the atoms in xyz
@@ -35,7 +31,7 @@ def LXYZ (NXYZ) :
     print (f"Numero de atomos en",g,":",natoms)
 
     f.readline()
-    MXYZ = np.zeros((natoms,3)) 
+    MXYZ = np.zeros((natoms,3))
     LA = []
     LA.append(natoms)
     for i in range(natoms):
@@ -43,16 +39,16 @@ def LXYZ (NXYZ) :
         for j in range(4):
             if j == 0 :
                 LA.append(line.split()[0])  #En vez de guardar el n'umero como str, se podría
-            else :                          #poner el número atómico, asi se juntan los arreglos 
+            else :                          #poner el número atómico, asi se juntan los arreglos
                 MXYZ[i,j-1] = line.split()[j] # Z + coord
-            
-    f.close()            
+
+    f.close()
     return LA, MXYZ
 #=================================================================================================#
 def rv (va,rmax,NALA,MXYZ) :
     """
     Return distance of all atoms to vertice and coordinates, which are lesser to rmax
-    """    
+    """
     #Esta hecho solo por ahora, para tener solo un tipo de átomo
     #del vertice
     coordv = np.zeros((3))
@@ -73,12 +69,12 @@ def rv (va,rmax,NALA,MXYZ) :
                     r = mh.sqrt(r)
                     if r <= rmax :
                         for k in range(4) :
-                            if k == 3 : 
+                            if k == 3 :
                                 distv[cont,k] = r
                                 cont += 1
                             else :
                                 distv[cont,k] = MXYZ[i,k] - coordv[k]  #Se resta coordv, para cambiar el cero de los vectores
-                                
+
     return cont, distv
 #=====================================================================================#
 def angle (NAV,VR) :
@@ -97,7 +93,7 @@ def angle (NAV,VR) :
             for k in range(3) :
                 APB += VR[i,k]*VR[l,k]
             C = 0.0
-            C = APB/(VR[i,3]*VR[l,3])    
+            C = APB/(VR[i,3]*VR[l,3])
             t = 0.0
             t = mh.acos(C)
             t = t*180/mh.pi
@@ -127,7 +123,7 @@ def SM (NALA,MXYZ,rmaxo) :
                     r = mh.sqrt(r)
                     if r <= rmaxo :
                         for k in range(4) :
-                            if k == 3 : 
+                            if k == 3 :
                                 distv[cont,k] = r
                                 cont += 1
                                 #Busco H más cercanos a O, distancia < 1.5
@@ -139,16 +135,16 @@ def SM (NALA,MXYZ,rmaxo) :
                                                 if jj == 2 :
                                                     r = dr[0]*dr[0] + dr[1]*dr[1] + dr[2]*dr[2]
                                                     r = mh.sqrt(r)
-                                                    if r <= 1.5 :  #El valor 1.5 es para garantizar los H que se disocian del H2O
+                                                    if r <= 1.54 :  #El valor 1.5 es para garantizar los H que se disocian del H2O
                                                         for kk in range(4):
-                                                            if kk == 3 :                                                                
+                                                            if kk == 3 :
                                                                 distv[cont,kk] = r
                                                                 #print (NALA[ii+1]," : ",distv[cont,:])
                                                                 cont += 1
                                                             else:
                                                                 distv[cont,kk] = MXYZ[ii,kk]
                             else :
-                                distv[cont,k] = MXYZ[i,k] 
+                                distv[cont,k] = MXYZ[i,k]
     return cont, distv, coordv
 #=================================================================================================#
 def dihedral (NAW,VR,RHg) :
@@ -188,7 +184,7 @@ def dihedral (NAW,VR,RHg) :
             r += dr
         nhh = mh.sqrt(r)
         for j in range(3) :
-            vhh[i,j] = vhh[i,j]/nhh 
+            vhh[i,j] = vhh[i,j]/nhh
     # vOHvHH Proyección de O->H en H->H y resto componente que alignea a H->H
     # vHHgvHH Proyección de H->Hg en H->H y resto componente que alignea a H->H
     dih = np.zeros((NO))
@@ -207,8 +203,8 @@ def dihedral (NAW,VR,RHg) :
             drhhg  = vhhg[i,j]*vhh[i,j]
             rhhg += drhhg
         for j in range(3): #Resto
-            vOHvHH[j] = voh[i,j] - roh*vhh[i,j] 
-            vHHgvHH[j] = vhhg[i,j] - rhhg*vhh[i,j] 
+            vOHvHH[j] = voh[i,j] - roh*vhh[i,j]
+            vHHgvHH[j] = vhhg[i,j] - rhhg*vhh[i,j]
     # El ángulo entre vOHvHH y vHHgvHH en un plano es el ángulo de torsión
             x += vOHvHH[j]*vHHgvHH[j]
         y1 = np.cross(vhh[i,:],vOHvHH)
