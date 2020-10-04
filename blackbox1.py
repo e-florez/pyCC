@@ -10,7 +10,8 @@
 # ------------------------------------------------------------------------------------
 
 import unittest
-import functions as fn
+import func_radial as fnr
+import func_shell  as fns
 import os
 import numpy as np
 
@@ -23,7 +24,7 @@ def drv_cdpath(path):
     Returns:
         working_dir [string]: path of working directory
     """
-    fn.cd_path(path)
+    fns.cd_path(path)
     working_dir = os.getcwd()
     print("\nfunction cd_path into: ")
     print("cd ",working_dir)
@@ -39,7 +40,7 @@ class Test(unittest.TestCase):
         path = []
         path.append(os.getcwd())
         path.append(os.getcwd())
-        self.assertEqual(fn.working_path(path), path[1], "Should be path[0]==path[1]")
+        self.assertEqual(fns.working_path(path), path[1], "Should be path[0]==path[1]")
         print("\n...Ok  test: working_path")
 
         self.assertEqual(drv_cdpath(path[0]),path[0], "Should be path[0]")
@@ -65,16 +66,15 @@ class Test(unittest.TestCase):
         pairs_elements = ["H-H", "H-O", "H-Hg", "H-C", "H-N", "H-F", "O-O", "O-Hg",
         "O-C", "O-N", "O-F", "Hg-Hg", "Hg-C", "Hg-N", "Hg-F", "C-C", "C-N", "C-F",
         "N-N", "N-F", "F-F"]
-        self.assertEqual(fn.all_elements("1test1.xyz"),pairs_elements)
+        self.assertEqual(fnr.all_elements("1test1.xyz"),pairs_elements)
         print("\n...Ok  test: all_elements")
         os.remove("1test1.xyz")
 
         pairs_elements1 = ["H-H", "H-O", "O-H", "O-Hg", "Hg-Hg", "Hg-Hg", "Hg-O",
         "F-C", "H-O"]
         pairs_elements2 = ["H-H", "H-O", "O-Hg", "Hg-Hg", "F-C"]
-        self.assertEqual(fn.sort_input_pairs(pairs_elements1),pairs_elements2)
+        self.assertEqual(fnr.sort_input_pairs(pairs_elements1),pairs_elements2)
         print("\n...Ok  test: sort_input_pairs")
 
 if __name__ == '__main__':
     unittest.main()
-    print("\n Everything passed")
