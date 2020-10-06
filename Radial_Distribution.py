@@ -71,7 +71,7 @@ def search_pairs_MR (pairs_list,max_natoms,At_Symb,N_Atoms,Mat_R):
 #---------------------------------------------------------#
 
 #---------------------------------------------------------#
-#-Start: Statistical to Radial Distribution               #
+#-Start: Statistical to Radial Distribution and save      #
 #---------------------------------------------------------#
 def statistical_radial (list_xyz,pairs_list,dist_pairs_l,max_natoms,ro,rf,dr,nbins,bs_points):
 
@@ -135,16 +135,12 @@ def statistical_radial (list_xyz,pairs_list,dist_pairs_l,max_natoms,ro,rf,dr,nbi
 
         atom_pair += 1
 
-    #rrr='fle'
-    #np.savetxt(rrr, df, fmt='%i')
-
-
-
+        print(f"\n###############################################################")
+        print(f"#           End Radial Distribution Analysis                    #")
+        print(f"\n###############################################################")
 #--------------------------------------------------#
-#-End: Statistical to Radial Distribution          #
+#-End: Statistical to Radial Distribution and save #
 #--------------------------------------------------#
-
-
 
 #---------------------------------------------------------#
 # -Start: Elements list to do radial distribution analisys#
