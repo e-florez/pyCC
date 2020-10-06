@@ -14,9 +14,9 @@ def all_elements(file_xyz):
     """[summary]
     Function to get atomic pairs from a XYZ file,
     when it is selected all the elements and verification.
-    Input:
+    Args:
         file_xyz (list): name of the .xyz
-    Output:
+    Return:
         element_list (list): pairs of elements unique
     """
 
@@ -61,9 +61,9 @@ def all_elements(file_xyz):
 def sort_input_pairs(elements):
     """[summary]
     Sorting uniques atomic pair A-B from an input list
-    Input:
+    Args:
         elements (list): pairs of elements from input
-    Output:
+    Return:
         element_lsit (list): pairs of elements unique
     """
 

@@ -60,7 +60,7 @@ def radda (radial,angle,dihedral):
             if unique_input_xyz not in list_xyz:
                 list_xyz.append(unique_input_xyz)
 
-    list_xyz = ["w3s2.xyz"]
+    list_xyz = ["w3s2.xyz", "w3s1.xyz"]
 
     # list_xyz = ["w1s1.xyz", "w2s1.xyz"]
     # list_xyz = ["w1s1.xyz", "w2s1.xyz", "w3s1.xyz"]
@@ -89,18 +89,21 @@ def radda (radial,angle,dihedral):
     #***********************************************#
 
     #***********************************************#
-    #Start: Read Files XYZ                          #
+    #Start: Read Files XYZ and Distance Matrix      #
     #***********************************************#
-    max_natoms, At_Symb, MXYZ = fng.input_from_XYZ(list_xyz)
+    max_natoms, At_Symb, MXYZ, N_Atoms = fng.input_from_XYZ(list_xyz)
+    Mat_R = fng.Mat_Distance(len(list_xyz),max_natoms,N_Atoms,MXYZ)
     #***********************************************#
-    #End: Read Files XYZ                            #
+    #End: Read Files XYZ and Distance Matrix        #
     #***********************************************#
+
     if radial == "yes" :
     #---------------------------------------------------------#
     # -Start: Elements list to do radial distribution analisys#
     #---------------------------------------------------------#
-        atom_pairs, pairs_list, ro, rf, dr, nbins, bs_points = rda.radial_distribution(list_xyz, max_natoms, At_Symb, MXYZ)
-
+        atom_pairs, pairs_list, ro, rf, dr, nbins, bs_points = \
+            rda.radial_distribution(list_xyz, max_natoms, At_Symb, N_Atoms, MXYZ, Mat_R)
+        exit()
     # - list of individual atoms
     elements_list = []
 
@@ -677,25 +680,25 @@ def radda (radial,angle,dihedral):
     # ---------------------------------------------------------------------------------------
     # ---------------------------------------------------------------------------------------
     # - bond distance based on  the previous grid for the RDA
-    bond_distance = np.linspace(ro, rf, nbins)
+#    bond_distance = np.linspace(ro, rf, nbins)
     # - to smooth the curve (BSpline)
-    smooth_bond_distance = np.linspace(ro, rf, nbins * bs_points)
+#    smooth_bond_distance = np.linspace(ro, rf, nbins * bs_points)
 
     # - saving
-    atom_pair = 0
-    while atom_pair < len(pairs_list):
+#    atom_pair = 0
+#    while atom_pair < len(pairs_list):
         # - atom pair from the list
-        pair = pairs_list[atom_pair]
-        total_bond = sum(occurrences[atom_pair, :])
+#        pair = pairs_list[atom_pair]
+#        total_bond = sum(occurrences[atom_pair, :])
 
         # - plotting only if any distance is found
-        if total_bond > 0:
+#        if total_bond > 0:
             # - saving RDA
 
-            rda_name = 'rda_' + pair + '.dat'
-            np.savetxt(rda_name, np.transpose([bond_distance, occurrences[atom_pair, :]]),
-                    delimiter=' ', header='distance [Angstrom]   occurrence (total=%i)' % total_bond,
-                    fmt='%.6f %28i')
+#            rda_name = 'rda_' + pair + '.dat'
+#            np.savetxt(rda_name, np.transpose([bond_distance, occurrences[atom_pair, :]]),
+#                    delimiter=' ', header='distance [Angstrom]   occurrence (total=%i)' % total_bond,
+#                    fmt='%.6f %28i')
 
             # # ------------------------------------------------
             # # - to plot
@@ -728,11 +731,11 @@ def radda (radial,angle,dihedral):
             # ax1.xaxis.set_ticks(np.arange(ro, rf, 0.2))
 
         # - no distance found
-        else:
-            print(f'\n*** Warning ***')
-            print(f'NO distance {pair} found in XYZ files\n')
+#        else:
+#            print(f'\n*** Warning ***')
+#            print(f'NO distance {pair} found in XYZ files\n')
 
-        atom_pair += 1
+#        atom_pair += 1
 
     # # ------------------------------------------------------------------------------------
     # - ENDING the plots

@@ -1,4 +1,4 @@
-# distance [Angstrom]   occurrence (total=3)
+# distance [Angstrom]   occurrence (total=4)
 0.600000                            0
 0.651786                            0
 0.703571                            0
@@ -26,7 +26,7 @@
 1.842857                            0
 1.894643                            0
 1.946429                            0
-1.998214                            0
+1.998214                            1
 2.050000                            0
 2.101786                            2
 2.153571                            0

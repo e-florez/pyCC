@@ -13,9 +13,9 @@ import os  # - to check id a file or dir exits -> os.path.exists()
 def working_path (path):
     """[summary]
     Get path of working directory from variable path or ask
-    Input:
+    Args:
         path (string) : with or no path of working directory
-    Output:
+    Return:
         working_dir (string) : path of working directory
     """
 
@@ -23,10 +23,11 @@ def working_path (path):
         tmp_dir =  input(f'\nDirectory (whit the XYZ files) to make the RDA [default: empty]: ')
         tmp_dir = tmp_dir.strip()
 
-        #if tmp_dir == '.' or len(tmp_dir) < 1:
-        #    working_dir = os.getcwd()
-        #else:
-        #    working_dir = os.getcwd() + '/' + tmp_dir
+        if tmp_dir == '.' or len(tmp_dir) < 1:
+            working_dir = os.getcwd()
+        else:
+            print(f"\n*** ERROR ***")
+            exit(f"Path of Working Directory, {working_dir}")
     elif path[1] == '.' :
         working_dir = os.getcwd()
         print(f'\nWorking directiry: {working_dir}')
@@ -43,7 +44,7 @@ def working_path (path):
 def cd_path (working_dir) :
     """[summary]
     Change to working directory
-    Input:
+    Args:
         working_dir (string): path of directory with .xyz
     """
     # Check if the working dir exists
