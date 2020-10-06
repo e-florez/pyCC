@@ -101,8 +101,8 @@ def radda (radial,angle,dihedral):
     #---------------------------------------------------------#
     # -Start: Elements list to do radial distribution analisys#
     #---------------------------------------------------------#
-        atom_pairs, pairs_list, ro, rf, dr, nbins, bs_points = \
-            rda.radial_distribution(list_xyz, max_natoms, At_Symb, N_Atoms, MXYZ, Mat_R)
+        pairs_list = \
+            rda.radial_distribution(list_xyz, max_natoms, At_Symb, N_Atoms, Mat_R)
         exit()
     # - list of individual atoms
     elements_list = []

@@ -17,7 +17,7 @@ def input_from_XYZ (list_xyz) :
         list_xyz list) : list with the names of files xyz
     Return:
         max_natoms (int) : Number max of atoms in xyz
-        At_Symb (array)  : Atomic symbol in each xyz
+        At_Symb (list)   : Atomic symbol in each xyz
         MXYZ (array)     : Coordinates in each xyz
         N_Atoms (array)  : Number of atoms in each .xyz
     """
