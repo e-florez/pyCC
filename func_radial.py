@@ -62,7 +62,7 @@ def sort_input_pairs(elements):
     Args:
         elements (list)    : Pairs of elements from input
     Return:
-        element_lsit (list): Pairs of elements unique
+        element_list (list): Pairs of elements unique
     """
 
     # - Deleting comma used to split atomic pairs (if any)
@@ -188,7 +188,7 @@ def search_pairs_RM (pairs_list,max_natoms,At_Symb,N_Atoms,Mat_R,rf):
                     if pair_ab in pairs_list[l] or pair_ba in pairs_list[l]:
                         distance_ab = Mat_R[i,j,k]
                         #Save pairs with distance > 0 and <= rf
-                        if distance_ab <= rf and distance_ab != 0.0E+0 :
+                        if distance_ab < rf and distance_ab > 1.0E-3 :
                             dist_pairs_l[i,l,il] = distance_ab
                             il += 1
                     k += 1

@@ -35,8 +35,6 @@ import Radial_Distribution as rda
 # ------------------------------------------------------------------------------------
 # ------ body
 # ------------------------------------------------------------------------------------
-
-
 def radda (radial,angle,dihedral):
 
     #Get path of Working Directory or Ask

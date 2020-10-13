@@ -5,7 +5,7 @@
 #   cesarfernando.ibarguen@gmail.com                      #
 # --------------------------------------------------------#
 import sys
-import func_radial as fnr
+import func_radial as fnr #¿por qué?
 #---------------------------------------------------------#
 # -Start: Elements list to do radial distribution analisys#
 #---------------------------------------------------------#
@@ -19,7 +19,6 @@ def radial_distribution (list_xyz, max_natoms, At_Symb, N_Atoms, Mat_R):
         At_Symb (list)   : Atomic symbol of atoms in each of the .xyz
         N_Atoms (array)  : Atom number in each of the .xyz
         Mat_R (array)    : Upper triangular distance Matrix of each of the .xyz
-
     Returns:
         [type]: [description]
     """
