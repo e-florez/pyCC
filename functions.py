@@ -63,8 +63,10 @@ def what_xyz_files(files_list_xyz, working_dir):
     by: Edison Florez <edisonffh@gmail.com>
     """
     # - avoiding an empty list
+    files_list_xyz = list(filter(None, files_list_xyz))
     if len(files_list_xyz) < 1:
-        exit(f'\n *** ERROR ***\n No XYZ file found in \n {working_dir}')
+        # if not any(s.strip() for s in files_list_xyz):
+        exit(f'\n *** ERROR ***\n No XYZ file found in: \'{working_dir}\'')
 
     while True:
         input_list = input(
