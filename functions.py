@@ -169,7 +169,6 @@ def format_xyz(file_xyz):
 
 def dict_coordinates_xyz(files_list_xyz):
     """
-    CHOOSING those XYZ files to analyse (by default all in working directory)
     CHECKING if those files has the XYZ format.
     CREATING a dictionary for each XYZ file with their coordinates in a pandas data frame 
 
