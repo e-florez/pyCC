@@ -31,18 +31,31 @@ import functions  # module with all the individuals function to do analysis
 # ------ Preamble
 # ------------------------------------------------------------------------------------
 
-print(f'\n****************************************************')
-print(f'*    Radial, Angle, and Dihedral       *')
-print(f'* Distribution Analisys for XYZ files  *')   
-print(f'*              "RADDA"                 *')
-print(f'****************************************************')
+message = """
+**********************************************************
+* Geometrical Analisys for Atomic and Molecular clusters *   
+*              - files with XYZ format -                 *   
+*                                                        *
+* Radial, Angular and Dihedral Distribution (Histogram)  *
+* Atom transfer (Stern-Limbach)                          *
+*                                                        *
+*                                                        *
+* by:                                                    *
+*    Edison Florez, Andy Zapata, Cesar Ibarguen (2020)   *
+*                                                        *
+**********************************************************
+"""
 
+print(message)
 
 # ------------------------------------------------------------------------------------
 # ------ Main body
 # ------------------------------------------------------------------------------------
 
-if __main__ == '__name__':
-    pass
+if __name__ == '__main__':
+    
+    list_files_XYZ = ["w1s1.xyz", "w2s1.xyz", "w3s1.xyz", "w6s10.xyz"]
+
+    coordinates_XYZ = functions.format_files_XYZ(list_files_XYZ)
 
 
