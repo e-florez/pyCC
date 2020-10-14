@@ -13,6 +13,9 @@
 *log_files/
 *org_files/
 
+# local files/directories
+.vscode/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
