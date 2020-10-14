@@ -31,7 +31,7 @@ import functions  # module with all the individuals function to do analysis
 # ------ Preamble
 # ------------------------------------------------------------------------------------
 
-message = """
+print("""
 **********************************************************
 * Geometrical Analisys for Atomic and Molecular clusters *   
 *              - files with XYZ format -                 *   
@@ -44,9 +44,7 @@ message = """
 *    Edison Florez, Andy Zapata, Cesar Ibarguen (2020)   *
 *                                                        *
 **********************************************************
-"""
-
-print(message)
+""")
 
 # ------------------------------------------------------------------------------------
 # ------ Main body
@@ -56,6 +54,9 @@ if __name__ == '__main__':
     
     list_files_XYZ = ["w1s1.xyz", "w2s1.xyz", "w3s1.xyz", "w6s10.xyz"]
 
+    # Choosing those XYZ files to be analyse (by default all in working directory)
+    # and CHECKING if those files has the XYZ format to create a dictionary 'coordinates_XYZ'
+    # for each XYZ file with their coordinates in a pandas data frame
     coordinates_XYZ = functions.format_files_XYZ(list_files_XYZ)
 
 
