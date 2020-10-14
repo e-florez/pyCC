@@ -78,7 +78,7 @@ def what_xyz_files(files_list_xyz, working_dir):
 
             for xyz in input_list:
 
-                # - removing any leading and trailing whitespaces
+                # - removing any leading or trailing whitespaces
                 xyz = xyz.strip()
                 
                 if xyz not in files_list_xyz:
@@ -119,34 +119,36 @@ def format_xyz(file_xyz):
     # - numbering lines
     line_number = 0 
     
-    for line in open(file_xyz, 'r'):
-        line_number += 1
-        values = [i for i in line.split()]
+    with open(file_xyz, 'r') as f:
+        # - reading line by line
+        for line in f:
+            line_number += 1
+            values = [i for i in line.split()]
 
-        # - firts line is number of atoms
-        if line_number == 1:
-            try:
-                atoms_number = int(values[0])
-            except ValueError:
-                error += 1
-                error_message += ' line 1: it must be a positive integer'
+            # - firts line is number of atoms
+            if line_number == 1:
+                try:
+                    atoms_number = int(values[0])
+                except ValueError:
+                    error += 1
+                    error_message += ' line 1: it must be a positive integer'
 
-        # - third line and beyond have element and x, y, z coordinates
-        elif line_number > 2:
-            try:
-                assert len(values) == 4
-            except AssertionError:
-                error += 1
-                error_message += ' no enough data for elements and coordinates'
-            
-            # - checking x, y, z coordinates
-            if not error:
-                for i in range(1, 4):
-                    try:
-                        float(values[i])
-                    except ValueError:
-                        error += 1
-                        error_message += ' coordinates (x, y, z) must be a float'
+            # - third line and beyond have element and x, y, z coordinates
+            elif line_number > 2:
+                try:
+                    assert len(values) == 4
+                except AssertionError:
+                    error += 1
+                    error_message += ' no enough data for elements and coordinates'
+                
+                # - checking x, y, z coordinates
+                if not error:
+                    for i in range(1, 4):
+                        try:
+                            float(values[i])
+                        except ValueError:
+                            error += 1
+                            error_message += ' coordinates (x, y, z) must be a float'
     
     if (line_number - 2) != atoms_number:
         error += 1
