@@ -66,7 +66,7 @@ def what_xyz_files(files_list_xyz, working_dir):
     files_list_xyz = list(filter(None, files_list_xyz))
     if len(files_list_xyz) < 1:
         # if not any(s.strip() for s in files_list_xyz):
-        exit(f'\n *** ERROR ***\n No XYZ file found in: \'{working_dir}\'')
+        exit(f'\n *** ERROR ***\n Not XYZ file found in: \'{working_dir}\'')
 
     while True:
         input_list = input(
@@ -119,8 +119,7 @@ def format_xyz(file_xyz):
     by: Edison Florez <edisonffh@gmail.com>
     """
 
-    # - if error == 0, no error found
-    error = 0
+    # - if error_message == 0, not error found
     error_message = ''
 
     # - numbering lines
@@ -136,33 +135,34 @@ def format_xyz(file_xyz):
             if line_number == 1:
                 try:
                     atoms_number = int(values[0])
-                except ValueError:
-                    error += 1
-                    error_message += ' | line 1: it must be a positive integer'
+                except ValueError as e:
+                    error_message += '\n | line 1: it must be a positive integer'
+                    error_message += f'\n--- {e} ---\n'
 
-            # - third line and beyond have element and x, y, z coordinates
+            # - second line is a comment line. Its content does not matter
+            # - third line and beyond must have: (element, x, y, z)
             elif line_number > 2:
                 try:
                     assert len(values) == 4
-                except AssertionError:
-                    error += 1
-                    error_message += ' | no enough data for elements and coordinates'
+                except AssertionError as e:
+                    error_message += '\n | Not enough data for elements and coordinates. It must be: (element, x, y, z)'
+                    error_message += f'\n--- {e} ---\n'
 
                 # - checking x, y, z coordinates
-                if not error:
+                if not error_message:
                     for i in range(1, 4):
                         try:
                             float(values[i])
-                        except ValueError:
-                            error += 1
-                            error_message += ' | coordinates (x, y, z) must be a float'
+                        except ValueError as e:
+                            error_message += '\n | coordinates (x, y, z) must be floats'
+                            error_message += f'\n--- {e} ---\n'
 
-    if (line_number - 2) != atoms_number:
-        error += 1
-        error_message = ' | no enough atoms found'
+    if not error_message and (line_number - 2) != atoms_number:
+        error_message += '\n | Not enough atoms were found'
+        error_message += f'\n--- Number of atoms at line 1: {atoms_number}, is not equivalent with total lines found: {line_number} lines ---\n'
 
     # - creating a df from a XYZ file
-    if not error:
+    if not error_message:
         df = pd.read_csv(file_xyz,
                          delim_whitespace=True,
                          skiprows=2,
@@ -172,7 +172,7 @@ def format_xyz(file_xyz):
                          )
 
     else:
-        df = "WARNING: check file '" + file_xyz + "' ** Error **" + error_message
+        df = "WARNING: check file '" + file_xyz + "'\n\n ** Error **\n" + error_message
 
     return df
 # ---------------------------------------------------------------------------------------
