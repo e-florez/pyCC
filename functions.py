@@ -98,6 +98,143 @@ def what_xyz_files(files_list_xyz, working_dir):
 # ---------------------------------------------------------------------------------------
 
 
+def number_to_symbol(number):
+    """
+    Returns the symbol for any atomic number (Z) in the periodic table (0 <= Z <= 118)
+
+    Args:
+        number (str or int): atomic number in [0, 118]
+
+    Returns:
+        symbol (str): symbol from any atomic number in the periodic table
+
+    by: edisonffh@gmail.com
+    """
+
+    symbol = {1: "H",
+              2: "He",
+              3: "Li",
+              4: "Be",
+              5: "B",
+              6: "C",
+              7: "N",
+              8: "O",
+              9: "F",
+              10: "Ne",
+              11: "Na",
+              12: "Mg",
+              13: "Al",
+              14: "Si",
+              15: "P",
+              16: "S",
+              17: "Cl",
+              18: "Ar",
+              19: "K",
+              20: "Ca",
+              21: "Sc",
+              22: "Ti",
+              23: "V",
+              24: "Cr",
+              25: "Mn",
+              26: "Fe",
+              27: "Co",
+              28: "Ni",
+              29: "Cu",
+              30: "Zn",
+              31: "Ga",
+              32: "Ge",
+              33: "As",
+              34: "Se",
+              35: "Br",
+              36: "Kr",
+              37: "Rb",
+              38: "Sr",
+              39: "Y",
+              40: "Zr",
+              41: "Nb",
+              42: "Mo",
+              43: "Tc",
+              44: "Ru",
+              45: "Rh",
+              46: "Pd",
+              47: "Ag",
+              48: "Cd",
+              49: "In",
+              50: "Sn",
+              51: "Sb",
+              52: "Te",
+              53: "I",
+              54: "Xe",
+              55: "Cs",
+              56: "Ba",
+              57: "La",
+              58: "Ce",
+              59: "Pr",
+              60: "Nd",
+              61: "Pm",
+              62: "Sm",
+              63: "Eu",
+              64: "Gd",
+              65: "Tb",
+              66: "Dy",
+              67: "Ho",
+              68: "Er",
+              69: "Tm",
+              70: "Yb",
+              71: "Lu",
+              72: "Hf",
+              73: "Ta",
+              74: "W",
+              75: "Re",
+              76: "Os",
+              77: "Ir",
+              78: "Pt",
+              79: "Au",
+              80: "Hg",
+              81: "Tl",
+              82: "Pb",
+              83: "Bi",
+              84: "Po",
+              85: "At",
+              86: "Rn",
+              87: "Fr",
+              88: "Ra",
+              89: "Ac",
+              90: "Th",
+              91: "Pa",
+              92: "U",
+              93: "Np",
+              94: "Pu",
+              95: "Am",
+              96: "Cm",
+              97: "Bk",
+              98: "Cf",
+              99: "Es",
+              100: "Fm",
+              101: "Md",
+              102: "No",
+              103: "Lr",
+              104: "Rf",
+              105: "Db",
+              106: "Sg",
+              107: "Bh",
+              108: "Hs",
+              109: "Mt",
+              110: "Ds",
+              111: "Rg",
+              112: "Cn",
+              113: "Nh",
+              114: "Fl",
+              115: "Mc",
+              116: "Lv",
+              117: "Ts",
+              118: "Og"
+              }
+
+    return symbol[int(number)]
+# ---------------------------------------------------------------------------------------
+
+
 def format_xyz(file_xyz):
     # - Modules
     import pandas as pd
@@ -114,7 +251,7 @@ def format_xyz(file_xyz):
         file_xyz (str): XYZ file name
         
     Returns:
-        a dataframe (element, x, y, z)
+        a pandas dataframe (element, x, y, z)
 
     by: Edison Florez <edisonffh@gmail.com>
     """
@@ -145,11 +282,16 @@ def format_xyz(file_xyz):
                 try:
                     assert len(values) == 4
                 except AssertionError as e:
-                    error_message += '\n | Not enough data for elements and coordinates. It must be: (element, x, y, z)'
+                    error_message += '\n | Not enough data for elements and coordinates.'
+                    error_message += '\n   It must be: (element, x, y, z)'
                     error_message += f'\n--- {e} ---\n'
 
-                # - checking x, y, z coordinates
                 if not error_message:
+                    # - checking element symbol (atomic number should change to symbol)
+                    if isinstance(values[0], str):
+                        pass
+
+                    # - checking x, y, z coordinates
                     for i in range(1, 4):
                         try:
                             float(values[i])
@@ -158,8 +300,11 @@ def format_xyz(file_xyz):
                             error_message += f'\n--- {e} ---\n'
 
     if not error_message and (line_number - 2) != atoms_number:
-        error_message += '\n | Not enough atoms were found'
-        error_message += f'\n--- Number of atoms at line 1: {atoms_number}, is not equivalent with total lines found: {line_number} lines ---\n'
+        error_message += f'\n | Not enough atoms were found'
+        error_message += f'\n ---Number of atoms at line 1: {atoms_number}, is not equivalent'
+        error_message += f'\n    to the total number of lines found: {line_number} lines.'
+        error_message += f'\n    Number of atoms (\'{atoms_number}\') plus two must be iqual to total lines (\'{line_number}\')'
+        error_message += f'\n    \'{atoms_number + 2}\' is not iqual to \'{line_number}\' ---'
 
     # - creating a df from a XYZ file
     if not error_message:
@@ -172,7 +317,8 @@ def format_xyz(file_xyz):
                          )
 
     else:
-        df = "WARNING: check file '" + file_xyz + "'\n\n ** Error **\n" + error_message
+        df = f" File \'{file_xyz}\' does not have XYZ file format\n" + \
+            error_message
 
     return df
 # ---------------------------------------------------------------------------------------
@@ -200,7 +346,15 @@ def dict_coordinates_xyz(files_list_xyz):
 
     coordinates_xyz = {}
     for file_xyz in files_list_xyz:
-        coordinates_xyz[file_xyz] = format_xyz(file_xyz)
+        # - creating a dataframe
+        df = format_xyz(file_xyz)
+
+        # - filtering XYZ file with errors (it will be a string, not a df)
+        if isinstance(df, str):
+            print(f'*** Format Error ***')
+            print(df)
+        else:
+            coordinates_xyz[file_xyz] = df
 
     return coordinates_xyz
 # ---------------------------------------------------------------------------------------
