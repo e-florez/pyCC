@@ -241,15 +241,15 @@ def format_xyz(file_xyz):
 
     """
     CHECKING if a file has the XYZ format.
-    
+
     The formatting of the .xyz file format is as follows:
         <number of atoms>
         comment line
-        <element> <X> <Y> <Z> 
-    
+        <element> <X> <Y> <Z>
+
     Args:
         file_xyz (str): XYZ file name
-        
+
     Returns:
         a pandas dataframe (element, x, y, z)
 
@@ -261,6 +261,9 @@ def format_xyz(file_xyz):
 
     # - numbering lines
     line_number = 0
+
+    # - atomic number will be replaced by their symbol
+    symbols_replace = {}
 
     with open(file_xyz, 'r') as f:
         # - reading line by line
@@ -277,8 +280,9 @@ def format_xyz(file_xyz):
                     error_message += f'\n--- {e} ---\n'
 
             # - second line is a comment line. Its content does not matter
-            # - third line and beyond must have: (element, x, y, z)
+            # - third line and beyond must have four fields: (element, x, y, z)
             elif line_number > 2:
+                # - checking length, four fields
                 try:
                     assert len(values) == 4
                 except AssertionError as e:
@@ -286,24 +290,46 @@ def format_xyz(file_xyz):
                     error_message += '\n   It must be: (element, x, y, z)'
                     error_message += f'\n--- {e} ---\n'
 
-                if not error_message:
-                    # - checking element symbol (atomic number should change to symbol)
-                    if isinstance(values[0], str):
-                        pass
+                # - cheking four fields: (element, x, y, z) -> (str, float, float, float)
+                else:
+                    # - checking if there is any atomic number instead of symbols
+                    try:
+                        number = int(values[0])
+
+                    # - ValueError means not any atomic number were found, just symbols
+                    except ValueError:
+                        pass   # nothing to do, only symbols were found
+
+                    else:
+                        # - atomic number will change to symbol
+                        try:
+                            symbol = number_to_symbol(number)
+                            print(
+                                f'\natomic number: {number} -> {symbol}, line: {line_number}')
+
+                        except KeyError:
+                            error_message += f' | Check line {line_number}, '
+                            error_message += f' Not symbol were found to \'{values[0]}\''
+
+                        # - atomic number will change to symbol
+                        else:
+                            symbols_replace[number] = symbol
 
                     # - checking x, y, z coordinates
-                    for i in range(1, 4):
-                        try:
-                            float(values[i])
-                        except ValueError as e:
-                            error_message += '\n | coordinates (x, y, z) must be floats'
-                            error_message += f'\n--- {e} ---\n'
+                    finally:
+                        for i in range(1, 4):
+                            try:
+                                float(values[i])
+                            except ValueError as e:
+                                error_message += '\n | coordinates (x, y, z) must be floats'
+                                error_message += f'\n--- {e} ---\n'
 
     if not error_message and (line_number - 2) != atoms_number:
         error_message += f'\n | Not enough atoms were found'
         error_message += f'\n ---Number of atoms at line 1: {atoms_number}, is not equivalent'
         error_message += f'\n    to the total number of lines found: {line_number} lines.'
-        error_message += f'\n    Number of atoms (\'{atoms_number}\') plus two must be iqual to total lines (\'{line_number}\')'
+        error_message += f'\n    Number of atoms (\'{atoms_number}\') plus two must be iqual'
+        error_message += f'\n    to total lines (\'{line_number}\').'
         error_message += f'\n    \'{atoms_number + 2}\' is not iqual to \'{line_number}\' ---'
 
     # - creating a df from a XYZ file
@@ -319,6 +345,17 @@ def format_xyz(file_xyz):
     else:
         df = f" File \'{file_xyz}\' does not have XYZ file format\n" + \
             error_message
+
+    # - if there is any atomic number to replace for its symbol
+    # - if 'symbols_replace' is not empty
+
+    print(symbols_replace)
+
+    if symbols_replace:
+        df["element"] = df["element"].map(symbols_replace)
+
+    # # - capitalizing symbols
+    # df = df["element"].str.capitalize()
 
     return df
 # ---------------------------------------------------------------------------------------
