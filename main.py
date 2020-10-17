@@ -25,7 +25,7 @@
 # ------ modules
 # ------------------------------------------------------------------------------------
 import functions  # module with all the individuals function to do analysis
-
+import sys
 
 # ------------------------------------------------------------------------------------
 # ------ Preamble
@@ -33,7 +33,7 @@ import functions  # module with all the individuals function to do analysis
 
 print(f'\n****************************************************')
 print(f'*    Radial, Angle, and Dihedral       *')
-print(f'* Distribution Analisys for XYZ files  *')   
+print(f'* Distribution Analisys for XYZ files  *')
 print(f'*              "RADDA"                 *')
 print(f'****************************************************')
 
@@ -43,6 +43,8 @@ print(f'****************************************************')
 # ------------------------------------------------------------------------------------
 
 if __name__ == '__main__':
+    #Enter to working directory
+    functions.working_directory(sys.argv)
     pass
 
 
