@@ -98,140 +98,142 @@ def what_xyz_files(files_list_xyz, working_dir):
 # ---------------------------------------------------------------------------------------
 
 
-def number_to_symbol(number):
+def transform_to_symbols(value):
     """
     Returns the symbol for any atomic number (Z) in the periodic table (0 <= Z <= 118)
 
     Args:
-        number (str or int): atomic number in [0, 118]
+        value (str or int): atomic number [0, 118]
 
     Returns:
         symbol (str): symbol from any atomic number in the periodic table
 
     by: edisonffh@gmail.com
-    """
+    """        
 
-    symbol = {1: "H",
-              2: "He",
-              3: "Li",
-              4: "Be",
-              5: "B",
-              6: "C",
-              7: "N",
-              8: "O",
-              9: "F",
-              10: "Ne",
-              11: "Na",
-              12: "Mg",
-              13: "Al",
-              14: "Si",
-              15: "P",
-              16: "S",
-              17: "Cl",
-              18: "Ar",
-              19: "K",
-              20: "Ca",
-              21: "Sc",
-              22: "Ti",
-              23: "V",
-              24: "Cr",
-              25: "Mn",
-              26: "Fe",
-              27: "Co",
-              28: "Ni",
-              29: "Cu",
-              30: "Zn",
-              31: "Ga",
-              32: "Ge",
-              33: "As",
-              34: "Se",
-              35: "Br",
-              36: "Kr",
-              37: "Rb",
-              38: "Sr",
-              39: "Y",
-              40: "Zr",
-              41: "Nb",
-              42: "Mo",
-              43: "Tc",
-              44: "Ru",
-              45: "Rh",
-              46: "Pd",
-              47: "Ag",
-              48: "Cd",
-              49: "In",
-              50: "Sn",
-              51: "Sb",
-              52: "Te",
-              53: "I",
-              54: "Xe",
-              55: "Cs",
-              56: "Ba",
-              57: "La",
-              58: "Ce",
-              59: "Pr",
-              60: "Nd",
-              61: "Pm",
-              62: "Sm",
-              63: "Eu",
-              64: "Gd",
-              65: "Tb",
-              66: "Dy",
-              67: "Ho",
-              68: "Er",
-              69: "Tm",
-              70: "Yb",
-              71: "Lu",
-              72: "Hf",
-              73: "Ta",
-              74: "W",
-              75: "Re",
-              76: "Os",
-              77: "Ir",
-              78: "Pt",
-              79: "Au",
-              80: "Hg",
-              81: "Tl",
-              82: "Pb",
-              83: "Bi",
-              84: "Po",
-              85: "At",
-              86: "Rn",
-              87: "Fr",
-              88: "Ra",
-              89: "Ac",
-              90: "Th",
-              91: "Pa",
-              92: "U",
-              93: "Np",
-              94: "Pu",
-              95: "Am",
-              96: "Cm",
-              97: "Bk",
-              98: "Cf",
-              99: "Es",
-              100: "Fm",
-              101: "Md",
-              102: "No",
-              103: "Lr",
-              104: "Rf",
-              105: "Db",
-              106: "Sg",
-              107: "Bh",
-              108: "Hs",
-              109: "Mt",
-              110: "Ds",
-              111: "Rg",
-              112: "Cn",
-              113: "Nh",
-              114: "Fl",
-              115: "Mc",
-              116: "Lv",
-              117: "Ts",
-              118: "Og"
-              }
+    symbols_list = {1: "H",
+                    2: "He",
+                    3: "Li",
+                    4: "Be",
+                    5: "B",
+                    6: "C",
+                    7: "N",
+                    8: "O",
+                    9: "F",
+                    10: "Ne",
+                    11: "Na",
+                    12: "Mg",
+                    13: "Al",
+                    14: "Si",
+                    15: "P",
+                    16: "S",
+                    17: "Cl",
+                    18: "Ar",
+                    19: "K",
+                    20: "Ca",
+                    21: "Sc",
+                    22: "Ti",
+                    23: "V",
+                    24: "Cr",
+                    25: "Mn",
+                    26: "Fe",
+                    27: "Co",
+                    28: "Ni",
+                    29: "Cu",
+                    30: "Zn",
+                    31: "Ga",
+                    32: "Ge",
+                    33: "As",
+                    34: "Se",
+                    35: "Br",
+                    36: "Kr",
+                    37: "Rb",
+                    38: "Sr",
+                    39: "Y",
+                    40: "Zr",
+                    41: "Nb",
+                    42: "Mo",
+                    43: "Tc",
+                    44: "Ru",
+                    45: "Rh",
+                    46: "Pd",
+                    47: "Ag",
+                    48: "Cd",
+                    49: "In",
+                    50: "Sn",
+                    51: "Sb",
+                    52: "Te",
+                    53: "I",
+                    54: "Xe",
+                    55: "Cs",
+                    56: "Ba",
+                    57: "La",
+                    58: "Ce",
+                    59: "Pr",
+                    60: "Nd",
+                    61: "Pm",
+                    62: "Sm",
+                    63: "Eu",
+                    64: "Gd",
+                    65: "Tb",
+                    66: "Dy",
+                    67: "Ho",
+                    68: "Er",
+                    69: "Tm",
+                    70: "Yb",
+                    71: "Lu",
+                    72: "Hf",
+                    73: "Ta",
+                    74: "W",
+                    75: "Re",
+                    76: "Os",
+                    77: "Ir",
+                    78: "Pt",
+                    79: "Au",
+                    80: "Hg",
+                    81: "Tl",
+                    82: "Pb",
+                    83: "Bi",
+                    84: "Po",
+                    85: "At",
+                    86: "Rn",
+                    87: "Fr",
+                    88: "Ra",
+                    89: "Ac",
+                    90: "Th",
+                    91: "Pa",
+                    92: "U",
+                    93: "Np",
+                    94: "Pu",
+                    95: "Am",
+                    96: "Cm",
+                    97: "Bk",
+                    98: "Cf",
+                    99: "Es",
+                    100: "Fm",
+                    101: "Md",
+                    102: "No",
+                    103: "Lr",
+                    104: "Rf",
+                    105: "Db",
+                    106: "Sg",
+                    107: "Bh",
+                    108: "Hs",
+                    109: "Mt",
+                    110: "Ds",
+                    111: "Rg",
+                    112: "Cn",
+                    113: "Nh",
+                    114: "Fl",
+                    115: "Mc",
+                    116: "Lv",
+                    117: "Ts",
+                    118: "Og"
+                    }
 
-    return symbol[int(number)]
+    symbol = symbols_list[int(value)]
+
+    return symbol
 # ---------------------------------------------------------------------------------------
 
 
@@ -243,9 +245,10 @@ def format_xyz(file_xyz):
     CHECKING if a file has the XYZ format.
 
     The formatting of the .xyz file format is as follows:
-        <number of atoms>
-        comment line
-        <element> <X> <Y> <Z>
+    
+        <number of atoms>               # only one filed (int)
+        comment line                    # free format
+        <element> <X> <Y> <Z>           # four fields (str/int, float, float, float)
 
     Args:
         file_xyz (str): XYZ file name
@@ -263,7 +266,7 @@ def format_xyz(file_xyz):
     line_number = 0
 
     # - atomic number will be replaced by their symbol
-    symbols_replace = {}
+    symbols = {}
 
     with open(file_xyz, 'r') as f:
         # - reading line by line
@@ -290,39 +293,29 @@ def format_xyz(file_xyz):
                     error_message += '\n   It must be: (element, x, y, z)'
                     error_message += f'\n--- {e} ---\n'
 
-                # - cheking four fields: (element, x, y, z) -> (str, float, float, float)
+                # - Four fields were found, so
+                # - checking first column (element) and x, y, z coordinates
                 else:
-                    # - checking if there is any atomic number instead of symbols
+                    # - checking first column (elements), is it a str or int?
                     try:
-                        number = int(values[0])
-
-                    # - ValueError means not any atomic number were found, just symbols
+                        int(values[0])
+                    
+                    # - string
                     except ValueError:
-                        pass   # nothing to do, only symbols were found
+                        # - as a string, symbol must be capitalised
+                        symbols[values[0]] = values[0].capitalize()
 
+                    # - integer (Not a 'ValueError')
                     else:
-                        # - atomic number will change to symbol
-                        try:
-                            symbol = number_to_symbol(number)
-                            print(
-                                f'\natomic number: {number} -> {symbol}, line: {line_number}')
-
-                        except KeyError:
-                            error_message += f' | Check line {line_number}, '
-                            error_message += f' Not symbol were found to \'{values[0]}\''
-
-                        # - atomic number will change to symbol
-                        else:
-                            symbols_replace[number] = symbol
+                        symbols[values[0]] = transform_to_symbols(values[0])
 
                     # - checking x, y, z coordinates
-                    finally:
-                        for i in range(1, 4):
-                            try:
-                                float(values[i])
-                            except ValueError as e:
-                                error_message += '\n | coordinates (x, y, z) must be floats'
-                                error_message += f'\n--- {e} ---\n'
+                    for i in range(1, 4):
+                        try:
+                            float(values[i])
+                        except ValueError as e:
+                            error_message += '\n | coordinates (x, y, z) must be floats'
+                            error_message += f'\n--- {e} ---\n'
 
     if not error_message and (line_number - 2) != atoms_number:
         error_message += f'\n | Not enough atoms were found'
@@ -342,20 +335,12 @@ def format_xyz(file_xyz):
                                 "y-coordinate", "z-coordinate"]
                          )
 
+        # - Replacing atomic number into symbols or capitalising symbols (if any)
+        df["element"] = df["element"].map(symbols)
+
     else:
         df = f" File \'{file_xyz}\' does not have XYZ file format\n" + \
             error_message
-
-    # - if there is any atomic number to replace for its symbol
-    # - if 'symbols_replace' is not empty
-
-    print(symbols_replace)
-
-    if symbols_replace:
-        df["element"] = df["element"].map(symbols_replace)
-
-    # # - capitalizing symbols
-    # df = df["element"].str.capitalize()
 
     return df
 # ---------------------------------------------------------------------------------------
