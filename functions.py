@@ -109,7 +109,7 @@ def transform_to_symbols(value):
         symbol (str): symbol from any atomic number in the periodic table
 
     by: edisonffh@gmail.com
-    """        
+    """
 
     symbols_list = {1: "H",
                     2: "He",
@@ -231,7 +231,10 @@ def transform_to_symbols(value):
                     118: "Og"
                     }
 
-    symbol = symbols_list[int(value)]
+    try:
+        symbol = symbols_list[int(value)]
+    except KeyError:
+        symbol = value
 
     return symbol
 # ---------------------------------------------------------------------------------------
@@ -299,7 +302,7 @@ def format_xyz(file_xyz):
                     # - checking first column (elements), is it a str or int?
                     try:
                         int(values[0])
-                    
+
                     # - string
                     except ValueError:
                         # - as a string, symbol must be capitalised
@@ -323,7 +326,7 @@ def format_xyz(file_xyz):
         error_message += f'\n    to the total number of lines found: {line_number} lines.'
         error_message += f'\n    Number of atoms (\'{atoms_number}\') plus two must be iqual'
         error_message += f'\n    to total lines (\'{line_number}\').'
-        error_message += f'\n    \'{atoms_number + 2}\' is not iqual to \'{line_number}\' ---'
+        error_message += f' \'{atoms_number + 2}\' is not iqual to \'{line_number}\' ---'
 
     # - creating a df from a XYZ file
     if not error_message:
