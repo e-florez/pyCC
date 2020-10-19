@@ -107,6 +107,7 @@ def transform_to_symbols(value):
 
     Returns:
         symbol (str): symbol from any atomic number in the periodic table
+                      if 'value' is not (0, 118] it returns the same value
 
     by: edisonffh@gmail.com
     """
@@ -234,6 +235,7 @@ def transform_to_symbols(value):
     try:
         symbol = symbols_list[int(value)]
     except KeyError:
+        # value is not (0, 118] returns value
         symbol = value
 
     return symbol
