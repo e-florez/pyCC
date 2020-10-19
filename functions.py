@@ -38,39 +38,22 @@ def working_directory(arg_prompt):
         tmp_dir =  input(f'\nAddress of directory (whit the XYZ files) [default: empty]: ')
         tmp_dir = tmp_dir.strip()
 
-        if tmp_dir == '.' or  '..' in tmp_dir or len(tmp_dir) < 1:
-            if tmp_dir == '.' or len(tmp_dir) < 1 :
-                working_dir = os.getcwd()
-            elif '../..' in tmp_dir:
-                print(f'\n*** ERROR ***')
-                exit(f'Only accept one return')
-            else:
-                ndirectories = len(os.getcwd().split("/"))
-                len_name_directory = len(os.getcwd().split("/")[ndirectories-1]) + 1
-                len_address = len(os.getcwd()) - len_name_directory
-                working_dir = os.getcwd().strip()[0:len_address]
+        if tmp_dir == '.' or len(tmp_dir) < 1:
+            working_dir = os.getcwd()
         else:
-            first_directory = os.getcwd().split("/")[1]
-            if first_directory in tmp_dir :
+            if tmp_dir.strip()[0] == "/":
                 working_dir = tmp_dir
             else:
-                print(f'\n*** ERROR ***')
-                print(f'Address incomplete')
-                exit(f'Put on all the explicit address')
+                working_dir =  str(os.getcwd()) + "/" + str(tmp_dir)
 
-    elif arg_prompt[1] == '.' or '..' in arg_prompt[1] :
-        if arg_prompt[1] == '.' :
-            working_dir = os.getcwd()
-        elif '../..' in arg_prompt[1] :
-            print(f'\n*** ERROR ***')
-            exit(f'Only accept one return')
-        else:
-            ndirectories = len(os.getcwd().split("/"))
-            len_name_directory = len(os.getcwd().split("/")[ndirectories-1]) + 1
-            len_address = len(os.getcwd()) - len_name_directory
-            working_dir = os.getcwd().strip()[0:len_address]
+    elif arg_prompt[1] == '.' :
+        working_dir = os.getcwd()
+
     else:
-        working_dir = arg_prompt[1]
+        if arg_prompt[1].strip()[0] == "/" :
+            working_dir = arg_prompt[1]
+        else:
+            working_dir =  str(os.getcwd()) + "/" + str(arg_prompt[1])
 
     print(f'\nWorking directiry: {working_dir}')
 
