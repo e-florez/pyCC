@@ -3,6 +3,9 @@
 *.out
 *.tgz
 
+# - IDE files/dir
+*.vscode/
+
 # bash script to transfor output files to XYZ
 *geometry*.sh
 
