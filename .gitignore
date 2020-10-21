@@ -4,7 +4,7 @@
 *.tgz
 
 # xyz
-*.xyz 
+#*.xyz 
 
 # bash script to transfor output files to XYZ
 *geometry*.sh
