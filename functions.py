@@ -42,7 +42,7 @@ def working_directory():
 
 
 def reading_files_XYZ():
-     """
+    """
     The aim of this function is to read, to make a list  and sorting the XYZ files into the working directory 
       
     Args: 
@@ -75,9 +75,9 @@ def reading_files_XYZ():
 
     # - checking if files exist
     if len(list_xyz) > 0:
-    for input_xyz in list_xyz:
-        if not os.path.exists(input_xyz):
-                    print(f'\n*** Warinnig ***\n file {input_xyz} does not exits \n')
+        for input_xyz in list_xyz:
+            if not os.path.exists(input_xyz):
+                print(f'\n*** Warinnig ***\n file {input_xyz} does not exits \n')
     else:
         exit(f' *** ERROR ***\n No file found to make the RDA \n ')
 
@@ -90,7 +90,9 @@ def reading_files_XYZ():
 
         count += (columns + 1)
 
-    return list_xyz
+        return list_xyz
+
+print(reading_files_XYZ())
 
 # def format_files_XYZ(): 
 #        """
