@@ -44,11 +44,6 @@ print(f'****************************************************')
 
 if __name__ == '__main__':
 
-    list_xyz_file = functions.reading_files_XYZ()
+    list_files_XYZ = functions.reading_files_XYZ()
     
-    print()
-    print(len(list_xyz_file))
-    print(list_xyz_file)
-    print()
-    print()
 

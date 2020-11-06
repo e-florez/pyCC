@@ -42,23 +42,37 @@ def working_directory():
 
 
 def reading_files_XYZ():
+<<<<<<< HEAD
+=======
+    import glob             # - Unix style pathname pattern expansion
+    import os            # - to check id a file or dir exits -> os.path.exists() # -  to smooth out your data
+#    from natsort import natsorted  # Simple yet flexible natural sorting in Python.
+
+>>>>>>> 16704f0b7e18cb9aa1afd559223fb1c90cdb37ff
     """
     The aim of this function is to read, to make a list  and sorting the XYZ files into the working directory 
       
-    Args: 
-        working_dir (str): Correspond to the path to working directory
+    Args:  
+        This functions does not have a argument, but it depend on working_dir (str), which 
+        correspond to the path to working directory
     Returns: 
         files_list_xyz (list str): It is a list with the names of all XYZ files in working directory to be analyzed
 
     by: César Ibarguen-Becerra <cesar-b29@hotmail.com>
     """
+<<<<<<< HEAD
     import glob             # - Unix style pathname pattern expansion
     import os               # - to check id a file or dir exits -> os.path.exists() # -  to smooth out your data
     from natsort import natsorted  # Simple yet flexible natural sorting in Python.
 
     repited_list_xyz = []  # repited files (if any)
     list_xyz = []  # unique files
+=======
+    repited_list_xyz = []  # Initializing an empty list for repited files (if any)
+    list_xyz = []  # Initializing an empty list unique files
+>>>>>>> 16704f0b7e18cb9aa1afd559223fb1c90cdb37ff
 
+    
     # - reading files
     for input_xyz in glob.glob('*.xyz'):
         name_xyz = input_xyz[:-4]  # deleting file extention
@@ -90,6 +104,7 @@ def reading_files_XYZ():
         count += columns
 
     return list_xyz
+
 
 # def format_files_XYZ(): 
 #        """
