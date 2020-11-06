@@ -42,7 +42,7 @@ def working_directory():
 
 
 def reading_files_XYZ():
-     """
+    """
     The aim of this function is to read, to make a list  and sorting the XYZ files into the working directory 
       
     Args: 
@@ -52,32 +52,31 @@ def reading_files_XYZ():
 
     by: César Ibarguen-Becerra <cesar-b29@hotmail.com>
     """
-    repited_list_xyz = []  # repited files (if any)
-    list_xyz = []  # unique files
-
     import glob             # - Unix style pathname pattern expansion
     import os               # - to check id a file or dir exits -> os.path.exists() # -  to smooth out your data
-    #from natsort import natsorted  # Simple yet flexible natural sorting in Python.
+    from natsort import natsorted  # Simple yet flexible natural sorting in Python.
 
+    repited_list_xyz = []  # repited files (if any)
+    list_xyz = []  # unique files
 
     # - reading files
     for input_xyz in glob.glob('*.xyz'):
         name_xyz = input_xyz[:-4]  # deleting file extention
         repited_list_xyz.append(input_xyz)  # creating an array for all xyz files
 
-            # keeping unique xyz files
+        # keeping unique xyz files
         for unique_input_xyz in repited_list_xyz:
             if unique_input_xyz not in list_xyz:
                 list_xyz.append(unique_input_xyz)
 
     # - sorting the input files list for a easier reading 
-    #    list_xyz = natsorted(list_xyz)
+    list_xyz = natsorted(list_xyz)
 
     # - checking if files exist
     if len(list_xyz) > 0:
-    for input_xyz in list_xyz:
-        if not os.path.exists(input_xyz):
-                    print(f'\n*** Warinnig ***\n file {input_xyz} does not exits \n')
+        for input_xyz in list_xyz:
+            if not os.path.exists(input_xyz):
+                print(f'\n*** Warinnig ***\n file {input_xyz} does not exits \n')
     else:
         exit(f' *** ERROR ***\n No file found to make the RDA \n ')
 
@@ -88,7 +87,7 @@ def reading_files_XYZ():
     while count < len(list_xyz):
         print(f'\t'.join(list_xyz[count:count + columns]))
 
-        count += (columns + 1)
+        count += columns
 
     return list_xyz
 
