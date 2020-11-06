@@ -23,9 +23,9 @@
 # ------ Main body
 # ------------------------------------------------------------------------------------
 
-import os  # - to check id a file or dir exits -> os.path.exists()
-
 def working_directory(arg_prompt):
+    import os  # - to check id a file or dir exits -> os.path.exists()
+
     """[summary]
     Asking or taking path of working directory from argument of prompt and
     verification of working directory
@@ -34,7 +34,7 @@ def working_directory(arg_prompt):
         arg_prompt (str): argument in the prompt when was execution of program
     """
 
-    if len(arg_prompt) <= 1 :
+    if len(arg_prompt) <= 1 :              #Ask
         tmp_dir =  input(f'\nAddress of directory (whit the XYZ files) [default: empty]: ')
         tmp_dir = tmp_dir.strip()
 
@@ -46,16 +46,16 @@ def working_directory(arg_prompt):
             else:
                 working_dir =  str(os.getcwd()) + "/" + str(tmp_dir)
 
-    elif arg_prompt[1] == '.' :
+    elif arg_prompt[1] == '.' :               #Here
         working_dir = os.getcwd()
 
     else:
-        if arg_prompt[1].strip()[0] == "/" :
+        if arg_prompt[1].strip()[0] == "/" :  #Full path (Since the root)
             working_dir = arg_prompt[1]
-        else:
+        else:                                 #Path incompleted
             working_dir =  str(os.getcwd()) + "/" + str(arg_prompt[1])
 
-    print(f'\nWorking directiry: {working_dir}')
+    print(f'\nWorking directiry: {working_dir}')   #Working directory
 
     # Check if the working dir exists
     if os.path.exists(working_dir) :
