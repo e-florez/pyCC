@@ -3,6 +3,10 @@
 *.out
 *.tgz
 
+
+# xyz
+#*.xyz 
+
 # - IDE files/dir
 *.vscode/
 
@@ -11,6 +15,11 @@
 
 # Directories for OUTPUT files from main softwares
 *log_files/
+*org_files/
+
+# local files/directories
+.vscode/
+*.vscode/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
