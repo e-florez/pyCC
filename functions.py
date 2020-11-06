@@ -8,6 +8,12 @@
 #   email: edisonffh@gmail.com
 #   affiliation: Massey University, New Zealand
 #
+#   danianescobarv@gmail.com
+#
+#   César Ibargüen Becerra (github.com/cesar-ibarguen)
+#   email: cesar-b29@hotmail.com
+#   affiliation: University of Antioquia, Medellín-Colombia
+
 # ------------------------------------------------------------------------------------
 # Description:
 # ------------------------------------------------------------------------------------
@@ -33,20 +39,58 @@ def working_directory():
 
 
 def reading_files_xyz():
+    import glob             # - Unix style pathname pattern expansion
+    import os            # - to check id a file or dir exits -> os.path.exists() # -  to smooth out your data
+#    from natsort import natsorted  # Simple yet flexible natural sorting in Python.
+
     """
-       [summary]
+    The aim of this function is to read, to make a list  and sorting the XYZ files into the working directory 
+      
+    Args:  
+        This functions does not have a argument, but it depend on working_dir (str), which 
+        correspond to the path to working directory
+    Returns: 
+        files_list_xyz (list str): It is a list with the names of all XYZ files in working directory to be analyzed
 
-       input: a, b, c
-       output: d
-
-       Args:
-           a (str): distancia
-           b ([type]): [description]
-           c ([type]): [description]
-           d ([type]): [description]
+    by: César Ibarguen-Becerra <cesar-b29@hotmail.com>
     """
-    pass
 
+    repited_list_xyz = []  # Initializing an empty list for repited files (if any)
+    list_xyz = []  # Initializing an empty list unique files
+    
+    # - reading files
+    for input_xyz in glob.glob('*.xyz'):
+        repited_list_xyz.append(input_xyz)  # creating an array for all xyz files
+
+        # keeping unique xyz files
+        for unique_input_xyz in repited_list_xyz:
+            if unique_input_xyz not in list_xyz:
+                list_xyz.append(unique_input_xyz)
+
+    # - sorting the input files list for a easier reading 
+    # list_xyz = natsorted(list_xyz)
+
+    # - checking if files exist
+    if len(list_xyz) > 0:
+        for input_xyz in list_xyz:
+            if not os.path.exists(input_xyz):
+                print(f'\n*** Warinnig ***\n file {input_xyz} does not exits \n')
+    else:
+        exit(f' *** ERROR ***\n No file found to make the RDA \n ')
+
+    print(f'\nA total of {len(list_xyz)} xyz files found\n')
+
+    count = 0
+    columns = 4
+    while count < len(list_xyz):
+        print(f'\t'.join(list_xyz[count:count + columns]))
+
+        count += columns
+
+    print()
+
+    return list_xyz
+#--------------------------------------------------
 
 def what_xyz_files(files_list_xyz, working_dir):
     """
@@ -385,3 +429,4 @@ def dict_coordinates_xyz(files_list_xyz):
 
     return coordinates_xyz
 # ---------------------------------------------------------------------------------------
+

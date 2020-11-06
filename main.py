@@ -49,10 +49,8 @@ import functions  # module with all the individuals function to do analysis
 if __name__ == '__main__':
 
     working_dir = 'here'
-
-#    list_files_XYZ = ["aw1s1.xyz", "bw1s1.xyz", "w1s1.xyz", "w2s1.xyz"]
-    list_files_XYZ = ["w1s1.xyz", "w2s1.xyz"]
-
+    
+    list_files_XYZ = functions.reading_files_xyz()
 
     # - choosing those XYZ files to analyse
     files_xyz = functions.what_xyz_files(list_files_XYZ, working_dir)
@@ -61,6 +59,7 @@ if __name__ == '__main__':
     # and CHECKING if those files has the XYZ format to create a dictionary 'coordinates_XYZ'
     # for each XYZ file with their coordinates in a pandas data frame
     coordinates_XYZ = functions.dict_coordinates_xyz(files_xyz)
+
 
     for key in coordinates_XYZ:
         print('\n' + '--' * 30 +
