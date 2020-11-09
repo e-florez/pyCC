@@ -34,25 +34,25 @@ def working_directory(arg_prompt):
         arg_prompt (str): argument in the prompt when was execution of program
     """
 
-    if len(arg_prompt) <= 1 :              #Ask
+    if len(arg_prompt) <= 1 : #argument from prompt shell is not vaccum
         tmp_dir =  input(f'\nAddress of directory (whit the XYZ files) [default: empty]: ')
         tmp_dir = tmp_dir.strip()
 
-        if tmp_dir == '.' or len(tmp_dir) < 1:
+        if tmp_dir == '.' or len(tmp_dir) < 1: #get path of current directory
             working_dir = os.getcwd()
-        else:
-            if tmp_dir.strip()[0] == "/":
+        else:  #get full path of working directory
+            if tmp_dir[0] == "/":
                 working_dir = tmp_dir
             else:
                 working_dir =  str(os.getcwd()) + "/" + str(tmp_dir)
 
-    elif arg_prompt[1] == '.' :               #Here
+    elif arg_prompt[1] == '.' : #argument from prompt shell indicate the current directory
         working_dir = os.getcwd()
 
-    else:
-        if arg_prompt[1].strip()[0] == "/" :  #Full path (Since the root)
+    else:   #argument from prompt shell is vaccum
+        if arg_prompt[1][0] == "/" :  #Full path (Since the root)
             working_dir = arg_prompt[1]
-        else:                                 #Path incompleted
+        else:                         #Path incompleted
             working_dir =  str(os.getcwd()) + "/" + str(arg_prompt[1])
 
     print(f'\nWorking directiry: {working_dir}')   #Working directory
@@ -70,7 +70,15 @@ def working_directory(arg_prompt):
             os.chdir(working_dir)
         else:
             print(f'\n*** ERROR ***')
-            exit(f'Directory permissions insufficient')
+            if read_permission == False:
+                print(f"\n Read permission missing")
+            if write_permission == False:
+                print(f"\n Write permission missing")
+            if execution_permission == False:
+                print(f"\n Execution permission missing")
+            if save_new_file_permission == False:
+                print(f"\n Save new files permission missing")
+            exit(f'\n*** Directory permissions insufficient ***')
     else:
         print(f'\n*** ERROR ***')
         exit(f"Can't change the Working Directory, {working_dir} doesn't exist")
