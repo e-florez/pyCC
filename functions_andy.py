@@ -10,7 +10,6 @@
 #
 #   name        : Andy Zapata (github.com/AndyDanian)
 #   email       : danianescobarv@gmail.com
-#   affiliation : Institute of Modelling and Innovative Technology (CONICET-IMIT), Argentina
 #
 #   cesar-b29@hotmail.com
 
