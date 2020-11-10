@@ -20,7 +20,6 @@
 # ------------------------------------------------------------------------------------
 # Description:
 
-import functions  # module with all the individuals function to do analysis
 message = """
 
 **********************************************************
@@ -35,6 +34,7 @@ message = """
 *    Edison Florez, Andy Zapata, Cesar Ibarguen (2020)   *
 *                                                        *
 **********************************************************
+>>>>>>> master:main.py
 
 """
 
@@ -43,14 +43,14 @@ print(message)
 # ------------------------------------------------------------------------------------
 # ------ modules
 # ------------------------------------------------------------------------------------
-
+import functions  # module with all the individuals function to do analysis
 # ------------------------------------------------------------------------------------
 # ------ Main body
 # ------------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-
-    working_dir = 'here'
+    #Enter to working directory
+    functions.working_directory(sys.argv)
 
     # - Function to check if exist, list and sort XYZ files in working directory
     list_files_XYZ = functions.reading_files_xyz()
