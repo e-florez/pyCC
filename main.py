@@ -34,8 +34,6 @@ message = """
 *    Edison Florez, Andy Zapata, Cesar Ibarguen (2020)   *
 *                                                        *
 **********************************************************
->>>>>>> master:main.py
-
 """
 
 print(message)
@@ -44,17 +42,18 @@ print(message)
 # ------ modules
 # ------------------------------------------------------------------------------------
 import functions  # module with all the individuals function to do analysis
-import sys
+import sys # module to recognise input argument form terminal (sys.argv)
+
 # ------------------------------------------------------------------------------------
 # ------ Main body
 # ------------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    #Enter to working directory
-    functions.working_directory(sys.argv)
+    #Working directory: checking permission and existence 
+    working_dir = functions.working_directory(sys.argv)
 
-    # - Function to check if exist, list and sort XYZ files in working directory
-    list_files_XYZ = functions.reading_files_xyz()
+    # - Function to check if XYZ files exist, list and sort them in working directory
+    list_files_XYZ = functions.reading_files_xyz(working_dir)
 
     # - Choosing those XYZ files to be analyse (by default all in working directory)
     # - Asking what XYZ files must be analise

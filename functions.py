@@ -31,59 +31,82 @@ def working_directory(arg_prompt):
 
     Args:
         arg_prompt (str): argument in the prompt when was execution of program
+
+    Return: 
+        working_dir (str): working directory path 
     """
 
-    if len(arg_prompt) <= 1 : #argument from prompt shell is not vaccum
-        tmp_dir =  input(f'\nAddress of directory (whit the XYZ files) [default: empty]: ')
+    #NO input argument from the terminal
+    if len(arg_prompt) < 1: 
+        tmp_dir =  input(f'\n Working directory path [default: empty=current dir]: ')
         tmp_dir = tmp_dir.strip()
 
-        if tmp_dir == '.' or len(tmp_dir) < 1: #get path of current directory
+        #current directory path
+        if tmp_dir == '.' or len(tmp_dir) < 1: 
             working_dir = os.getcwd()
-        else:  #get full path of working directory
+
+        #working directory path
+        else:
+            # path from root?
             if tmp_dir[0] == "/":
                 working_dir = tmp_dir
             else:
                 working_dir =  str(os.getcwd()) + "/" + str(tmp_dir)
 
-    elif arg_prompt[1] == '.' : #argument from prompt shell indicate the current directory
+    #input argument from the terminal, is it current directory?
+    elif arg_prompt[1] == '.' : 
         working_dir = os.getcwd()
 
-    else:   #argument from prompt shell is vaccum
-        if arg_prompt[1][0] == "/" :  #Full path (Since the root)
+    #input argument from the terminal
+    else:   
+        # path from root?
+        if arg_prompt[1][0] == "/" :
             working_dir = arg_prompt[1]
-        else:                         #Path incompleted
+        else:
             working_dir =  str(os.getcwd()) + "/" + str(arg_prompt[1])
 
-    print(f'\nWorking directiry: {working_dir}')   #Working directory
+    # path for the Working Directory
+    print(f' Working directory: {working_dir}')
 
-    # Check if the working dir exists
-    if os.path.exists(working_dir) :
-        #Verification of permission of directory
-        read_permission = os.access(working_dir, os.R_OK)
-        write_permission = os.access(working_dir, os.W_OK)
-        execution_permission = os.access(working_dir, os.X_OK)
-        save_new_file_permission = os.access(working_dir, os.X_OK | os.W_OK)
-        if read_permission == True and write_permission == True and\
-            execution_permission == True and save_new_file_permission == True:
-            # Change the current working Directory
-            os.chdir(working_dir)
-        else:
-            print(f'\n*** ERROR ***')
-            if read_permission == False:
-                print(f"\n Read permission missing")
-            if write_permission == False:
-                print(f"\n Write permission missing")
-            if execution_permission == False:
-                print(f"\n Execution permission missing")
-            if save_new_file_permission == False:
-                print(f"\n Save new files permission missing")
-            exit(f'\n*** Directory permissions insufficient ***')
+    # Check if this working dir exists
+    if not os.path.exists(working_dir):
+        print(f'\n*** ERROR ***')
+        exit(f" Working Directory does not exit\n")
+
+    #Checking permission
+    read_permission = os.access(working_dir, os.R_OK)
+    write_permission = os.access(working_dir, os.W_OK)
+    execution_permission = os.access(working_dir, os.X_OK)
+    save_new_file_permission = os.access(working_dir, os.X_OK | os.W_OK)
+
+    if ( read_permission  and write_permission and \
+         execution_permission and save_new_file_permission ):
+
+        # ALL DONE, changing to the Working Directory
+        os.chdir(working_dir)
+        return working_dir
+
+    # Not enough permissions
     else:
         print(f'\n*** ERROR ***')
-        exit(f"Can't change the Working Directory, {working_dir} doesn't exist")
-#*******************************************************************************#
+ 
+        if not read_permission:
+            print(f" Needs Reading permission")
 
-def reading_files_xyz():
+        if not write_permission:
+            print(f" Needs Writing permission")
+
+        if not execution_permission:
+            print(f" Needs Execution permission")
+
+        if not save_new_file_permission:
+            print(f" Needs Saving New Files permission")
+
+        exit(f'\n*** Not enough permissions ***\n')
+# --------------------------------------------------
+
+
+def reading_files_xyz(working_dir):
     # - Unix style pathname pattern expansion
     import glob
     # - to check id a file or dir exits -> os.path.exists() # -  to smooth out your data
@@ -95,43 +118,27 @@ def reading_files_xyz():
     The aim of this function is to read, to make a list  and sorting the XYZ files into the working directory 
       
     Args:  
-        This functions does not have a argument, but it depend on working_dir (str), which 
-        correspond to the path to working directory
+        working_dir (str): path to working directory
+
     Returns: 
-        files_list_xyz (list str): It is a list with the names of all XYZ files in working directory to be analyzed
+        list_xyz (list str): It is a list with the names of all XYZ files in working directory to be analyzed
 
     by: César Ibarguen-Becerra <cesar-b29@hotmail.com>
     """
 
-    # Initializing an empty list for repited files (if any)
-    repited_list_xyz = []
-    list_xyz = []  # Initializing an empty list unique files
+    # - listing all the pathnames matching '.xyz' pattern
+    list_xyz = glob.glob('*.xyz') 
 
-    # - reading files
-    for input_xyz in glob.glob('*.xyz'):
-        # creating an array for all xyz files
-        repited_list_xyz.append(input_xyz)
+    if len(list_xyz) == 0:
+        print(f'\n *** ERROR ***')
+        exit(f' No XYZ files were found in {working_dir}')
 
-        # keeping unique xyz files
-        for unique_input_xyz in repited_list_xyz:
-            if unique_input_xyz not in list_xyz:
-                list_xyz.append(unique_input_xyz)
-
-    # - sorting the input files list for a easier reading
+    # - sorting XYZ files in this list for a easier reading
     list_xyz = natsorted(list_xyz)
 
-    # - checking if files exist
-    if len(list_xyz) > 0:
-        for input_xyz in list_xyz:
-            if not os.path.exists(input_xyz):
-                print(
-                    f'\n*** Warinnig ***\n file {input_xyz} does not exits \n')
-    else:
-        exit(f' *** ERROR ***\n No file found to make the RDA \n ')
-
-    print(f'\nA total of {len(list_xyz)} xyz files found\n')
-
     # - Showing those XYZ file
+    print(f'\nA total of {len(list_xyz)} XYZ files were found:\n')
+
     count = 0
     columns = 4
     while count < len(list_xyz):
@@ -146,11 +153,13 @@ def reading_files_xyz():
 
 
 def what_xyz_files(files_list_xyz, working_dir):
+    import os  # - to check id a file or dir exits -> os.path.exists()
+
     """
     CHOOSING those XYZ files to analyse (by default all in working directory)
 
     Args:
-        files_list_xyz (list str): It is a list with all XYZ file's names in the working directory
+        files_list_xyz (list of str): It is a list with all XYZ file's names in the working directory
         working_dir (str): path with the working directory
 
     Returns:
@@ -159,15 +168,16 @@ def what_xyz_files(files_list_xyz, working_dir):
 
     by: Edison Florez <edisonffh@gmail.com>
     """
+
     # - avoiding an empty list
     files_list_xyz = list(filter(None, files_list_xyz))
-    if len(files_list_xyz) < 1:
-        # if not any(s.strip() for s in files_list_xyz):
-        exit(f'\n *** ERROR ***\n Not XYZ file found in: \'{working_dir}\'')
+
+    if len(files_list_xyz) == 0:
+        print(f'\n *** ERROR ***')
+        exit(f'No XYZ files were found in: \'{working_dir}\'')
 
     while True:
-        input_list = input(
-            f'What XYZ files do you want to analyse, separated by comma? [default: all] \n')
+        input_list = input('What XYZ files do you want? Separated by comma [default: empty=all]\n')
 
         input_list = input_list.split(',')
 
@@ -182,10 +192,12 @@ def what_xyz_files(files_list_xyz, working_dir):
                 # - removing any leading or trailing whitespaces
                 xyz = xyz.strip()
 
-                if xyz not in files_list_xyz:
-                    print(f'** Warnnig ** file \'{xyz}\' does not exits \n')
-                else:
+                # - does XYZ file exist?
+                if os.path.exists(xyz):
                     files_list.append(xyz)
+                else:
+                    print(f'\n *** Warning ***')
+                    print(f' file \'{xyz}\' does not exits in {working_dir}\n')
 
         # - EXITING with a not empty list
         if len(files_list) > 0:
