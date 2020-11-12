@@ -388,6 +388,12 @@ def format_xyz(file_xyz):
             line_number += 1
             values = [i for i in line.split()]
 
+            # - checking empty lines. Only line number two has a free format
+            if len(values) == 0 and line_number != 2:
+                error_message += f'\n | line {line_number} is empty'
+                error_message += f'\n | Only line number two has a free format and could be empty\n'
+                continue
+
             # - firts line is number of atoms
             if line_number == 1:
                 try:
