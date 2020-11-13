@@ -36,8 +36,9 @@ def working_directory(arg_prompt):
         working_dir (str): working directory path 
     """
 
-    #NO input argument from the terminal
-    if len(arg_prompt) < 1: 
+    # - NO input argument from the terminal 
+    # - (Remember that sys.argv[0] is the name of the script)
+    if len(arg_prompt) == 1: 
         tmp_dir =  input(f'\n Working directory path [default: empty=current dir]: ')
         tmp_dir = tmp_dir.strip()
 
