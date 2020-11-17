@@ -43,7 +43,7 @@ print(message)
 # ------------------------------------------------------------------------------------
 import functions  # module with all the individuals function to do analysis
 import sys # module to recognise input argument form terminal (sys.argv)
-
+import matrix_r # module to calculate of matriz distance
 # ------------------------------------------------------------------------------------
 # ------ Main body
 # ------------------------------------------------------------------------------------
@@ -71,14 +71,14 @@ if __name__ == '__main__':
 
 
     # - CESAR: define a grid for each histogram: bond, angle and dihedral angle
-    
+
 
 
 
     # - ANDY: Computing matrix distance for each XYZ and create a 
     #   dictionary whit a panda data frame with all distances between 
     #   all possible atomic pairs
-
+    R_Matrix = matrix_r.Distance_Matrix(files_xyz,coordinates_XYZ)
 
 
 
