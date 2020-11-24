@@ -17,27 +17,33 @@ def Distance_Matrix(files_xyz,coordinates_XYZ):
     Return:
         R_Matrix (dictonary)   : KEY: file.xyz (str),
                                 VALUES: pandas dataframe (Distance between atoms)
-                                R_Matrix = {file.xyz: (distance_iatom_jatom)}
+                                R_Matrix = {file.xyz: (              iatom
+                                                        jatom   distance_jatom_iatom)}
     """
     nfiles_xyz = len(files_xyz) #Number of files .xyz
-    R_Matrix = {}
+    R_Matrix = {} #Dictonary with distances matrix
     for ifile in range(nfiles_xyz):
-        XYZ = pd.DataFrame(coordinates_XYZ[files_xyz[ifile]],\
-            columns=['x-coordinate','y-coordinate','z-coordinate'])
-        natoms=len(XYZ['x-coordinate'])   #Number of atoms
+        natoms=len(coordinates_XYZ[files_xyz[ifile]]['x-coordinate']) #Number of atoms
         temporal_R_Matrix = np.zeros((natoms,natoms),dtype=float)
+        label=[]
         #Computing distance matrix
         for iatom in range(natoms):
+            label.append(coordinates_XYZ[files_xyz[ifile]]['element'][iatom]) #Columns' header of dataframe
             for jatom in range(natoms):
-                distance_ab_x = XYZ['x-coordinate'][jatom] - XYZ['x-coordinate'][iatom]
+                distance_ab_x  = coordinates_XYZ[files_xyz[ifile]]['x-coordinate'][jatom]\
+                                - coordinates_XYZ[files_xyz[ifile]]['x-coordinate'][iatom]
                 distance_ab_x *= distance_ab_x
-                distance_ab_y = XYZ['y-coordinate'][jatom] - XYZ['y-coordinate'][iatom]
+                distance_ab_y  = coordinates_XYZ[files_xyz[ifile]]['y-coordinate'][jatom]\
+                                - coordinates_XYZ[files_xyz[ifile]]['y-coordinate'][iatom]
                 distance_ab_y *= distance_ab_y
-                distance_ab_z = XYZ['z-coordinate'][jatom] - XYZ['z-coordinate'][iatom]
+                distance_ab_z  = coordinates_XYZ[files_xyz[ifile]]['z-coordinate'][jatom]\
+                                - coordinates_XYZ[files_xyz[ifile]]['z-coordinate'][iatom]
                 distance_ab_z *= distance_ab_z
-                temporal_R_Matrix[jatom,iatom] =\
-                    np.sqrt(distance_ab_x+distance_ab_y+distance_ab_z)
-        df = pd.DataFrame(temporal_R_Matrix)
+                temporal_R_Matrix[jatom][iatom] =\
+                    np.sqrt(distance_ab_x+distance_ab_y+distance_ab_z)  #Distance between atoms
+        df=pd.DataFrame(temporal_R_Matrix,columns=[label])
+        #first column
+        df.insert(loc=0, column='atom', value=coordinates_XYZ[files_xyz[ifile]]['element'])
         #Save distance matrix in dictonary
         R_Matrix[files_xyz[ifile]] = df
     return R_Matrix
