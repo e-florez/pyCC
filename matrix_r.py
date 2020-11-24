@@ -27,9 +27,11 @@ def Distance_Matrix(files_xyz,coordinates_XYZ):
         temporal_R_Matrix = np.zeros((natoms,natoms),dtype=float)
         label=[]
         #Computing distance matrix
-        for iatom in range(natoms):
-            label.append(coordinates_XYZ[files_xyz[ifile]]['element'][iatom]) #Columns' header of dataframe
-            for jatom in range(natoms):
+        for iatom in range(natoms): #Colums
+            #Labels of columns and rows : str(element) + str(iatom)
+            label.append(coordinates_XYZ[files_xyz[ifile]]['element'][iatom] + str(iatom))
+            jatom = iatom
+            while jatom < natoms: #Rows
                 distance_ab_x  = coordinates_XYZ[files_xyz[ifile]]['x-coordinate'][jatom]\
                                 - coordinates_XYZ[files_xyz[ifile]]['x-coordinate'][iatom]
                 distance_ab_x *= distance_ab_x
@@ -39,13 +41,19 @@ def Distance_Matrix(files_xyz,coordinates_XYZ):
                 distance_ab_z  = coordinates_XYZ[files_xyz[ifile]]['z-coordinate'][jatom]\
                                 - coordinates_XYZ[files_xyz[ifile]]['z-coordinate'][iatom]
                 distance_ab_z *= distance_ab_z
+                #Distance between atoms
                 temporal_R_Matrix[jatom][iatom] =\
-                    np.sqrt(distance_ab_x+distance_ab_y+distance_ab_z)  #Distance between atoms
+                    np.sqrt(distance_ab_x+distance_ab_y+distance_ab_z)
+                #Symmetric term
+                temporal_R_Matrix[iatom][jatom] = temporal_R_Matrix[jatom][iatom]
+                jatom += 1
+        #Dateframe with distances
         df=pd.DataFrame(temporal_R_Matrix,columns=[label])
-        #first column
-        df.insert(loc=0, column='atom', value=coordinates_XYZ[files_xyz[ifile]]['element'])
-        #Save distance matrix in dictonary
+        #First column of df
+        df.insert(loc=0, column='atom', value=np.transpose(label))
+        #Save df in dictonary
         R_Matrix[files_xyz[ifile]] = df
+        print(R_Matrix[files_xyz[ifile]])
     return R_Matrix
 #---------------------------------------------------------#
 # -End: Build Distance Matrix to each .xyz                #
