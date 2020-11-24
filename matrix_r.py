@@ -28,8 +28,8 @@ def Distance_Matrix(files_xyz,coordinates_XYZ):
         label=[]
         #Computing distance matrix
         for iatom in range(natoms): #Colums
-            #Labels of columns and rows : str(element) + str(iatom)
-            label.append(coordinates_XYZ[files_xyz[ifile]]['element'][iatom] + str(iatom))
+            #Labels of columns and rows
+            label.append(coordinates_XYZ[files_xyz[ifile]]['element'][iatom])
             jatom = iatom
             while jatom < natoms: #Rows
                 distance_ab_x  = coordinates_XYZ[files_xyz[ifile]]['x-coordinate'][jatom]\
