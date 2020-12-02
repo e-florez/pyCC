@@ -78,10 +78,10 @@ if __name__ == '__main__':
     # - EDISON: Multihistogram analysis for bond ditribution
 
     # - grid to do a histogram analysis, rmin, rmax and bin width
-    grid = (0.5, 3.0, 0.01)
+    grid = (0.5, 3.7, 0.01)
 
     # - atomic pairs
-    atom_pair = ['Hg', 'O']
+    atom_pair = ['O', 'H']
 
     # - distance matrix
     distances = coordinates_XYZ

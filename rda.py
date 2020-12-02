@@ -29,17 +29,19 @@ def rda(distances, atom_pair, grid):
     rmin, rmax, dr = grid
 
     print('\n\n --------------STARTING HERE---------------------- \n\n')
-    
+
     for xyz in distances:
         df = distances[xyz]
 
-        print('\n NEW-------- \n')
+        print(df)
 
         new_df = df[df['atoms'] == atom_pair[0]]
 
-        print(f'\n File {xyz}, pair: ' + '-'.join(atom_pair) + '\n')
+        print('\n NEW-------- \n')
 
-        # print(new_df[atom_pair[1]])
+        print(new_df)
+
+        print(f'\n FILE {xyz}, pair: ' + '-'.join(atom_pair) + '\n')
 
         new_df = new_df[atom_pair[1]]
 
@@ -49,9 +51,17 @@ def rda(distances, atom_pair, grid):
 
         last_df = new_df[(new_df > rmin) & (new_df < rmax)]
 
-        last_df = pd.DataFrame(last_df)
+        # last_df = pd.DataFrame(last_df)
 
         print(last_df)
+
+        # - getting indexes for ROWS
+        print('\n First atoms index (rows) \n')
+        print(last_df.index.to_list())
+
+        # - getting indexes for COLUMNS
+        print('\n Second atoms index (COLUMNS) \n')
+        print(last_df.columns == atom_pair[1])
 
         # last_df = last_df.to_string(index=False)
 
@@ -64,5 +74,5 @@ def rda(distances, atom_pair, grid):
 
         # for
 
-        print('---')
+        print(' \n\n *** XXXXXXXXXX ***\n\n')
         # break
