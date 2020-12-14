@@ -90,6 +90,6 @@ if __name__ == '__main__':
 
     matrix_d = distance_matrix.distance_matrix(distances, grid)
 
-    import rda
+    import rda_np
 
-    rda.rda(matrix_d, atom_pair, grid)
+    rda_np.rda(matrix_d, atom_pair, grid)
