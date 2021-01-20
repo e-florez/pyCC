@@ -36,11 +36,15 @@ def rda(distances, atom_pair, grid):
         df = distances[xyz]
         print(df)
 
+        df2 = df.loc[:, df.columns == 'atoms']
+
         # - from pandas DF to numpy array
+        df = df.loc[:, df.columns != 'atoms']
+
         df = df.to_numpy()
 
         print(f'\n *********** \n')
-        print(df)
+        print(df2)
 
         print(' \n\n *** XXXXXXXXXX ***\n\n')
         # break

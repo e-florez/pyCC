@@ -71,12 +71,15 @@ def distance_matrix(distances, grid):
                 atom_b += 1
             atom_a += 1
 
-        df = pd.DataFrame(distance_matrix
-                          #   columns=header_distance_matrix
-                          )
+        df = pd.DataFrame(distance_matrix)
 
-        # df.insert(0, 'atoms', header_distance_matrix, True)
+        # # - inserting columns' name
+        # df.columns = header_distance_matrix
+
+        # - inserting rows' name
+        df.insert(0, 'atoms', header_distance_matrix, True)
 
         matrix_d[xyz] = df
+        # matrix_d[xyz] = distance_matrix
 
     return matrix_d

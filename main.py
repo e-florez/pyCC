@@ -73,7 +73,7 @@ if __name__ == '__main__':
     # - ANDY: Computing matrix distance for each XYZ and create a
     #   dictionary whit a panda data frame with all distances between
     #   all possible atomic pairs
-    R_Matrix = matrix_r.Distance_Matrix(files_xyz, coordinates_XYZ)
+    # R_Matrix = matrix_r.Distance_Matrix(files_xyz, coordinates_XYZ)
 
     # - EDISON: Multihistogram analysis for bond ditribution
 
@@ -90,6 +90,6 @@ if __name__ == '__main__':
 
     matrix_d = distance_matrix.distance_matrix(distances, grid)
 
-    import rda_np
+    import rda
 
-    rda_np.rda(matrix_d, atom_pair, grid)
+    rda.rda(matrix_d, atom_pair, grid)
