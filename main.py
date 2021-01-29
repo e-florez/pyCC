@@ -78,18 +78,20 @@ if __name__ == '__main__':
     # - EDISON: Multihistogram analysis for bond ditribution
 
     # - grid to do a histogram analysis, rmin, rmax and bin width
-    grid = (0.5, 3.7, 0.01)
+    # grid = (0.5, 3.7, 0.01)
+    grid = (0.5, 3.0, 0.01)
 
     # - atomic pairs
-    atom_pair = ['O', 'H']
+    input_pair = ['Hg', 'O', 'H']
 
     # - distance matrix
-    distances = coordinates_XYZ
-
     import distance_matrix
+    distances_dict = distance_matrix.distance_matrix(coordinates_XYZ, grid)
 
-    matrix_d = distance_matrix.distance_matrix(distances, grid)
+    # - loop over each XYZ file
+    for xyz in distances_dict:
+        distances = distances_dict[xyz]
 
-    import rda
-
-    rda.rda(matrix_d, atom_pair, grid)
+        # - getting atoms list to compute distance, angle or dihedral
+        import atoms_index_list
+        atoms_index_list.atoms_index_list(distances, input_pair, grid)

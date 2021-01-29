@@ -11,7 +11,7 @@
 # Main body
 # ------------------------------------------------------------------------------------
 
-def neighbors_atoms_pair(df, input_pair, rmin, rmax):
+def neighbors_atoms_pair(distance_matrix, input_pair, rmin, rmax):
     import pandas as pd
 
     """
@@ -31,10 +31,10 @@ def neighbors_atoms_pair(df, input_pair, rmin, rmax):
         # return atoms_pair 
     
     # - distances matrix (no atoms or labels)
-    df_dist = df.loc[:, df.columns != 'atoms']
+    df_dist = distance_matrix.loc[:, distance_matrix.columns != 'atoms']
 
     # - filtering atoms labels (one column)
-    df_label = df.loc[:, df.columns == 'atoms']
+    df_label = distance_matrix.loc[:, distance_matrix.columns == 'atoms']
 
     # - filtering for the each atom from the input pair
     df_first_atom= df_label[df_label['atoms'] == input_pair[0]]
@@ -54,6 +54,7 @@ def neighbors_atoms_pair(df, input_pair, rmin, rmax):
                 atoms_pair.append((atom_a, atom_b))
 
     return atoms_pair
+# ---------------------------------------------------------------------------------------
 
 
 def atoms_index_list(distances, input_pair, grid):
@@ -68,10 +69,23 @@ def atoms_index_list(distances, input_pair, grid):
 
     rmin, rmax, dr = grid
     
-    for xyz in distances:
-        df = distances[xyz]
+    n = 0
+    while n < (len(input_pair) - 1):        
         
-        atoms_pair = neighbors_atoms_pair(df, input_pair, rmin, rmax)
+        pair = []
+        if n == 2:
+            # - only for dihedral [A, B, C, D] to get [A, B]; [B, C]; [B, D] (instead of [C, D])
+            pair.append(input_pair[n-1])
+            pair.append(input_pair[n+1])
+        else:
+            pair.append(input_pair[n])
+            pair.append(input_pair[n+1])        
+        
+        print(f'\n {pair}')
+        
+        atoms_pair = neighbors_atoms_pair(distances, pair, rmin, rmax)
         
     
-    print(atoms_pair)
+        print(atoms_pair)
+        
+        n += 1

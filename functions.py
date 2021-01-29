@@ -143,7 +143,7 @@ def reading_files_xyz(working_dir):
     count = 0
     columns = 4
     while count < len(list_xyz):
-        print(f'\t'.join(list_xyz[count:count + columns]))
+        print(f'\t' + f'\t'.join(list_xyz[count:count + columns]))
 
         count += columns
 
@@ -183,7 +183,7 @@ def what_xyz_files(files_list_xyz, working_dir):
         input_list = input_list.split(',')
 
         if len(input_list[0]) == 0 or input_list[0].lower().strip() == 'all':
-            return files_list_xyz
+            files_list = list(files_list_xyz)
 
         else:
 
@@ -203,6 +203,16 @@ def what_xyz_files(files_list_xyz, working_dir):
         # - EXITING with a not empty list
         if len(files_list) > 0:
             break
+        
+    print(f'\tworking files:')
+    count = 0
+    columns = 4
+    while count < len(files_list):
+        print(f'\t' + f'\t'.join(files_list[count:count + columns]))
+
+        count += columns
+        
+    print()
 
     return files_list
 # ---------------------------------------------------------------------------------------
