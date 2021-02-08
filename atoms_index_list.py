@@ -15,7 +15,7 @@ def neighbors_atoms_pair(distance_matrix, input_pair, rmin, rmax):
     import pandas as pd
 
     """
-    Finding pair of atoms into a regind definded by rmin and rmax 
+    Finding pair of atoms, neighborhood definded by rmin and rmax 
 
     Args:
         distance (dict): dict with a matrix distance for each XYZ file
@@ -52,40 +52,165 @@ def neighbors_atoms_pair(distance_matrix, input_pair, rmin, rmax):
 
             if (rmin <= distance) and (distance <= rmax):
                 atoms_pair.append((atom_a, atom_b))
+                # atoms_pair.append((atom_a+1, atom_b+1))
 
     return atoms_pair
 # ---------------------------------------------------------------------------------------
 
 
-def atoms_index_list(distances, input_pair, grid):
+def atoms_index_list(distances, input_list, grid):
     """
+    For a list of max 4 elements: bond distance [A, B]; bond angle [A, B, C]; and 
+    dihedral angle [A, B, C, D], we split every list in pairs and compute which of them
+    are into rmin, rmax. 
+
+    WARNING: input_list order MATTER! [A, B, C] != [A, C, B]
+    
+    For instance,
+        input: [A, B, C] splits into [A, B] and [B, C] to find neighbors and returns
+        atoms index for those between rmin, rmax
 
     Args:
+        distance (dataframe): distances matrix for each XYZ file
+        input_list (list [str]): list of atoms to define neighbors
+        grid (3D tuple [float]): min and max distance and bind width to do the histogram
+
 
     Return:
 
     """
     
+    print(f'-'*30)
 
     rmin, rmax, dr = grid
     
+    list_atoms_index = []
     n = 0
-    while n < (len(input_pair) - 1):        
+    while n < (len(input_list) - 1):        
         
         pair = []
         if n == 2:
             # - only for dihedral [A, B, C, D] to get [A, B]; [B, C]; [B, D] (instead of [C, D])
-            pair.append(input_pair[n-1])
-            pair.append(input_pair[n+1])
+            pair.append(input_list[n-1])
+            pair.append(input_list[n+1])
         else:
-            pair.append(input_pair[n])
-            pair.append(input_pair[n+1])        
-        
-        print(f'\n {pair}')
-        
-        atoms_pair = neighbors_atoms_pair(distances, pair, rmin, rmax)
-        
-    
-        print(atoms_pair)
+            pair.append(input_list[n])
+            pair.append(input_list[n+1])        
         
         n += 1
+        
+        atoms_pair = neighbors_atoms_pair(distances, pair, rmin, rmax)
+
+        print(f'\n {pair}')
+        print(atoms_pair)
+        
+        # - list of lists (max 3 lists), for each pair we have a list of index
+        list_atoms_index.append(atoms_pair)
+        
+    # - the first list has a key atom (pivot). For [A, B, C] or [A, B, C, D], 
+    #   'B' is pivot atom (which defines the angle)
+    firts_list = list_atoms_index[0]
+    
+    # list of tuples to compute distances, angle or dihedrals
+    index_to_return = []
+    
+    # - avoiding equivalent trends; i.e., 
+    #   [A, B] is equivalent to [B, A]
+    #   [A, B, C] is equivalent to [C, B, A]
+    #   [A, B, C, D] is equivalent to [A, B, D, C] 
+    duplicates_list = []
+    
+    
+    
+    
+    atoms_index = []
+    
+    
+
+    for first_pair in firts_list:
+   
+        pivot_atom = first_pair[1]
+        left_atom = first_pair[0]
+        
+                
+        # - looking for connection through pivot atom; i.e., 
+        #   for [A, B] (first_pair) we use 'B' (pivot) to look
+        #   on [B, C] (pair_list) and group them to [A, B, C].
+        #   for [A, B] (first_pair), where left_atom: 'A', pivot_atom: 'B'
+        for pair1 in list_atoms_index[1]: 
+        
+            # - getting index for the list of atoms to return
+            #   pair = [B, C], then pivot must be iqual to 'B'
+            #   and left_atom must not be iqual to C
+            if (pivot_atom == pair1[0] and left_atom != pair1[1]):
+
+
+
+                
+                # - only for dihedral
+                if len(list_atoms_index) > 2:
+                    for pair2 in list_atoms_index[2]:
+                        
+                        if (pivot_atom == pair2[0] and left_atom != pair2[1] 
+                            and pair1[1] != pair2[1]):
+                            
+                            
+                            indexes = [left_atom+1, pivot_atom+1,
+                                           pair1[1]+1, pair2[1]+1]
+                            indexes_rev = [left_atom+1, pivot_atom+1, 
+                                               pair2[1]+1, pair1[1]+1]
+
+                            atoms_index.append(indexes)   
+                            
+                        else:
+                            pass ################ Warning! no atom found for dihedral
+                        
+                else:                  
+                    indexes = [left_atom+1, pivot_atom+1, pair1[1]+1]
+                    indexes_rev = [pair1[1]+1, pivot_atom+1, left_atom+1]
+
+                    atoms_index.append(indexes)   
+                         
+         
+         
+         
+                if indexes not in duplicates_list:
+                    duplicates_list.append(indexes)
+                    duplicates_list.append(indexes_rev)
+                    index_to_return.append(atoms_index)
+
+
+
+            # atoms_index = [(x+1) for x in atoms_index]
+
+            # index_result = tuple(atoms_index)
+            
+            # print(f'index: {atoms_index}')
+            
+                
+            # # - deleting duplicates
+            # if len(atoms_index) == 4:
+            #     # - len([A, B, C, D]) iqual four means dihedral angle; i.e.,
+            #     #   [A, B, C, D] is equivalent to [A, B, D, C]            
+            #     duplicates_list.append(index_result[:2])  # reversed
+            #     duplicates_list.append(index_result[-1])  # reversed
+            #     duplicates_list.append(index_result[-2])  # reversed
+            # else:
+            #     # - len([A, B, C]) iqual three means plane angle; i.e., 
+            #     #   [A, B] is equivalent to [B, A]
+            #     #   [A, B, C] is equivalent to [C, B, A]
+            #     duplicates_list.append(index_result[::-1])  # reversed
+
+            # if index_result not in duplicates_list:
+            #     duplicates_list.append(index_result) 
+            #     index_to_return.append(tuple(index_result))
+
+            # atoms_index = []
+
+        
+
+        
+    print(f'\n***********')
+    print(f'results: {index_to_return}')
+        
+    print(f'\n XXXXXXXXXXXXXX \n')

@@ -82,7 +82,8 @@ if __name__ == '__main__':
     grid = (0.5, 3.0, 0.01)
 
     # - atomic pairs
-    input_pair = ['Hg', 'O', 'H']
+    # input_pair = ['Hg', 'O', 'H']
+    input_pair = ['Hg', 'O', 'H', 'H']
 
     # - distance matrix
     import distance_matrix
