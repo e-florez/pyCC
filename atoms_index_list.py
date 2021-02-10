@@ -150,6 +150,7 @@ def atoms_index_list(distances, input_list, grid):
                     atoms_index = [left_atom, pivot_atom, pair1[1]]
                     atoms_index_rev = [pair1[1], pivot_atom, left_atom]
 
+                # - avoiding duplicates
                 if atoms_index not in duplicates_list:
                     duplicates_list.append(atoms_index)
                     duplicates_list.append(atoms_index_rev)

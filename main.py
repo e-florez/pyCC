@@ -102,7 +102,8 @@ if __name__ == '__main__':
         # - dictionary with atoms index according to input list
         index_dict[xyz] = atoms_index
 
-        # @@@@ - index starts at zero.
+        # @@@ -----------------------------------------------
+        # - index starts at zero.
         tmp = []
         for t in atoms_index:
             tmp2 = []
@@ -115,5 +116,15 @@ if __name__ == '__main__':
         # print(atoms_index)
         print(tmp)
         print('\n\n')
+        # @@@ -----------------------------------------------
 
     # - histogram analysis
+    if len(input_list) == 2:
+        # - bond distance analysis; i.e., input_list = [A, B]
+        pass
+    elif len(input_list) == 3:
+        # - anglular analysis; i.e., input_list = [A, B, C]
+        pass
+    elif len(input_list) == 4:
+        # - dihedral analysis; i.e., input_list = [A, B, C, D]
+        pass
