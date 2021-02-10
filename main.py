@@ -85,18 +85,35 @@ if __name__ == '__main__':
     distances_dict = distance_matrix.distance_matrix(coordinates_XYZ, grid)
 
     # - atomic pairs
-    # input_pair = ['H', 'O']
-    # input_pair = ['H', 'O', 'H']
-    input_pair = ['Hg', 'O', 'H', 'H']
+    input_list = ['H', 'O']
+    # input_list = ['H', 'O', 'H']
+    # input_list = ['Hg', 'O', 'H', 'H']
 
-    # - loop over each XYZ file
+    # - loop over each XYZ file to get atoms index
+    index_dict = {}
     for xyz in distances_dict:
         distances = distances_dict[xyz]
 
         # - getting atoms list to compute distance, angle or dihedral
         import atoms_index_list
-        abc = atoms_index_list.atoms_index_list(distances, input_pair, grid)
+        atoms_index = atoms_index_list.atoms_index_list(
+            distances, input_list, grid)
 
-print(f'requiring: {input_pair}\n')
-print(abc)
-print('\n\n')
+        # - dictionary with atoms index according to input list
+        index_dict[xyz] = atoms_index
+
+        # @@@@ - index starts at zero.
+        tmp = []
+        for t in atoms_index:
+            tmp2 = []
+            for s in t:
+                tmp2.append(s+1)
+            tmp.append(tuple(tmp2))
+
+        print(f'file: {xyz}')
+        print(f'requiring: {input_list}\n')
+        # print(atoms_index)
+        print(tmp)
+        print('\n\n')
+
+    # - histogram analysis
