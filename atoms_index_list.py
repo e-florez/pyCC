@@ -157,3 +157,43 @@ def atoms_index_list(distances, input_list, grid):
                     index_to_return.append(tuple(atoms_index))
 
     return index_to_return
+# ---------------------------------------------------------------------------------------
+
+
+def atoms_index_dict(distances_dict, input_list, grid):
+    """
+
+    Args:
+
+    Return:
+
+    """
+    # - loop over each XYZ file to get atoms index
+    index_dict = {}
+    for xyz in distances_dict:
+        distances = distances_dict[xyz]
+
+        # - getting atoms list to compute distance, angle or dihedral
+        atoms_index = atoms_index_list(distances, input_list, grid)
+
+        # - dictionary with atoms index according to input list
+        index_dict[xyz] = atoms_index
+
+        # # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+        # # - index starts at zero.
+        # tmp = []
+        # for t in atoms_index:
+        #     tmp2 = []
+        #     for s in t:
+        #         tmp2.append(s+1)
+        #     tmp.append(tuple(tmp2))
+
+        # print(f'file: {xyz}')
+        # print(f'requiring: {input_list}\n')
+        # # print(atoms_index)
+        # print(tmp)
+        # print('\n\n')
+        # # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+    return index_dict
+# ---------------------------------------------------------------------------------------

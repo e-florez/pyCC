@@ -19,10 +19,12 @@
 # ------ Preamble
 # ------------------------------------------------------------------------------------
 # Description:
-
-import matrix_r  # module to calculate of matriz distance
-import sys  # module to recognise input argument form terminal (sys.argv)
 import functions  # module with all the individuals function to do analysis
+import sys  # module to recognise input argument form terminal (sys.argv)
+import matrix_r  # module to calculate of matriz distance
+import numpy as np
+
+
 message = """
 
 **********************************************************
@@ -44,6 +46,7 @@ print(message)
 # ------------------------------------------------------------------------------------
 # ------ modules
 # ------------------------------------------------------------------------------------
+
 # ------------------------------------------------------------------------------------
 # ------ Main body
 # ------------------------------------------------------------------------------------
@@ -78,7 +81,11 @@ if __name__ == '__main__':
     # - EDISON: Multihistogram analysis for bond ditribution
 
     # - grid to do a histogram analysis, rmin, rmax and bin width
-    grid = (0.5, 3.0, 0.01)
+    grid = (0.6, 3.5, 0.05)
+
+    # - number of bins for the accurences
+    rmin, rmax, dr = grid
+    nbins = int((rmax - rmin) / dr)
 
     # - distance matrix
     import distance_matrix
@@ -89,43 +96,73 @@ if __name__ == '__main__':
     # input_list = ['H', 'O', 'H']
     # input_list = ['Hg', 'O', 'H', 'H']
 
-    # - loop over each XYZ file to get atoms index
-    index_dict = {}
-    for xyz in distances_dict:
-        distances = distances_dict[xyz]
-
-        # - getting atoms list to compute distance, angle or dihedral
-        import atoms_index_list
-        atoms_index = atoms_index_list.atoms_index_list(distances, input_list, grid)
-
-        # - dictionary with atoms index according to input list
-        index_dict[xyz] = atoms_index
-
-        # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-        # - index starts at zero.
-        tmp = []
-        for t in atoms_index:
-            tmp2 = []
-            for s in t:
-                tmp2.append(s+1)
-            tmp.append(tuple(tmp2))
-
-        print(f'file: {xyz}')
-        print(f'requiring: {input_list}\n')
-        # print(atoms_index)
-        print(tmp)
-        print('\n\n')
-        # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    # - getting atoms list to compute distance, angle or dihedral
+    import atoms_index_list
+    index_dict = atoms_index_list.atoms_index_dict(
+        distances_dict, input_list, grid)
 
     # - histogram analysis
+    import histogram
     if len(input_list) == 2:
-        # - bond distance analysis; i.e., input_list = [A, B]
-        import rda
-        rda.rda(index_dict, distances_dict, grid)
+
+        # - radial (bond) distribution analysis (RDA); i.e., input_list = [A, B]
+        histogram = histogram.rda(index_dict, distances_dict, grid, nbins)
+
+        # - saving histogram
+        bond_distance = np.linspace(rmin, rmax, nbins)
+        pair = f'-'.join(input_list)
+
+        # if sum(histogram) > 0:
+        histogram_name = 'rda_' + pair + '.dat'
+        np.savetxt(histogram_name, np.transpose([bond_distance, histogram]),
+                   delimiter=' ',
+                   header='distance [Angstrom]   occurrence (total=%i)'
+                   % sum(histogram),
+                   fmt='%.6f %28i')
 
     elif len(input_list) == 3:
-        # - anglular analysis; i.e., input_list = [A, B, C]
-        pass
+        # - anglular distribution analysis (ADA); i.e., input_list = [A, B, C]
+
+        # - grid = 0.1 --> 1800 = (180 - 0)/0.1
+        delta_angle = 5.0
+        min_angle = 0
+        max_angle = 190
+        nbins = int((max_angle - min_angle) / delta_angle)
+
+        histogram = histogram.ada(
+            index_dict, coordinates_XYZ, delta_angle, nbins)
+
+        # - saving histogram
+        angle_distribution = np.linspace(min_angle, max_angle, nbins)
+        pair = f'-'.join(input_list)
+
+        histogram_name = 'ada_' + pair + '.dat'
+        np.savetxt(histogram_name, np.transpose([angle_distribution, histogram]),
+                   delimiter=' ',
+                   header='angle [Degrees]   occurrence (total=%i)'
+                   % sum(histogram),
+                   fmt='%.6f %28i')
+
     elif len(input_list) == 4:
         # - dihedral analysis; i.e., input_list = [A, B, C, D]
-        pass
+
+        # grid = 0.1 --> 3600 = (3600 - 0)/0.1
+        delta_angle = 5.0
+        min_angle = 0
+        max_angle = 360
+
+        nbins = int((max_angle - min_angle) / delta_angle)
+
+        histogram = histogram.dada(
+            index_dict, coordinates_XYZ, delta_angle, nbins)
+
+        # - saving histogram
+        angle_distribution = np.linspace(min_angle, max_angle, nbins)
+        pair = f'-'.join(input_list)
+
+        histogram_name = 'dada_' + pair + '.dat'
+        np.savetxt(histogram_name, np.transpose([angle_distribution, histogram]),
+                   delimiter=' ',
+                   header='angle [Degrees]   occurrence (total=%i)'
+                   % sum(histogram),
+                   fmt='%.6f %28i')
