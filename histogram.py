@@ -11,8 +11,6 @@
 # Main body
 # ------------------------------------------------------------------------------------
 
-import numpy
-
 
 def rda(index_dict, distances_dict, grid, nbins):
     import pandas as pd
@@ -89,25 +87,30 @@ def ada(index_dict, coordinates_XYZ, delta_angle, nbins):
         indexes = index_dict[xyz]
         df = coordinates_XYZ[xyz]
 
+        # print(indexes)
+
         # - distances matrix (no atoms or labels)
         coordinates = df.loc[:, df.columns != 'element']
 
-    for pair in indexes:
-        coordinates_A = coordinates.iloc[pair[0]]
-        atom_A = coordinates_A.to_numpy()
+        for pair in indexes:
+            coordinates_A = coordinates.iloc[pair[0]]
+            atom_A = coordinates_A.to_numpy()
 
-        coordinates_B = coordinates.iloc[pair[1]]
-        atom_B = coordinates_B.to_numpy()
+            coordinates_B = coordinates.iloc[pair[1]]
+            atom_B = coordinates_B.to_numpy()
 
-        coordinates_C = coordinates.iloc[pair[2]]
-        atom_C = coordinates_C.to_numpy()
+            coordinates_C = coordinates.iloc[pair[2]]
+            atom_C = coordinates_C.to_numpy()
 
-        # - computing angle A-B-C (using dot product)
-        angle_deg = angle(atom_A, atom_B, atom_C)
+            # - computing angle A-B-C (using dot product)
+            angle_deg = angle(atom_A, atom_B, atom_C)
 
-        angle_hit = int(round((angle_deg) / delta_angle))
-        if angle_hit > 0 and angle_hit < nbins:
-            occurrences[angle_hit] += 1
+            if angle_deg < 50:
+                print(xyz, indexes)
+
+            angle_hit = int(round((angle_deg) / delta_angle))
+            if angle_hit > 0 and angle_hit < nbins:
+                occurrences[angle_hit] += 1
 
     return occurrences
 # ---------------------------------------------------------------------------------------
@@ -134,25 +137,25 @@ def dada(index_dict, coordinates_XYZ, delta_angle, nbins):
         # - distances matrix (no atoms or labels)
         coordinates = df.loc[:, df.columns != 'element']
 
-    for pair in indexes:
-        coordinates_A = coordinates.iloc[pair[0]]
-        atom_A = coordinates_A.to_numpy()
+        for pair in indexes:
+            coordinates_A = coordinates.iloc[pair[0]]
+            atom_A = coordinates_A.to_numpy()
 
-        coordinates_B = coordinates.iloc[pair[1]]
-        atom_B = coordinates_B.to_numpy()
+            coordinates_B = coordinates.iloc[pair[1]]
+            atom_B = coordinates_B.to_numpy()
 
-        coordinates_C = coordinates.iloc[pair[2]]
-        atom_C = coordinates_C.to_numpy()
+            coordinates_C = coordinates.iloc[pair[2]]
+            atom_C = coordinates_C.to_numpy()
 
-        coordinates_D = coordinates.iloc[pair[3]]
-        atom_D = coordinates_D.to_numpy()
+            coordinates_D = coordinates.iloc[pair[3]]
+            atom_D = coordinates_D.to_numpy()
 
-        # - computing dihedral angle A-B-C-D
-        angle_deg = dihedral.dihedral(atom_A, atom_B, atom_C, atom_D)
+            # - computing dihedral angle A-B-C-D
+            angle_deg = dihedral.dihedral(atom_A, atom_B, atom_C, atom_D)
 
-        angle_hit = int(round((angle_deg) / delta_angle))
-        if angle_hit > 0 and angle_hit < nbins:
-            occurrences[angle_hit] += 1
+            angle_hit = int(round((angle_deg) / delta_angle))
+            if angle_hit > 0 and angle_hit < nbins:
+                occurrences[angle_hit] += 1
 
     return occurrences
 # ---------------------------------------------------------------------------------------

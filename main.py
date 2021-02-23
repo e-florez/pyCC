@@ -80,7 +80,7 @@ if __name__ == '__main__':
 
     # - EDISON: Multihistogram analysis for bond ditribution
 
-    #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
     # - grid to do a histogram analysis, rmin, rmax and bin width
     grid = (0.6, 3.5, 0.05)
@@ -94,21 +94,20 @@ if __name__ == '__main__':
     distances_dict = distance_matrix.distance_matrix(coordinates_XYZ, grid)
 
     # - atomic pairs
-    input_list = ['H', 'O']
-    input_list = ['H', 'O', 'H']
-    # input_list = ['O', 'H', 'O']     # Stern-Limbach
-    input_list = ['Hg', 'O', 'H', 'H']
+    # input_list = ['H', 'O']
+    # input_list = ['O', 'H']
+    # input_list = ['H', 'O', 'H']
+    # input_list = ['O', 'Hg', 'O']
+    input_list = ['O', 'H', 'O']     # Stern-Limbach
+    # input_list = ['Hg', 'O', 'H', 'H']
 
     # - getting atoms list to compute distance, angle or dihedral
     import atoms_index_list
-    index_dict = atoms_index_list.atoms_index_dict(distances_dict, input_list, grid)
-
-
-
+    index_dict = atoms_index_list.atoms_index_dict(
+        distances_dict, input_list, grid)
 
     # # - Stern-Limbach analisys for atom tranfers
     # if len(input_list) == 3:
-        
 
     #     transfer_list = ["O", "H", "O"]
 
@@ -118,7 +117,7 @@ if __name__ == '__main__':
 
     #     for pair in pairs_q1_q2:
     #         natural_bond_coordinates.append(pair)
-            
+
     #         triplets = '-'.join(transfer_list)
     #         transfer_name = 'transfer_' + '-'.join(transfer_list) + '.dat'
 
@@ -135,8 +134,7 @@ if __name__ == '__main__':
     #     np.savetxt(transfer_name, natural_bond_coordinates,
     #             delimiter=' ', header='q1 [Angstrom]    q2 [Angstrom]',
     #             fmt='%15.10f %15.10f')
-        
-    
+
     # #@@@@@@@@@@@@@@@@@@@@@
     # exit()
 
@@ -150,7 +148,7 @@ if __name__ == '__main__':
         # - saving histogram
         bond_distance = np.linspace(rmin, rmax, nbins)
         pair = f'-'.join(input_list)
-        
+
         # if sum(histogram) > 0:
         histogram_name = 'rda_' + pair + '.dat'
         np.savetxt(histogram_name, np.transpose([bond_distance, histogram]),

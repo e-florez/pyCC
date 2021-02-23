@@ -101,12 +101,6 @@ def atoms_index_list(distances, input_list, grid):
 
         list_atoms_index.append(atoms_pair)
 
-    # - list of lists (max 3 lists), for each pair we have a list of index
-    if len(list_atoms_index) == 1:
-        # - bond distance
-        index_to_return = list(list_atoms_index[0])
-        return index_to_return
-
     # list of tuples to compute distances, angle or dihedrals
     index_to_return = []
 
@@ -115,6 +109,24 @@ def atoms_index_list(distances, input_list, grid):
     #   [A, B, C] is equivalent to [C, B, A]
     #   [A, B, C, D] is equivalent to [A, B, D, C]
     duplicates_list = []
+
+    # - list of lists (max 3 lists), for each pair we have a list of index
+    if len(list_atoms_index) == 1:
+        # - bond distance
+
+        # - avoiding duplicates
+        for pair0 in list_atoms_index[0]:
+
+            atoms_index = [pair0[0], pair0[1]]
+            atoms_index_rev = [pair0[1], pair0[0]]
+
+            # - avoiding duplicates
+            if atoms_index not in duplicates_list:
+                duplicates_list.append(atoms_index)
+                duplicates_list.append(atoms_index_rev)
+                index_to_return.append(tuple(atoms_index))
+
+        return index_to_return
 
     # - the first list has a key atom (pivot). For [A, B, C] or [A, B, C, D],
     #   'B' is pivot atom (which defines the angle)
