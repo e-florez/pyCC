@@ -83,7 +83,7 @@ if __name__ == '__main__':
     # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
     # - grid to do a histogram analysis, rmin, rmax and bin width
-    grid = (0.6, 3.5, 0.05)
+    grid = (0.6, 2.6, 0.05)
 
     # - number of bins for the accurences
     rmin, rmax, dr = grid
@@ -106,37 +106,77 @@ if __name__ == '__main__':
     index_dict = atoms_index_list.atoms_index_dict(
         distances_dict, input_list, grid)
 
-    # # - Stern-Limbach analisys for atom tranfers
-    # if len(input_list) == 3:
+    # - Stern-Limbach analisys for atom tranfers
+    if len(input_list) == 3:
 
-    #     transfer_list = ["O", "H", "O"]
+        import atoms_transfer as transfer
 
-    #     import atoms_transfer as transfer
+        transfer_list = list(input_list)
 
-    #     pairs_q1_q2 = transfer.atom_transfer(transfer_list, coordinates_XYZ, distances_dict)
+        natural_bond_coordinates = transfer.atom_transfer(
+            index_dict, input_list, distances_dict)
 
-    #     for pair in pairs_q1_q2:
-    #         natural_bond_coordinates.append(pair)
+        triplets = '-'.join(transfer_list)
+        transfer_name = 'transfer_' + '-'.join(transfer_list) + '.dat'
 
-    #         triplets = '-'.join(transfer_list)
-    #         transfer_name = 'transfer_' + '-'.join(transfer_list) + '.dat'
+        print(f'')
+        print(
+            f'Atoms transfer analysis ({triplets}) according to Stern-Limbach model (q1, q2):')
+        print(
+            f'Transfer of atoms {transfer_list[1]} ' +
+            f'between {transfer_list[0]} and {transfer_list[2]}, ' +
+            f'where q1=0.5*(r1-r2) and q2=r1+r2, ' +
+            f'r1: distance[{transfer_list[0]}{transfer_list[1]}] and r2: distance[{transfer_list[1]}{transfer_list[2]}]')
+        print(f'')
 
-    #     print(f'')
-    #     print(
-    #         f'Atoms transfer analysis ({triplets}) according to Stern-Limbach model (q1, q2):')
-    #     print(
-    #         f'Transfer of atoms {transfer_list[1]} ' +
-    #         f'between {transfer_list[0]} and {transfer_list[2]}, ' +
-    #         f'where q1=0.5*(r1-r2) and q2=r1+r2, ' +
-    #         f'r1: distance[{transfer_list[0]}{transfer_list[1]}] and r2: distance[{transfer_list[1]}{transfer_list[2]}]')
-    #     print(f'')
+        np.savetxt(transfer_name, natural_bond_coordinates,
+                   delimiter=' ', header='q1 [Angstrom]    q2 [Angstrom]',
+                   fmt='%15.10f %15.10f')
 
-    #     np.savetxt(transfer_name, natural_bond_coordinates,
-    #             delimiter=' ', header='q1 [Angstrom]    q2 [Angstrom]',
-    #             fmt='%15.10f %15.10f')
+        # ---------------------------------------------------------------------------
+        import matplotlib.pyplot as plt  # - plotting tools
+        # - Stern-Limbach plot
+        fig = plt.figure(figsize=(10, 8))  # inches WxH
+        # , fontweight='bold')
+        fig.suptitle(f'Stern-Limbach for {transfer_list[0]}-{transfer_list[1]}---{transfer_list[2]}', fontsize=20)
 
-    # #@@@@@@@@@@@@@@@@@@@@@
-    # exit()
+        ax1 = plt.subplot(111)
+        ax1.grid()
+
+        # - legends for the main plot
+        # , fontweight='bold')
+        plt.xlabel('q1=(r1-r2)/2 [Angstrom]', fontsize=18)
+        plt.ylabel('q2=r1+r2 [Angstrom]', fontsize=18)  # , fontweight='bold')
+
+        # - loading files to read and plot them
+        x, y = [], []
+        for q1, q2 in natural_bond_coordinates:
+            x.append(q1)
+            y.append(q2)
+
+        ax1.plot(x, y, 'o', label='Transfer %s--%s-----%s' %
+                 (transfer_list[0], transfer_list[1], transfer_list[2]))
+
+        ax1.xaxis.set_major_locator(plt.MaxNLocator(12))
+
+        # -----------------------------------------------------------
+        # - Ending the plot
+
+        plt.legend(loc=0)
+        # Put a legend below current axis
+        # plt.legend(loc='lower center', bbox_to_anchor=(1.32, 0.6, 0.0, 0.0),
+        # fancybox=True, shadow=True, ncol=1, fontsize=11)
+
+        # - Shrink current axis's height by 10% on the bottom
+        # box = ax1.get_position()
+        # ax1.set_position([box.x0, box.y0, box.width * 0.7, box.height])
+
+        # ---------------------------------------------------------------------------------------------------------
+        # - ENDING the plots
+        plt.show()
+
+    # @@@@@@@@@@@@@@@@@@@@@
+    exit()
 
     # - histogram analysis
     import histogram
