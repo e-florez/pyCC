@@ -59,13 +59,11 @@ def atom_transfer(index_dict, input_list, distances_dict):
             r2 = distances_df.iloc[pair[1], pair[2]]
 
             # - atoms transfer analysis compute q1 = 0.5 * (r1 - r2) and q2 = r1 + r2
-            q1 = 0.5 * (r1 - r2)
+            q1 = 0.5 * (r2 - r1)
             q2 = r1 + r2
 
-            if q2 > 3.4:
-                print(xyz, [x+1 for x in pair], q2)
-                print(r1, r2)
-                print()
+            if r2 > 2.0:
+                continue
 
             if q2 < 3.5:
                 natural_bond_coordinates.append((q1, q2))

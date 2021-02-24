@@ -83,7 +83,7 @@ if __name__ == '__main__':
     # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
     # - grid to do a histogram analysis, rmin, rmax and bin width
-    grid = (0.6, 2.6, 0.05)
+    grid = (0.5, 2.0, 0.05)
 
     # - number of bins for the accurences
     rmin, rmax, dr = grid
