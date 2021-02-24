@@ -38,12 +38,7 @@ def atom_transfer(index_dict, input_list, distances_dict):
     Returns:
         natural_bond_coordinates [(q1, q2) type: floats]:  list of tuples q1, q2 (floats)
     """
-
-    max_distance = 2.0
-    min_distance = 0.5
-
-    # last_result = {}
-    natural_bond_coordinates = []
+    q1_q2_coordinates = []
 
     for xyz in index_dict:
         indexes = index_dict[xyz]
@@ -52,23 +47,15 @@ def atom_transfer(index_dict, input_list, distances_dict):
         # - distances matrix (no atoms or labels)
         distances_df = distances_df.loc[:, distances_df.columns != 'atoms']
 
-        # natural_bond_coordinates = []
-
         for pair in indexes:
             r1 = distances_df.iloc[pair[0], pair[1]]
             r2 = distances_df.iloc[pair[1], pair[2]]
 
             # - atoms transfer analysis compute q1 = 0.5 * (r1 - r2) and q2 = r1 + r2
-            q1 = 0.5 * (r2 - r1)
+            # q1 = np.abs(0.5 * (r2 - r1))
+            q1 = (0.5 * (r1 - r2))
             q2 = r1 + r2
 
-            if r2 > 2.0:
-                continue
+            q1_q2_coordinates.append((q1, q2))
 
-            if q2 < 3.5:
-                natural_bond_coordinates.append((q1, q2))
-
-        # last_result[xyz] = natural_bond_coordinates
-        last_result = natural_bond_coordinates
-
-    return last_result
+    return q1_q2_coordinates
