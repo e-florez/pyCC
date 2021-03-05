@@ -14,7 +14,7 @@
 # ------------------------------------------------------------------------------------
 
 
-def atom_transfer(index_dict, input_list, distances_dict):
+def stern_limbach(index_dict, input_list, distances_dict):
     import pandas as pd
     import numpy as np
 
@@ -59,3 +59,30 @@ def atom_transfer(index_dict, input_list, distances_dict):
             q1_q2_coordinates.append((q1, q2))
 
     return q1_q2_coordinates
+
+
+def atom_transfer(index_dict, input_list, distances_dict):
+    import numpy as np
+    """[summary]
+    """
+
+    input_list = list(input_list)
+
+    natural_bond_coordinates = stern_limbach(index_dict, input_list, distances_dict)
+
+    triplets = '-'.join(input_list)
+    transfer_name = 'transfer_' + '-'.join(input_list) + '.dat'
+
+    print(f'')
+    print(
+        f'Atoms transfer analysis ({triplets}) according to Stern-Limbach model (q1, q2):')
+    print(
+        f'Transfer of atoms {input_list[1]} ' +
+        f'between {input_list[0]} and {input_list[2]}, ' +
+        f'where q1=0.5*(r1-r2) and q2=r1+r2, ' +
+        f'r1: distance[{input_list[0]}{input_list[1]}] and r2: distance[{input_list[1]}{input_list[2]}]')
+    print(f'')
+
+    np.savetxt(transfer_name, natural_bond_coordinates,
+                delimiter=' ', header='q1 [Angstrom]    q2 [Angstrom]',
+                fmt='%15.10f %15.10f')

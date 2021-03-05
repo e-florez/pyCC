@@ -418,7 +418,7 @@ def format_xyz(file_xyz):
             elif line_number > 2:
                 # - checking length, four fields
                 try:
-                    assert len(values) == 4
+                    assert len(values) >= 4
                 except AssertionError as e:
                     error_message += '\n | Not enough data for elements and coordinates.'
                     error_message += '\n   It must be: (element, x, y, z)'
@@ -460,6 +460,7 @@ def format_xyz(file_xyz):
     if not error_message:
         df = pd.read_csv(file_xyz,
                          delim_whitespace=True,
+                         usecols=[0, 1, 2, 3],
                          skiprows=2,
                          header=None,
                          names=["element", "x-coordinate",

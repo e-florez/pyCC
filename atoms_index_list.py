@@ -26,10 +26,6 @@ def neighbors_atoms_pair(distance_matrix, input_pair, rmin, rmax):
         atoms_pair (list of 2D tuples [int]): list of atoms pair with a distance between rmin and rmax
     """
 
-    # - checking inputs
-    # if len(input_pair) != 2:
-    # return atoms_pair
-
     # - distances matrix (no atoms or labels)
     df_dist = distance_matrix.loc[:, distance_matrix.columns != 'atoms']
 
@@ -52,7 +48,6 @@ def neighbors_atoms_pair(distance_matrix, input_pair, rmin, rmax):
 
             if (rmin <= distance) and (distance <= rmax):
                 atoms_pair.append((atom_a, atom_b))
-                # atoms_pair.append((atom_a+1, atom_b+1))
 
     return atoms_pair
 # ---------------------------------------------------------------------------------------
@@ -80,28 +75,40 @@ def atoms_index_list(distances, input_list, grid):
 
     """
     rmin, rmax, dr = grid
+    
+    # - max number of elements is four; two for bond, three for angle an d three for dihedral
+    input_list = input_list[:4]
 
+    # - list of indexes 
     list_atoms_index = []
+    
+    # - splitting list into pair; i.e., for 
+    #   bond: [A, B] we get one pair [A, B]
+    #   angle: [A, B, C] we get two pairs [A, B] and [B, C] (B as a pivot)
+    #   dihedral: [A, B, C, D] we get three pairs [A, B], [B, C] and [B, D] (B as a pivot)
+    
+    # - max number of pair 
+    max_pair = range(len(input_list) - 1)
+    
     n = 0
-    while n < (len(input_list) - 1):
-
-        pair = []
-        if n == 2:
-            # - only for dihedral [A, B, C, D] to get [A, B]; [B, C]; [B, D] (instead of [C, D])
-            pair.append(input_list[n-1])
-            pair.append(input_list[n+1])
+    for n in max_pair:
+        if n < 2:
+            pair = [input_list[n], input_list[n+1]]
         else:
-            pair.append(input_list[n])
-            pair.append(input_list[n+1])
-
-        n += 1
+            # - only for dihedral [A, B, C, D] 
+            #   to get [A, B]; [B, C]; [B, D] (instead of [C, D])
+            pair = [input_list[n-1], input_list[n+1]]
 
         # - computing list of pair into a region
         atoms_pair = neighbors_atoms_pair(distances, pair, rmin, rmax)
 
+        # - list of lists (max 3 lists), for each pair we have a list of index
         list_atoms_index.append(atoms_pair)
 
-    # list of tuples to compute distances, angle or dihedrals
+    #--------------------------------
+    # - groupping these indexes 
+    
+    # - list of tuples to compute distances, angle or dihedrals
     index_to_return = []
 
     # - avoiding equivalent trends; i.e.,
@@ -110,17 +117,15 @@ def atoms_index_list(distances, input_list, grid):
     #   [A, B, C, D] is equivalent to [A, B, D, C]
     duplicates_list = []
 
-    # - list of lists (max 3 lists), for each pair we have a list of index
+    # - bond distance: only ONE list of pair is given
+    #   e.g. [A, B] gives [(1, 2), (2, 3), (5,6), ...] (only one list of several tuples)
     if len(list_atoms_index) == 1:
-        # - bond distance
 
         # - avoiding duplicates
-        for pair0 in list_atoms_index[0]:
+        for pair in list_atoms_index[0]:
+            atoms_index = [pair[0], pair[1]]
+            atoms_index_rev = [pair[1], pair[0]]
 
-            atoms_index = [pair0[0], pair0[1]]
-            atoms_index_rev = [pair0[1], pair0[0]]
-
-            # - avoiding duplicates
             if atoms_index not in duplicates_list:
                 duplicates_list.append(atoms_index)
                 duplicates_list.append(atoms_index_rev)
@@ -128,16 +133,12 @@ def atoms_index_list(distances, input_list, grid):
 
         return index_to_return
 
-    # - the first list has a key atom (pivot). For [A, B, C] or [A, B, C, D],
-    #   'B' is pivot atom (which defines the angle)
-    firts_list = list_atoms_index[0]
-
-    #   for [A, B] (first_pair) we use 'B' (pivot)
-    for first_pair in firts_list:
-
+    # - Angle: [A, B, C] we'd have TWO list of several tuple, one for [A, B] and another for [B, C]
+    #   first list has a key atom (pivot); 'B' is pivot atom (which defines the angle)
+    for first_pair in list_atoms_index[0]:
         #   for [A, B] (first_pair), left_atom: 'A', pivot_atom: 'B'
-        pivot_atom = first_pair[1]
         left_atom = first_pair[0]
+        pivot_atom = first_pair[1]
 
         # - looking for connection through pivot atom.
         for pair1 in list_atoms_index[1]:
@@ -145,22 +146,39 @@ def atoms_index_list(distances, input_list, grid):
             # - for pair [B, C], then pivot must be iqual to 'B'
             #   and left_atom must not be iqual to C
             if (pivot_atom == pair1[0] and left_atom != pair1[1]):
+                atoms_index = [left_atom, pivot_atom, pair1[1]]
+                atoms_index_rev = [pair1[1], pivot_atom, left_atom]
+                                
+                # - avoiding duplicates
+                if atoms_index not in duplicates_list:
+                    duplicates_list.append(atoms_index)
+                    duplicates_list.append(atoms_index_rev)
+                    index_to_return.append(tuple(atoms_index))
 
-                # - only for dihedral
-                if len(list_atoms_index) > 2:
-                    for pair2 in list_atoms_index[2]:
-
-                        if (pivot_atom == pair2[0]
-                            and left_atom != pair2[1]
-                                and pair1[1] != pair2[1]):
-
-                            atoms_index = [left_atom, pivot_atom,
-                                           pair1[1], pair2[1]]
-                            atoms_index_rev = [left_atom, pivot_atom,
-                                               pair2[1], pair1[1]]
-                else:
-                    atoms_index = [left_atom, pivot_atom, pair1[1]]
-                    atoms_index_rev = [pair1[1], pivot_atom, left_atom]
+    # - at this point we have triplets for angles
+    if len(list_atoms_index) > 2:
+        # - if we ask for dihedrals
+        # - clearing variables for dihedrals
+        duplicates_list = []
+        triplet_index = list(index_to_return)
+        index_to_return = []
+    else:
+        # - no dihedrals, then returns triplet to get only bond angle
+        return index_to_return
+   
+    # - Dihedral: [A, B, C, D] we'd have THREE list of several tuple, 
+    #   one for [A, B], one for [B, C] and another one for [B, D]
+    #   'B' is pivot atom (which defines the angle)
+    for triplet in triplet_index:
+        # - triplets: [A, B, C]
+        left = triplet[0]
+        pivot = triplet[1]
+        right = triplet[2]
+        
+        for pair in list_atoms_index[2]:
+            if (pivot == pair[0] and left != pair[1] and right != pair[1]):
+                atoms_index = [left, pivot, right, pair[1]]
+                atoms_index_rev = [left, pivot, pair[1], right]           
 
                 # - avoiding duplicates
                 if atoms_index not in duplicates_list:
@@ -190,22 +208,6 @@ def atoms_index_dict(distances_dict, input_list, grid):
 
         # - dictionary with atoms index according to input list
         index_dict[xyz] = atoms_index
-
-        # # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-        # # - index starts at zero.
-        # tmp = []
-        # for t in atoms_index:
-        #     tmp2 = []
-        #     for s in t:
-        #         tmp2.append(s+1)
-        #     tmp.append(tuple(tmp2))
-
-        # print(f'file: {xyz}')
-        # print(f'requiring: {input_list}\n')
-        # # print(atoms_index)
-        # print(tmp)
-        # print('\n\n')
-        # # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
     return index_dict
 # ---------------------------------------------------------------------------------------

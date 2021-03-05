@@ -83,7 +83,7 @@ if __name__ == '__main__':
     # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
     # - grid to do a histogram analysis, rmin, rmax and bin width
-    grid = (0.6, 2.5, 0.05)
+    grid = (0.5, 3.0, 0.05)
 
     # - number of bins for the accurences
     rmin, rmax, dr = grid
@@ -94,9 +94,9 @@ if __name__ == '__main__':
     distances_dict = distance_matrix.distance_matrix(coordinates_XYZ, grid)
 
     # - atomic pairs
-    # input_list = ['H', 'O']
+    # input_list = ['O', 'O']
     # input_list = ['O', 'H']
-    # input_list = ['H', 'O', 'H']
+    # input_list = ['Hg', 'O', 'H']
     # input_list = ['O', 'Hg', 'O']
     input_list = ['O', 'H', 'O']     # Stern-Limbach
     # input_list = ['Hg', 'O', 'H', 'H']
@@ -114,12 +114,12 @@ if __name__ == '__main__':
         histogram = histogram.rda(index_dict, distances_dict, grid, nbins)
 
         # - saving histogram
-        bond_distance = np.linspace(rmin, rmax, nbins)
+        distribution = np.linspace(rmin, rmax, nbins)
         pair = f'-'.join(input_list)
 
         # if sum(histogram) > 0:
         histogram_name = 'rda_' + pair + '.dat'
-        np.savetxt(histogram_name, np.transpose([bond_distance, histogram]),
+        np.savetxt(histogram_name, np.transpose([distribution, histogram]),
                    delimiter=' ',
                    header='distance [Angstrom]   occurrence (total=%i)'
                    % sum(histogram),
@@ -138,11 +138,11 @@ if __name__ == '__main__':
             index_dict, coordinates_XYZ, delta_angle, nbins)
 
         # - saving histogram
-        angle_distribution = np.linspace(min_angle, max_angle, nbins)
+        distribution = np.linspace(min_angle, max_angle, nbins)
         pair = f'-'.join(input_list)
 
         histogram_name = 'ada_' + pair + '.dat'
-        np.savetxt(histogram_name, np.transpose([angle_distribution, histogram]),
+        np.savetxt(histogram_name, np.transpose([distribution, histogram]),
                    delimiter=' ',
                    header='angle [Degrees]   occurrence (total=%i)'
                    % sum(histogram),
@@ -150,32 +150,10 @@ if __name__ == '__main__':
 
         #------------------------------------------------
         # - Stern-Limbach analisys for atom tranfers
-
         import atoms_transfer as transfer
+        transfer.atom_transfer(index_dict, input_list, distances_dict)
 
-        input_list = list(input_list)
-
-        natural_bond_coordinates = transfer.atom_transfer(
-            index_dict, input_list, distances_dict)
-
-        triplets = '-'.join(input_list)
-        transfer_name = 'transfer_' + '-'.join(input_list) + '.dat'
-
-        print(f'')
-        print(
-            f'Atoms transfer analysis ({triplets}) according to Stern-Limbach model (q1, q2):')
-        print(
-            f'Transfer of atoms {input_list[1]} ' +
-            f'between {input_list[0]} and {input_list[2]}, ' +
-            f'where q1=0.5*(r1-r2) and q2=r1+r2, ' +
-            f'r1: distance[{input_list[0]}{input_list[1]}] and r2: distance[{input_list[1]}{input_list[2]}]')
-        print(f'')
-
-        np.savetxt(transfer_name, natural_bond_coordinates,
-                   delimiter=' ', header='q1 [Angstrom]    q2 [Angstrom]',
-                   fmt='%15.10f %15.10f')
-
-
+   
     elif len(input_list) == 4:
         # - dihedral analysis; i.e., input_list = [A, B, C, D]
 
@@ -186,15 +164,14 @@ if __name__ == '__main__':
 
         nbins = int((max_angle - min_angle) / delta_angle)
 
-        histogram = histogram.dada(
-            index_dict, coordinates_XYZ, delta_angle, nbins)
+        histogram = histogram.dada(index_dict, coordinates_XYZ, delta_angle, nbins)
 
         # - saving histogram
-        angle_distribution = np.linspace(min_angle, max_angle, nbins)
+        distribution = np.linspace(min_angle, max_angle, nbins)
         pair = f'-'.join(input_list)
 
         histogram_name = 'dada_' + pair + '.dat'
-        np.savetxt(histogram_name, np.transpose([angle_distribution, histogram]),
+        np.savetxt(histogram_name, np.transpose([distribution, histogram]),
                    delimiter=' ',
                    header='angle [Degrees]   occurrence (total=%i)'
                    % sum(histogram),

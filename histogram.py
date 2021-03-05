@@ -87,8 +87,6 @@ def ada(index_dict, coordinates_XYZ, delta_angle, nbins):
         indexes = index_dict[xyz]
         df = coordinates_XYZ[xyz]
 
-        # print(indexes)
-
         # - distances matrix (no atoms or labels)
         coordinates = df.loc[:, df.columns != 'element']
 
@@ -104,9 +102,6 @@ def ada(index_dict, coordinates_XYZ, delta_angle, nbins):
 
             # - computing angle A-B-C (using dot product)
             angle_deg = angle(atom_A, atom_B, atom_C)
-
-            if angle_deg < 50:
-                print(xyz, indexes)
 
             angle_hit = int(round((angle_deg) / delta_angle))
             if angle_hit > 0 and angle_hit < nbins:
@@ -152,6 +147,8 @@ def dada(index_dict, coordinates_XYZ, delta_angle, nbins):
 
             # - computing dihedral angle A-B-C-D
             angle_deg = dihedral.dihedral(atom_A, atom_B, atom_C, atom_D)
+
+            print(angle_deg)
 
             angle_hit = int(round((angle_deg) / delta_angle))
             if angle_hit > 0 and angle_hit < nbins:

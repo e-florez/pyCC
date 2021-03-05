@@ -139,7 +139,7 @@ ax1.set_position([box.x0, box.y0, box.width * 0.7, box.height])
 
 # ---------------------------------------------------------------------------------------------------------
 # - ENDING the plots
-plt.show()
+plt.show(block=True)
 
 print(f'\n *** DONE ***\n')
 # ---------------------------- END
