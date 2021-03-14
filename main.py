@@ -83,7 +83,7 @@ if __name__ == '__main__':
     # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
     # - grid to do a histogram analysis, rmin, rmax and bin width
-    grid = (0.5, 3.0, 0.05)
+    grid = (1.5, 10.0, 0.05)
 
     # - number of bins for the accurences
     rmin, rmax, dr = grid
@@ -94,11 +94,11 @@ if __name__ == '__main__':
     distances_dict = distance_matrix.distance_matrix(coordinates_XYZ, grid)
 
     # - atomic pairs
-    # input_list = ['O', 'O']
+    input_list = ['O', 'O']
     # input_list = ['O', 'H']
     # input_list = ['Hg', 'O', 'H']
     # input_list = ['O', 'Hg', 'O']
-    input_list = ['O', 'H', 'O']     # Stern-Limbach
+    # input_list = ['O', 'H', 'O']     # Stern-Limbach
     # input_list = ['Hg', 'O', 'H', 'H']
 
     # - getting atoms list to compute distance, angle or dihedral

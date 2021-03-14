@@ -111,10 +111,10 @@ for rda in rda_files:
     smooth_y = smooth(smooth_x)
 
     # - Bspline fitting
-    ax1.plot(smooth_x, smooth_y / total, label=' %s \n Total= %i' %(rda, total))
+    # ax1.plot(smooth_x, smooth_y / total, label=' %s \n Total= %i' %(rda, total))
 
     # - raw data, no Bspline fitting
-    # ax1.plot(x, y, label='%s' %rda)
+    ax1.plot(x, y, label='%s' %rda)
 
 # - ticks for the x-axis
 # delta_x = (x[-1] - x[0]) / 10
