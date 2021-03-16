@@ -44,8 +44,7 @@ def distance_matrix(distances, grid):
         coordinates_a = np.zeros(3, dtype=float)
         coordinates_b = np.zeros(3, dtype=float)
 
-        atom_a = 0
-        while atom_a < num_atoms:
+        for atom_a in range(0, num_atoms):
             coordinates_a[0] = float(data_xyz.iloc[atom_a, 1])
             coordinates_a[1] = float(data_xyz.iloc[atom_a, 2])
             coordinates_a[2] = float(data_xyz.iloc[atom_a, 3])
@@ -53,8 +52,7 @@ def distance_matrix(distances, grid):
             # - the header for the distnces matrix
             header_distance_matrix.append(data_xyz.iloc[atom_a, 0])
 
-            atom_b = atom_a + 1
-            while atom_b < num_atoms:
+            for atom_b in range(atom_a + 1, num_atoms):
                 coordinates_b[0] = float(data_xyz.iloc[atom_b, 1])
                 coordinates_b[1] = float(data_xyz.iloc[atom_b, 2])
                 coordinates_b[2] = float(data_xyz.iloc[atom_b, 3])
@@ -68,8 +66,6 @@ def distance_matrix(distances, grid):
                 distance_matrix[atom_b, atom_a] = distance
 
                 # ------------------------------------------------
-                atom_b += 1
-            atom_a += 1
 
         df = pd.DataFrame(distance_matrix)
 
