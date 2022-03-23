@@ -69,6 +69,7 @@ def atom_transfer(transfer_list, header_distance_matrix, data_xyz, distance_matr
         # - initial value to choose the min
         min_first = 10000
 
+        choose_first = 0
         for first in list_idx_first_atom:
 
             if central == first:
@@ -134,6 +135,10 @@ def atom_transfer(transfer_list, header_distance_matrix, data_xyz, distance_matr
         # - atoms transfer analysis compute q1 = 0.5 * (r1 - r2) and q2 = r1 + r2
         q1 = 0.5 * (r1 - r2)
         q2 = r1 + r2
+
+        # if q2 < 2:
+        #     print(central_first)
+        #     print(central_second)
 
         natural_bond_coordinates.append((q1, q2))
 

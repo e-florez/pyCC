@@ -14,12 +14,18 @@
 *geometry*.sh
 
 # Directories for OUTPUT files from main softwares
+<<<<<<< HEAD
 *log_files/
 *org_files/
 
 # local files/directories
 .vscode/
 *.vscode/
+=======
+**/log_files/
+**/org_files/
+**/*_files/
+>>>>>>> c5038a5ecccd7e1786ea396425ede467d0081339
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
