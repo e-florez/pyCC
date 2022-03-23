@@ -14,12 +14,13 @@
 # ------------------------------------------------------------------------------------
 # ------ moules
 # ------------------------------------------------------------------------------------
+import functions as fn
 import sys  # to get System-specific parameters
 import os  # - to check id a file or dir exits -> os.path.exists()
 # -  to smooth out your data
 from scipy.interpolate import make_interp_spline, BSpline
 import glob  # - Unix style pathname pattern expansion
-#from natsort import natsorted  # Simple yet flexible natural sorting in Python.
+# from natsort import natsorted  # Simple yet flexible natural sorting in Python.
 # - complete data analysis tool (it can replace matplotlib or numpy, as it is built on top of both)
 import pandas as pd
 import numpy as np  # - arrays and matrix manipulation
@@ -28,13 +29,12 @@ import matplotlib.pyplot as plt  # - plotting tools
 from matplotlib import rc
 rc('text', usetex=True)   # --- enable TeX mode for matplotlib
 
-import functions as fn
 # ------------------------------------------------------------------------------------
 # ------ body
 # ------------------------------------------------------------------------------------
 print(f'\n****************************************************')
 print(f'*    Radial, Angle, and Dihedral       *')
-print(f'* Distribution Analisys for XYZ files  *')   #Borrar lo de Radial
+print(f'* Distribution Analisys for XYZ files  *')  # Borrar lo de Radial
 print(f'*              "RADDA"                 *')
 print(f'****************************************************')
 
@@ -42,14 +42,14 @@ print(f'****************************************************')
 
 # print(f"\nCurrent working directory: {os.getcwd()}")
 
-#Get path of Working Directory or Ask
+# Get path of Working Directory or Ask
 working_dir = fn.working_path(sys.argv)
 
-#Chage to Working Directory
+# Chage to Working Directory
 fn.cd_path(working_dir)
 
-##########################Lineas transladadas a functions.py
-#if len(sys.argv) <= 1:
+# Lineas transladadas a functions.py
+# if len(sys.argv) <= 1:
 #    tmp_dir =  input(f'\nDirectory (whit the XYZ files) to make the RDA [default: empty]: ')
 #    tmp_dir = tmp_dir.strip()
 
@@ -57,18 +57,18 @@ fn.cd_path(working_dir)
 #        working_dir = os.getcwd()
 #    else:
 #        working_dir = os.getcwd() + '/' + tmp_dir
-#else:
+# else:
 #    working_dir = os.getcwd() + '/' + sys.argv[1]
 #    print(f'\nWorking directiry: {working_dir}')
 
 # Check if the working dir exists
-#if os.path.exists(working_dir) :
+# if os.path.exists(working_dir) :
 # Change the current working Directory
 #    os.chdir(working_dir)
-#else:
+# else:
 #    print(f'\n*** ERROR ***')
 #    exit(f"Can't change the Working Directory, {working_dir} doesn't exist")
-##########################Lineas transladadas a functions.py
+# Lineas transladadas a functions.py
 
 # - reading files
 repited_list_xyz = []  # repited files (if any)
@@ -83,7 +83,7 @@ for input_xyz in glob.glob('*.xyz'):
         if unique_input_xyz not in list_xyz:
             list_xyz.append(unique_input_xyz)
 
-list_xyz = ["w3s2.xyz"]
+# list_xyz = ["w3s2.xyz"]
 
 # list_xyz = ["w1s1.xyz", "w2s1.xyz"]
 # list_xyz = ["w1s1.xyz", "w2s1.xyz", "w3s1.xyz"]
@@ -112,20 +112,19 @@ while count < len(list_xyz):
 # -------------------------------------------------------------------------------
 # - Elements list to do radial distribution analisys
 
-###############################Filas transladadas a functions.py
-#def all_elements(file_xyz):
+# Filas transladadas a functions.py
+# def all_elements(file_xyz):
 #    """ Function to get atomic pairs from a XYZ file  """
 #    elements = pd.read_csv(list_xyz[0], delim_whitespace=True,
 #                    skiprows=2, header=None,
 #                    names=["element", "x-coordinate", "y-coordinate", "z-coordinate"])
-
 
     # - if XYZ file has no coordinates (by mistake)
 #    if elements.shape[0] <= 1:
 #        elements = []
 #        print(f'\n*** WARNING *** \nNo coordinates found in {file_xyz}')
 #        return elements
-        # return '*** WARNING *** No coordinates found in ', file_xyz
+    # return '*** WARNING *** No coordinates found in ', file_xyz
 
 #    elements = elements['element'].tolist()
 
@@ -151,11 +150,10 @@ while count < len(list_xyz):
 
 #    return element_list
 
-#def sort_input_pairs(elements):
+# def sort_input_pairs(elements):
 #    """sorting uniques atomic pair A-B from an input list """
     # - deleting comma used to split atomic pairs (if any)
 #    elements = [pair.replace(',','') for pair in elements]
-
 
     # - creating a list of lists to capitalize each atom
 #    elements = [pair.split('-') for pair in elements]
@@ -170,7 +168,7 @@ while count < len(list_xyz):
 #        pair += 2
 
 #    return element_list
-###############################Filas transladadas a functions.py
+# Filas transladadas a functions.py
 
 
 # --------------------------------------------------------------------------
@@ -642,7 +640,7 @@ for file_xyz in list_xyz:
 #                 print()
 
     # --------------------------------------------------------------------
-    # atom transfer according to Stern-limbach model
+    # - atom transfer according to Stern-limbach model
 
     transfer_list = ["O", "H", "O"]
 
@@ -696,41 +694,46 @@ else:
 # ---------------------------------------------------------------------------
 # - Stern-Limbach plot
 fig = plt.figure(figsize=(10, 8))  # inches WxH
-fig.suptitle(f'Stern-Limbach for {transfer_list[0]}-{transfer_list[1]}---{transfer_list[2]}', fontsize=20) #, fontweight='bold')
+# , fontweight='bold')
+fig.suptitle(f'Stern-Limbach for {transfer_list[0]}-{transfer_list[1]}---{transfer_list[2]}', fontsize=20)
 
 ax1 = plt.subplot(111)
 ax1.grid()
 
 # - legends for the main plot
-plt.xlabel('q1=(r1-r2)/2 [Angstrom]', fontsize=18) #, fontweight='bold')
-plt.ylabel('q2=r1+r2 [Angstrom]', fontsize=18) #, fontweight='bold')
+plt.xlabel('q1=(r1-r2)/2 [Angstrom]', fontsize=18)  # , fontweight='bold')
+plt.ylabel('q2=r1+r2 [Angstrom]', fontsize=18)  # , fontweight='bold')
 
 # - loading files to read and plot them
 x, y = [], []
 for q1, q2 in natural_bond_coordinates:
     x.append(q1)
     y.append(q2)
+    
+    if q1 > -0.00001 and q1 < 0.00001:
+        print(file_xyz)
+        # print(q1, q2)
 
-ax1.plot(x, y, 'o', label='Transfer %s--%s-----%s' %(transfer_list[0], transfer_list[1], transfer_list[2]))
+ax1.plot(x, y, 'o', label='Transfer %s--%s-----%s' %
+         (transfer_list[0], transfer_list[1], transfer_list[2]))
 
 ax1.xaxis.set_major_locator(plt.MaxNLocator(12))
 
-# -----------------------------------------------------------
-# - Ending the plot
+# # -----------------------------------------------------------
+# # - Ending the plot
 
-plt.legend(loc=0)
-# Put a legend below current axis
-# plt.legend(loc='lower center', bbox_to_anchor=(1.32, 0.6, 0.0, 0.0),
-            # fancybox=True, shadow=True, ncol=1, fontsize=11)
+# plt.legend(loc=0)
+# # Put a legend below current axis
+# # plt.legend(loc='lower center', bbox_to_anchor=(1.32, 0.6, 0.0, 0.0),
+# # fancybox=True, shadow=True, ncol=1, fontsize=11)
 
-# - Shrink current axis's height by 10% on the bottom
-# box = ax1.get_position()
-# ax1.set_position([box.x0, box.y0, box.width * 0.7, box.height])
+# # - Shrink current axis's height by 10% on the bottom
+# # box = ax1.get_position()
+# # ax1.set_position([box.x0, box.y0, box.width * 0.7, box.height])
 
-# ---------------------------------------------------------------------------------------------------------
-# - ENDING the plots
-plt.show()
-
+# # ---------------------------------------------------------------------------------------------------------
+# # - ENDING the plots
+# plt.show()
 
 
 # ---------------------------------------------------------------------------------------
@@ -772,7 +775,8 @@ print(f'         \\')
 print(f'          {dihedral_list[3]}')
 print(f'')
 
-bond_angle = np.linspace(min_dihedral_angle, max_dihedral_angle, nbins_dihedral_angle)
+bond_angle = np.linspace(
+    min_dihedral_angle, max_dihedral_angle, nbins_dihedral_angle)
 
 total_dihedral_angles = sum(occurrences_dihedral_angle)
 
