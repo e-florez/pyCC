@@ -6,15 +6,15 @@
 import matplotlib.pyplot as plt
 import matplotlib.ticker as plticker  # - ticks
 import numpy as np
-import sys # to get System-specific parameters
-import os # contains some useful functions on pathnames
-import glob # - Unix style pathname pattern expansion
-from scipy.interpolate import make_interp_spline, BSpline # - to smooth out your data
+import sys  # to get System-specific parameters
+import os  # contains some useful functions on pathnames
+import glob  # - Unix style pathname pattern expansion
+from scipy.interpolate import make_interp_spline, BSpline  # - to smooth out your data
 
 # ---------------------------------------------------------------------------------------------------------
 # ------ body
 # ---------------------------------------------------------------------------------------------------------
-print(f'\nPlotting Radial Distribution Analisys (RDA)\n')
+print(f"\nPlotting Radial Distribution Analisys (RDA)\n")
 
 # -----------------------------------------------------------
 # - working directory
@@ -48,11 +48,13 @@ print(f"\nCurrent working directory: {os.getcwd()}")
 # - RDA files to plot
 rda_files = []
 if len(sys.argv) < 2:
-    input_files =  input(f"List of files to plot RDA, **separated by space** [Default: all '.dat']: ")
+    input_files = input(
+        f"List of files to plot RDA, **separated by space** [Default: all '.dat']: "
+    )
 
     # - by default reading elements for the first XYZ file
     if len(input_files.split()) < 1:
-        for file_rda in glob.glob('*.dat'):
+        for file_rda in glob.glob("*.dat"):
             rda_files.append(file_rda)
     else:
         rda_files = input_files.split()
@@ -65,35 +67,35 @@ else:
 # - checking if there is any file to plot
 if len(rda_files) > 0:
     # print(f'\nList of files:\n\n{rda_files}\n')
-    print(f'\nList of files:\n')
-    print('\n'.join(rda_files))
+    print(f"\nList of files:\n")
+    print("\n".join(rda_files))
     for file_rda in rda_files:
         if not os.path.exists(file_rda):
-            exit(f'\n*** Warinnig ***\n file {file_rda} does not exits \n')
+            exit(f"\n*** Warinnig ***\n file {file_rda} does not exits \n")
 else:
-    exit(f'\n *** ERROR ***\n No files found to plot\n')
+    exit(f"\n *** ERROR ***\n No files found to plot\n")
 
 # -----------------------------------------------------------
 # - plotting: defining frames and designing the area to plot
 fig = plt.figure(figsize=(10, 8))  # inches WxH
-fig.suptitle('Distribution Analisys', fontsize=20) #, fontweight='bold')
+fig.suptitle("Distribution Analisys", fontsize=20)  # , fontweight='bold')
 
 ax1 = plt.subplot(111)
 ax1.grid()
 
 # - legends for the main plot
-plt.ylabel('Relative Number of Ocurrences', fontsize=12) #, fontweight='bold')
+plt.ylabel("Relative Number of Ocurrences", fontsize=12)  # , fontweight='bold')
 # plt.xlabel('Bond Distance [Angstrom]', fontsize=12) #, fontweight='bold')
 
 # -----------------------------------------------------------
 # - loading files to read and plot them
 for rda in rda_files:
     x, y = [], []
-    for line in open(rda, 'r'):
+    for line in open(rda, "r"):
         # skipping the header
         if line.startswith("#"):
             label = [header.title() for header in line.split()]
-            label_x = ' '.join(label[1:3])
+            label_x = " ".join(label[1:3])
             continue
 
         values = [float(s) for s in line.split()]
@@ -104,17 +106,31 @@ for rda in rda_files:
     total = sum(y)
 
     # - to smooth the curve (BSpline)
-    smooth_x = np.linspace(x[0], x[-1], len(x)*100)
+    smooth_x = np.linspace(x[0], x[-1], len(x) * 100)
 
     # smooth curve BSpline, degree k=3, cubic
     smooth = make_interp_spline(x, y, k=3)
     smooth_y = smooth(smooth_x)
 
     # - Bspline fitting
-    # ax1.plot(smooth_x, smooth_y / total, label=' %s \n Total= %i' %(rda, total))
+    ax1.plot(
+        smooth_x,
+        smooth_y / total,
+        "-",
+        # color="black",
+        # label=" %s \n Total= %i" % (rda, total),
+        label="%s" % (rda),
+    )
+    # ax1.plot(
+    #     x,
+    #     [i / total for i in y],
+    #     ".",
+    #     color="black",
+    #     # label=" %s \n Total= %i" % (rda, total),
+    # )
 
     # - raw data, no Bspline fitting
-    ax1.plot(x, y, label='%s' %rda)
+    # ax1.plot(x, y, "o", label="%s" % rda)
 
 # - ticks for the x-axis
 # delta_x = (x[-1] - x[0]) / 10
@@ -122,16 +138,22 @@ for rda in rda_files:
 ax1.xaxis.set_major_locator(plt.MaxNLocator(12))
 
 if len(label_x) < 1:
-    label_x = input(f'Please, insert a name for x-axis: ')
+    label_x = input(f"Please, insert a name for x-axis: ")
 
-plt.xlabel(label_x, fontsize=12) #, fontweight='bold')
+plt.xlabel(label_x, fontsize=12)  # , fontweight='bold')
 # -----------------------------------------------------------
 # - Ending the plot
 
 # plt.legend(loc=0)
 # Put a legend below current axis
-plt.legend(loc='lower center', bbox_to_anchor=(1.32, 0.6, 0.0, 0.0),
-            fancybox=True, shadow=True, ncol=1, fontsize=11)
+plt.legend(
+    loc="lower right",
+    bbox_to_anchor=(1.5, 0.0, 0.0, 0.0),
+    fancybox=True,
+    shadow=True,
+    ncol=1,
+    fontsize=11,
+)
 
 # - Shrink current axis's height by 10% on the bottom
 box = ax1.get_position()
@@ -141,6 +163,6 @@ ax1.set_position([box.x0, box.y0, box.width * 0.7, box.height])
 # - ENDING the plots
 plt.show(block=True)
 
-print(f'\n *** DONE ***\n')
+print(f"\n *** DONE ***\n")
 # ---------------------------- END
 exit()
