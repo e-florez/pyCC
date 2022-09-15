@@ -15,6 +15,7 @@
 def rda(index_dict, distances_dict, grid, nbins):
     import pandas as pd
     import numpy as np
+
     """
     Args:
     Return:
@@ -29,7 +30,7 @@ def rda(index_dict, distances_dict, grid, nbins):
         distances_df = distances_dict[xyz]
 
         # - distances matrix (no atoms or labels)
-        distances_df = distances_df.loc[:, distances_df.columns != 'atoms']
+        distances_df = distances_df.loc[:, distances_df.columns != "atoms"]
 
         for pair in indexes:
             distance = distances_df.iloc[pair[0], pair[1]]
@@ -39,11 +40,14 @@ def rda(index_dict, distances_dict, grid, nbins):
                 occurrences[distance_hit] += 1
 
     return occurrences
+
+
 # ---------------------------------------------------------------------------------------
 
 
 def angle(atom_A, atom_B, atom_C):
     import numpy as np
+
     """
     Computing plane angle between three atoms A-B-C
 
@@ -67,12 +71,15 @@ def angle(atom_A, atom_B, atom_C):
     angle = np.arccos(Cos)
 
     return np.degrees(angle)
+
+
 # ---------------------------------------------------------------------------------------
 
 
 def ada(index_dict, coordinates_XYZ, delta_angle, nbins):
     import pandas as pd
     import numpy as np
+
     """
 
     Args:
@@ -88,7 +95,7 @@ def ada(index_dict, coordinates_XYZ, delta_angle, nbins):
         df = coordinates_XYZ[xyz]
 
         # - distances matrix (no atoms or labels)
-        coordinates = df.loc[:, df.columns != 'element']
+        coordinates = df.loc[:, df.columns != "element"]
 
         for pair in indexes:
             coordinates_A = coordinates.iloc[pair[0]]
@@ -108,13 +115,16 @@ def ada(index_dict, coordinates_XYZ, delta_angle, nbins):
                 occurrences[angle_hit] += 1
 
     return occurrences
+
+
 # ---------------------------------------------------------------------------------------
 
 
-def dada(index_dict, coordinates_XYZ, delta_angle, nbins):
+def tda(index_dict, coordinates_XYZ, delta_angle, nbins):
     import pandas as pd
     import numpy as np
     import dihedral
+
     """
 
     Args:
@@ -130,7 +140,7 @@ def dada(index_dict, coordinates_XYZ, delta_angle, nbins):
         df = coordinates_XYZ[xyz]
 
         # - distances matrix (no atoms or labels)
-        coordinates = df.loc[:, df.columns != 'element']
+        coordinates = df.loc[:, df.columns != "element"]
 
         for pair in indexes:
             coordinates_A = coordinates.iloc[pair[0]]
@@ -148,11 +158,13 @@ def dada(index_dict, coordinates_XYZ, delta_angle, nbins):
             # - computing dihedral angle A-B-C-D
             angle_deg = dihedral.dihedral(atom_A, atom_B, atom_C, atom_D)
 
-            print(angle_deg)
+            # print(angle_deg)
 
             angle_hit = int(round((angle_deg) / delta_angle))
             if angle_hit > 0 and angle_hit < nbins:
                 occurrences[angle_hit] += 1
 
     return occurrences
+
+
 # ---------------------------------------------------------------------------------------
