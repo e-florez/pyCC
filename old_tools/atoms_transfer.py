@@ -135,6 +135,18 @@ def atom_transfer(transfer_list, header_distance_matrix, data_xyz, distance_matr
         q1 = 0.5 * (r1 - r2)
         q2 = r1 + r2
 
+        if q1 > -0.00001 and q1 < 0.00001:
+            pass
+            # print(file_xyz)
+            # print(coordinates_first)
+            # print(coordinates_central)
+            # print(coordinates_second)
+            # print(r1, r2)
+
+        # print(q1, q2)
+        print(r1, r2)
+        # print()
+
         natural_bond_coordinates.append((q1, q2))
 
     return natural_bond_coordinates
