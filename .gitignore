@@ -3,12 +3,12 @@
 *.out
 *.tgz
 
-
 # xyz
-#*.xyz 
+#*.xyz
 
 # - IDE files/dir
-*.vscode/
+.vscode/*
+*.vscode/*
 
 # bash script to transfor output files to XYZ
 *geometry*.sh
@@ -18,8 +18,6 @@
 *org_files/
 
 # local files/directories
-.vscode/
-*.vscode/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
